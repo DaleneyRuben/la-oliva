@@ -3,9 +3,13 @@ import Client from '../../../models/Client';
 import sequelize from '../../../database/sequelize';
 import { record } from '../../client-history';
 import { softDelete } from '../soft-delete';
+import { finalizeAllForClient } from '../../subscription';
 
 jest.mock('../../../models/Client');
 jest.mock('../../client-history');
+jest.mock('../../subscription', () => ({
+  finalizeAllForClient: jest.fn(),
+}));
 jest.mock('../../../database/sequelize', () => ({
   __esModule: true,
   default: { query: jest.fn(), transaction: jest.fn() },
@@ -21,7 +25,7 @@ describe('softDelete', () => {
     (sequelize.transaction as jest.Mock).mockImplementation((work) => work(transaction));
   });
 
-  it('calls destroy on the client and records a client_deleted history event', async () => {
+  it('finalizes unfinalized subscriptions, deletes the client, and records a client_deleted history event', async () => {
     const mockInstance = {
       id: 1,
       destroy: jest.fn().mockResolvedValue({}),
@@ -31,6 +35,7 @@ describe('softDelete', () => {
 
     await softDelete(1, actor);
 
+    expect(finalizeAllForClient).toHaveBeenCalledWith(1, transaction);
     expect(mockInstance.destroy).toHaveBeenCalledWith({ transaction });
     expect(record).toHaveBeenCalledWith(
       actor,
