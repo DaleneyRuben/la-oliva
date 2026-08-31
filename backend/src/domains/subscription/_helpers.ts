@@ -21,7 +21,7 @@ export const findContractActiveSubscriptions = async (date: string): Promise<Sub
       pausedSince: { [Op.is]: null },
       paid: true,
     },
-    include: [{ model: Client }, { model: Plan }],
+    include: [{ model: Client, required: true }, { model: Plan }],
     order: [['createdAt', 'ASC']],
   });
 

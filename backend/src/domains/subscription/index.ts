@@ -2,6 +2,7 @@ export { create } from './create';
 export { update } from './update';
 export { markPaid } from './mark-paid';
 export { finalize } from './finalize';
+export { finalizeAllForClient } from './finalize-all-for-client';
 export { pause } from './pause';
 export { resume } from './resume';
 export { extendAfterPause } from './extend-after-pause';
