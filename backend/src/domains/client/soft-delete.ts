@@ -4,12 +4,14 @@ import Client from '../../models/Client';
 import { withTransaction } from '../../database/with-transaction';
 import type { Actor } from '../../types/actor';
 import { record } from '../client-history';
+import { finalizeAllForClient } from '../subscription';
 
 export const softDelete = async (id: number, actor: Actor, transaction?: Transaction) => {
   const client = await Client.findByPk(id);
   if (!client) return null;
 
   await withTransaction(transaction, async (t) => {
+    await finalizeAllForClient(id, t);
     await client.destroy({ transaction: t });
     await record(actor, { type: HISTORY_EVENTS.CLIENT_DELETED, clientId: id }, t);
   });
