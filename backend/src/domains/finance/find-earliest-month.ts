@@ -10,7 +10,7 @@ export const findEarliestMonth = async (): Promise<string | null> => {
   const rows = await sequelize.query<EarliestRow>(
     `SELECT MIN(date) AS earliest
      FROM (
-       SELECT MIN("paidAt") AS date FROM payments
+       SELECT MIN("paidAt") AS date FROM payments WHERE "voidedAt" IS NULL
        UNION ALL
        SELECT MIN("spentAt") AS date FROM expenses WHERE "deletedAt" IS NULL
      ) AS movements`,

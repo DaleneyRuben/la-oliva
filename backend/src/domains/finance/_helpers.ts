@@ -37,7 +37,7 @@ export const sameName = (name: string): WhereOptions =>
 // the subtotal so the list and the figure below it can never disagree about what is in scope.
 export const movementScope = (month: string, filters: MovementFilters = {}) => {
   const replacements: Record<string, unknown> = { ...monthBounds(month) };
-  const incomeWhere = ['p."paidAt" BETWEEN :start AND :end'];
+  const incomeWhere = ['p."voidedAt" IS NULL', 'p."paidAt" BETWEEN :start AND :end'];
   const expenseWhere = ['e."deletedAt" IS NULL', 'e."spentAt" BETWEEN :start AND :end'];
 
   if (filters.categoryId !== undefined) {

@@ -36,6 +36,7 @@ const setup = (movement: Movement) => {
   const onEdit = jest.fn();
   const onDuplicate = jest.fn();
   const onDelete = jest.fn();
+  const onVoidIncome = jest.fn();
   render(
     <MemoryRouter>
       <MovementRow
@@ -43,10 +44,11 @@ const setup = (movement: Movement) => {
         onEdit={onEdit}
         onDuplicate={onDuplicate}
         onDelete={onDelete}
+        onVoidIncome={onVoidIncome}
       />
     </MemoryRouter>,
   );
-  return { onEdit, onDuplicate, onDelete };
+  return { onEdit, onDuplicate, onDelete, onVoidIncome };
 };
 
 const openActions = () => userEvent.click(screen.getByRole('button', { name: /acciones/i }));
@@ -79,6 +81,17 @@ describe('MovementRow', () => {
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
     expect(screen.getByText('Marcela Ríos')).toBeInTheDocument();
     expect(screen.getByText('Cliente archivado')).toBeInTheDocument();
+  });
+
+  it('offers an income-void action from the archived client menu', async () => {
+    const { onVoidIncome } = setup({ ...income, clientArchived: true });
+
+    await userEvent.click(screen.getByRole('button', { name: 'Acciones del ingreso' }));
+    const action = screen.getByRole('button', { name: 'Anular ingreso' });
+
+    await userEvent.click(action);
+
+    expect(onVoidIncome).toHaveBeenCalledWith({ ...income, clientArchived: true });
   });
 
   it('reads an expense row as its note, tagged with the category it was filed against', () => {

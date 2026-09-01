@@ -36,6 +36,16 @@ class Payment extends Model {
 
   @BelongsTo(() => User)
   declare registeredByUser: User;
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  declare voidedAt: Date | null;
+
+  @ForeignKey(() => User)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  declare voidedBy: number | null;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare voidReason: string | null;
 }
 
 export default Payment;

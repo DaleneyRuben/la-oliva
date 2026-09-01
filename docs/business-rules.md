@@ -225,7 +225,9 @@ outstanding balance, and nothing the register can say about money owed in either
   paid, so there is no manual income entry and the register can never disagree with the Clientes
   screen. The asymmetry with expenses is deliberate, not an omission.
 - **Expenses are typed by hand** — amount, category, date, optional description — and record who
-  registered them. They are editable and soft-deleted; Payments are neither, from this screen.
+  registered them. They are editable and soft-deleted. A payment for an archived client may be
+  voided when that client was created by mistake; it no longer counts in the register, while the
+  original payment, voiding user, date and reason remain auditable.
 - **An expense is never dated in the future**, since the money has not moved yet. It may be
   backdated freely.
 - **Repetition is Duplicar**: an expense copied into a new one dated today. Nothing is ever

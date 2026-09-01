@@ -70,11 +70,12 @@ const overview: FinanceOverview = {
 const create = jest.fn().mockResolvedValue(undefined);
 const update = jest.fn().mockResolvedValue(undefined);
 const remove = jest.fn().mockResolvedValue(undefined);
+const voidIncome = jest.fn().mockResolvedValue(undefined);
 
 beforeEach(() => {
   jest.clearAllMocks();
   mockedUseFinance.mockReturnValue({ overview, isLoading: false, error: null });
-  mockedUseMutations.mockReturnValue({ create, update, remove, isSaving: false });
+  mockedUseMutations.mockReturnValue({ create, update, remove, voidIncome, isSaving: false });
   // As the server sends it: ranked by use this month, so Transporte leads and nothing on this side
   // re-sorts it (business-rules.md → Finanzas).
   mockedUseCatalog.mockReturnValue({
@@ -111,6 +112,25 @@ describe('FinancePage', () => {
     expect(screen.getByText('34.800')).toBeInTheDocument();
     expect(screen.getByText('Marcela Ríos')).toBeInTheDocument();
     expect(screen.getByTestId('category-name')).toHaveTextContent('Insumos');
+  });
+
+  it('uses neutral copy when confirming an income void', async () => {
+    mockedUseFinance.mockReturnValue({
+      overview: {
+        ...overview,
+        movements: [{ ...overview.movements[0], clientArchived: true }],
+        incomeCount: 1,
+        expenseCount: 0,
+      },
+      isLoading: false,
+      error: null,
+    });
+    renderPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Acciones del ingreso' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Anular ingreso' }));
+
+    expect(screen.getByText('Se quitará de los totales.')).toBeInTheDocument();
   });
 
   it('asks the hook for the month the selector moves to', async () => {

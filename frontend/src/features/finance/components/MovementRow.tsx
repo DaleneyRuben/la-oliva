@@ -12,6 +12,7 @@ interface Props {
   onEdit: (movement: Movement) => void;
   onDuplicate: (movement: Movement) => void;
   onDelete: (movement: Movement) => void;
+  onVoidIncome: (movement: Movement) => void;
 }
 
 const TAG_CLS =
@@ -58,7 +59,14 @@ function IncomeTitle({ movement }: { movement: Movement }) {
   );
 }
 
-export function MovementRow({ movement, isLast, onEdit, onDuplicate, onDelete }: Props) {
+export function MovementRow({
+  movement,
+  isLast,
+  onEdit,
+  onDuplicate,
+  onDelete,
+  onVoidIncome,
+}: Props) {
   const isIncome = movement.kind === 'income';
 
   return (
@@ -104,11 +112,22 @@ export function MovementRow({ movement, isLast, onEdit, onDuplicate, onDelete }:
         {formatMoney(movement.amount)}
       </span>
 
-      {/* Nothing on an income row is a human's to revise, and a disabled control would only invite
-          the question (ADR-008) — so the slot is held open rather than filled. */}
-      {isIncome ? (
-        <span className="w-[28px] shrink-0" />
-      ) : (
+      {isIncome && movement.clientArchived && (
+        <OverflowMenu
+          variant="bare"
+          label="Acciones del ingreso"
+          items={[
+            {
+              label: 'Anular ingreso',
+              icon: 'trash',
+              variant: 'alert',
+              onClick: () => onVoidIncome(movement),
+            },
+          ]}
+        />
+      )}
+      {isIncome && !movement.clientArchived && <span className="w-[28px] shrink-0" />}
+      {!isIncome && (
         <OverflowMenu
           variant="bare"
           label="Acciones del gasto"

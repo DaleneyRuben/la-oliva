@@ -63,6 +63,7 @@ export function FinancePage() {
   const [month, setMonth] = useState(currentMonth);
   const [form, setForm] = useState<FormState | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Movement | null>(null);
+  const [pendingVoid, setPendingVoid] = useState<Movement | null>(null);
   const [isManagingCategories, setIsManagingCategories] = useState(false);
   const [lastCategoryId, setLastCategoryId] = useState<string | undefined>();
 
@@ -75,7 +76,7 @@ export function FinancePage() {
   // One catalog for the screen, read for the month on show: the form's chip order is the server's
   // ranking of that month's use, and the filter select and categories modal read the same rows.
   const { categories } = useCategoryCatalog(month);
-  const { create, update, remove, isSaving } = useExpenseMutations();
+  const { create, update, remove, voidIncome, isSaving } = useExpenseMutations();
 
   const closeForm = () => setForm(null);
 
@@ -104,6 +105,12 @@ export function FinancePage() {
     if (!pendingDelete) return;
     await remove(pendingDelete.id);
     toast.success('Gasto eliminado');
+  };
+
+  const handleVoid = async () => {
+    if (!pendingVoid) return;
+    await voidIncome(pendingVoid.id);
+    toast.success('Ingreso anulado');
   };
 
   return (
@@ -168,6 +175,7 @@ export function FinancePage() {
             onEdit={openFor('edit')}
             onDuplicate={openFor('duplicate')}
             onDelete={setPendingDelete}
+            onVoidIncome={setPendingVoid}
           />
         </div>
       )}
@@ -204,6 +212,18 @@ export function FinancePage() {
           confirmLabel="Eliminar"
           onClose={() => setPendingDelete(null)}
           onConfirm={handleDelete}
+        />
+      )}
+
+      {pendingVoid && (
+        <ConfirmModal
+          title="Anular ingreso"
+          icon="trash"
+          message={`${pendingVoid.label} · Bs ${formatMoney(pendingVoid.amount)} · ${formatMonthLabel(month)}`}
+          details="Se quitará de los totales."
+          confirmLabel="Anular ingreso"
+          onClose={() => setPendingVoid(null)}
+          onConfirm={handleVoid}
         />
       )}
     </div>
