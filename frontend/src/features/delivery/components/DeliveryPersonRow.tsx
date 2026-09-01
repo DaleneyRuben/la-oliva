@@ -7,6 +7,7 @@ interface Props {
   avatarClass: string;
   rowBorderClass: string;
   showAddress?: boolean;
+  showExternalDeliveryTag?: boolean;
 }
 
 export function DeliveryPersonRow({
@@ -14,6 +15,7 @@ export function DeliveryPersonRow({
   avatarClass,
   rowBorderClass,
   showAddress = false,
+  showExternalDeliveryTag = true,
 }: Props) {
   const phoneLink = (
     <a
@@ -40,6 +42,11 @@ export function DeliveryPersonRow({
           {person.isNew && (
             <span className="font-mono text-[9px] font-bold tracking-[.1em] uppercase text-white bg-olive-700 rounded-full px-2 py-0.5 shrink-0">
               Nuevo
+            </span>
+          )}
+          {showExternalDeliveryTag && person.delivery === 'Otro' && (
+            <span className="font-mono text-[9px] font-bold tracking-[.06em] text-warn-text bg-warn-bg border border-warn-border rounded-full px-2 py-0.5 shrink-0">
+              Entrega fuera de La Oliva
             </span>
           )}
         </div>

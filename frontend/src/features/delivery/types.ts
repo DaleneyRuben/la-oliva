@@ -5,6 +5,7 @@ export interface DeliveryPerson {
   deliveryZone: string;
   address: string;
   isNew: boolean;
+  delivery?: 'Otro';
 }
 
 export interface DeliveryGroup {

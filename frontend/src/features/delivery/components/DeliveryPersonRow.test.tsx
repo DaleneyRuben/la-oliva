@@ -69,4 +69,16 @@ describe('DeliveryPersonRow', () => {
     );
     expect(screen.getByText('Nuevo')).toBeInTheDocument();
   });
+
+  it('identifies a client whose delivery is outside La Oliva', () => {
+    render(
+      <DeliveryPersonRow
+        person={{ ...person, delivery: 'Otro' }}
+        avatarClass=""
+        rowBorderClass=""
+      />,
+    );
+
+    expect(screen.getByText('Entrega fuera de La Oliva')).toBeInTheDocument();
+  });
 });

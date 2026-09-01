@@ -49,6 +49,20 @@ describe('DeliveryGroupCard', () => {
     expect(screen.getAllByText('C. Sucre #88, Centro')).toHaveLength(1);
   });
 
+  it('shows one outside-La-Oliva marker for the whole group', () => {
+    render(
+      <DeliveryGroupCard
+        group={{
+          ...group,
+          members: group.members.map((member) => ({ ...member, delivery: 'Otro' as const })),
+        }}
+        colorIndex={0}
+      />,
+    );
+
+    expect(screen.getAllByText('Entrega fuera de La Oliva')).toHaveLength(1);
+  });
+
   it('wraps the colorIndex around the palette size', () => {
     const { container: c1 } = render(<DeliveryGroupCard group={group} colorIndex={0} />);
     const { container: c2 } = render(

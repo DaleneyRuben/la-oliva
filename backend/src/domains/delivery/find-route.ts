@@ -1,5 +1,7 @@
 import { parseISO } from 'date-fns';
 import Client from '../../models/Client';
+import { ROLES } from '../../constants/roles.constants';
+import type { UserRole } from '../../models/User';
 import { appToday, addCalendarDays } from '../../utils/date';
 import { checkIsWeekend } from '../../utils/devFlags';
 import { findActiveSubscriptionsForDate } from '../subscription';
@@ -16,6 +18,7 @@ export type DeliveryPerson = {
   deliveryZone: string;
   address: string;
   isNew: boolean;
+  delivery?: 'Otro';
 };
 
 export type DeliveryGroup = {
@@ -42,6 +45,7 @@ type DeliveryClientRow = {
   groupToken: string | null;
   address: string;
   startDate: string | null;
+  delivery: string;
 };
 
 const byName = (a: DeliveryPerson, b: DeliveryPerson) => a.name.localeCompare(b.name, 'es');
@@ -55,6 +59,7 @@ const toPerson = (c: DeliveryClientRow, date: string): DeliveryPerson => ({
   deliveryZone: c.deliveryZone,
   address: c.address,
   isNew: c.startDate === date,
+  ...(c.delivery === 'Otro' ? { delivery: 'Otro' as const } : {}),
 });
 
 const buildZones = (clients: DeliveryClientRow[], date: string): DeliveryZoneRoute[] =>
@@ -96,33 +101,38 @@ const buildZones = (clients: DeliveryClientRow[], date: string): DeliveryZoneRou
   }).filter((z) => z.deliveryCount > 0);
 
 // Weekends are never delivery days — return an empty route without hitting the DB.
-const buildDayRoute = async (date: string): Promise<DeliveryDayRoute> => {
+const buildDayRoute = async (date: string, role: UserRole): Promise<DeliveryDayRoute> => {
   if (checkIsWeekend(parseISO(date))) return { zones: [] };
 
   const subscriptions = await findActiveSubscriptionsForDate(date);
-  const clients = subscriptions.map((s) => {
-    const c = s.client as Client;
-    return {
-      id: c.id,
-      name: c.name,
-      phoneNumber: c.phoneNumber,
-      deliveryZone: c.deliveryZone,
-      groupToken: c.groupToken,
-      address: c.address,
-      startDate: s.startDate,
-    };
-  });
+  const clients = subscriptions
+    .filter((s) => role !== ROLES.DELIVERY || (s.client as Client).delivery !== 'Otro')
+    .map((s) => {
+      const c = s.client as Client;
+      return {
+        id: c.id,
+        name: c.name,
+        phoneNumber: c.phoneNumber,
+        deliveryZone: c.deliveryZone,
+        groupToken: c.groupToken,
+        address: c.address,
+        startDate: s.startDate,
+        delivery: c.delivery,
+      };
+    });
 
   return { zones: buildZones(clients, date) };
 };
 
-export const findRoute = async (): Promise<Record<string, DeliveryDayRoute>> => {
+export const findRoute = async (
+  role: UserRole = ROLES.ADMIN,
+): Promise<Record<string, DeliveryDayRoute>> => {
   const today = appToday();
   const tomorrow = addCalendarDays(today, 1);
 
   const [todayRoute, tomorrowRoute] = await Promise.all([
-    buildDayRoute(today),
-    buildDayRoute(tomorrow),
+    buildDayRoute(today, role),
+    buildDayRoute(tomorrow, role),
   ]);
 
   return { [today]: todayRoute, [tomorrow]: tomorrowRoute };

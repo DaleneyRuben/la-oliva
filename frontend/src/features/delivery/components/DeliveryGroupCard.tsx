@@ -57,6 +57,7 @@ interface Props {
 
 export function DeliveryGroupCard({ group, colorIndex }: Props) {
   const c = GROUP_PALETTE[colorIndex % GROUP_PALETTE.length];
+  const isOutsideLaOliva = group.members.some((member) => member.delivery === 'Otro');
 
   return (
     <div className={`rounded-[13px] px-[17px] py-[15px] flex flex-col gap-[11px] ${c.card}`}>
@@ -67,6 +68,11 @@ export function DeliveryGroupCard({ group, colorIndex }: Props) {
         >
           Entrega conjunta
         </span>
+        {isOutsideLaOliva && (
+          <span className="font-mono text-[9px] font-bold tracking-[.06em] text-warn-text bg-warn-bg border border-warn-border rounded-full px-2 py-0.5 shrink-0">
+            Entrega fuera de La Oliva
+          </span>
+        )}
         <span
           className={`font-mono text-[10px] font-semibold tracking-[.05em] rounded-full px-[9px] py-[3px] whitespace-nowrap ${c.chip}`}
         >
@@ -88,6 +94,7 @@ export function DeliveryGroupCard({ group, colorIndex }: Props) {
             person={m}
             avatarClass={c.avatar}
             rowBorderClass={c.rowBorder}
+            showExternalDeliveryTag={false}
           />
         ))}
       </div>

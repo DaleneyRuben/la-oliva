@@ -17,6 +17,7 @@ const makeClient = (overrides: Partial<Record<string, unknown>> = {}) => ({
   name: 'Ana López',
   phoneNumber: '+591 7000 0000',
   deliveryZone: 'Centro',
+  delivery: 'La Oliva',
   groupToken: null,
   address: 'Av. Siempre Viva #123',
   ...overrides,
@@ -79,6 +80,34 @@ describe('findRoute', () => {
   });
 
   describe('zone/group clustering', () => {
+    it('omits clients delivered elsewhere from a delivery user route', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-06-23');
+      (findActiveSubscriptionsForDate as jest.Mock).mockResolvedValue([
+        makeSubscription(makeClient({ name: 'La Oliva', delivery: 'La Oliva' })),
+        makeSubscription(makeClient({ id: 2, name: 'Otro repartidor', delivery: 'Otro' })),
+      ]);
+
+      const result = await findRoute('delivery');
+
+      expect(result['2026-06-23'].zones[0]?.singles.map((client) => client.name)).toEqual([
+        'La Oliva',
+      ]);
+    });
+
+    it('includes clients delivered elsewhere for an admin and identifies them', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-06-23');
+      (findActiveSubscriptionsForDate as jest.Mock).mockResolvedValue([
+        makeSubscription(makeClient({ name: 'Otro repartidor', delivery: 'Otro' })),
+      ]);
+
+      const result = await findRoute('admin');
+
+      expect(result['2026-06-23'].zones[0]?.singles[0]).toMatchObject({
+        name: 'Otro repartidor',
+        delivery: 'Otro',
+      });
+    });
+
     it('groups clients sharing a groupToken together within their zone', async () => {
       (appToday as jest.Mock).mockReturnValue('2026-06-23');
       (findActiveSubscriptionsForDate as jest.Mock).mockResolvedValue([
