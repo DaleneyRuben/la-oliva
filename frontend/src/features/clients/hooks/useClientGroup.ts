@@ -14,6 +14,7 @@ export function useClientGroup(clientId: string, initialMembers: GroupMember[]) 
     members.some((m) => !savedMembers.find((s) => s.id === m.id));
 
   const mutation = useMutation({
+    meta: { skipGlobalErrorToast: true },
     mutationFn: (memberIds: string[]) => api.put(`/clients/${clientId}/group`, { memberIds }),
     onSuccess: () => {
       setSavedMembers(members);
