@@ -162,24 +162,13 @@ Don't repeat logic. If the same pattern appears twice, extract it. The third occ
 
 ## Git workflow
 
-This project uses **GitHub Flow**:
-
-1. Create a feature branch off `main` before starting any change (`git checkout -b <type>/<short-description>`)
-2. Work on the branch with atomic commits (use `/commit`)
-3. Verify the change end-to-end via Playwright (see "Verify end-to-end before calling it done" below) — this is a hard stop before step 4, not an optional follow-up
-4. Open a PR — CI runs lint, typecheck, frontend tests, and backend tests
-5. Merge to `main` only after CI passes — always use a merge commit (`gh pr merge --merge --delete-branch`), never `--squash`. Squashing collapses the branch's atomic commits (including the separate red/green TDD commits) into one, destroying the history this workflow is built to produce.
-6. After merging, delete the feature branch on both local and remote (`git branch -d <branch>` and `git push origin --delete <branch>`) — `gh pr merge --delete-branch` does both in one step
-
-`main` is always production. Never commit directly to `main`.
-
-Branch naming: `feat/`, `fix/`, `refactor/`, `docs/`, `chore/` prefix followed by a short kebab-case description.
+The source of truth is [`docs/agent-workflow.md`](../../../docs/agent-workflow.md). It applies to every contributor and coding agent. `main` is production; never commit directly to it.
 
 ---
 
 ## Committing
 
-Always use the `/commit` skill when committing changes — never run `git commit` manually. The skill enforces atomic commits, correct message format, and runs related tests before committing.
+Use the commit workflow available in the current environment. It must preserve atomic commits, enforce the project's commit-message rules, and run related tests before committing.
 
 ---
 
@@ -206,11 +195,11 @@ Never write implementation code before a failing test exists. Never ship a backe
 
 Passing unit tests, typecheck, and lint proves the code is internally consistent — it does not prove the fix works. Unit tests mock the API/DB boundary, so they can't catch mismatches in how layers are actually wired together (e.g. a response-shape or encoding change that breaks a consumer silently).
 
-After tests are green, verify through the running app using the Playwright MCP tools — never a standalone script that imports services/models directly or talks to the DB out of band:
+After tests are green, verify through the running app using the browser automation available in the current environment — never a standalone script that imports services/models directly or talks to the DB out of band:
 
-- **Frontend/UI changes**: use Playwright to load the page in the running browser and exercise the golden path plus edge cases.
-- **Backend changes that affect an API contract or cross a service boundary**: use Playwright to drive the change through the running frontend (or hit the real endpoint via its network tools) and confirm the actual behavior — not just that mocked tests pass.
-- **Bug fixes involving a data claim** (counts, totals, filters): use Playwright to cross-check the result against an independent source of truth in the app (a different view/table showing the same underlying data) rather than trusting a single code path.
+- **Frontend/UI changes**: use browser automation to load the page in the running browser and exercise the golden path plus edge cases.
+- **Backend changes that affect an API contract or cross a service boundary**: use browser automation to drive the change through the running frontend (or hit the real endpoint via its network tools) and confirm the actual behavior — not just that mocked tests pass.
+- **Bug fixes involving a data claim** (counts, totals, filters): use browser automation to cross-check the result against an independent source of truth in the app (a different view/table showing the same underlying data) rather than trusting a single code path.
 
 If the environment doesn't allow running or testing the app, say so explicitly instead of declaring the task complete.
 

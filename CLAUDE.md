@@ -1,3 +1,5 @@
+@docs/agent-workflow.md
+
 @docs/business-rules.md
 
 ---
