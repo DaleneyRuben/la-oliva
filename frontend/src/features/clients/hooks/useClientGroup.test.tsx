@@ -1,27 +1,33 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import api from '@/services/api';
+import { queryClient } from '@/services/queryClient';
 import { useClientGroup } from '@/features/clients/hooks/useClientGroup';
 import type { GroupMember } from '@/features/clients/types';
 
 jest.mock('@/services/api', () => ({
   default: { put: jest.fn(), get: jest.fn() },
 }));
+jest.mock('sonner', () => ({ toast: { success: jest.fn(), error: jest.fn() } }));
 const mockPut = api.put as jest.Mock;
 
 const ana: GroupMember = { id: '2', name: 'Ana' };
 const bob: GroupMember = { id: '3', name: 'Bob' };
 
 function makeWrapper() {
-  const queryClient = new QueryClient({
+  const testQueryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   return function Wrapper({ children }: { children: React.ReactNode }) {
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    return <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>;
   };
 }
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  queryClient.clear();
+});
 
 describe('useClientGroup', () => {
   it('initialises members from prop', () => {
@@ -91,5 +97,27 @@ describe('useClientGroup', () => {
     expect(result.current.isDirty).toBe(true);
     await act(() => result.current.save());
     await waitFor(() => expect(result.current.isDirty).toBe(false));
+  });
+
+  it('shows one error when the group has incompatible delivery types', async () => {
+    mockPut.mockRejectedValue(
+      new Error('No se pueden agrupar clientes con tipos de entrega distintos'),
+    );
+    const { result } = renderHook(() => useClientGroup('1', [ana]), {
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      ),
+    });
+
+    await expect(act(() => result.current.save())).rejects.toThrow(
+      'No se pueden agrupar clientes con tipos de entrega distintos',
+    );
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'No se pueden agrupar clientes con tipos de entrega distintos',
+      ),
+    );
+    expect(toast.error).toHaveBeenCalledTimes(1);
   });
 });

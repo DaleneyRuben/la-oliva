@@ -14,11 +14,15 @@ export function useClientGroup(clientId: string, initialMembers: GroupMember[]) 
     members.some((m) => !savedMembers.find((s) => s.id === m.id));
 
   const mutation = useMutation({
+    meta: { skipGlobalErrorToast: true },
     mutationFn: (memberIds: string[]) => api.put(`/clients/${clientId}/group`, { memberIds }),
     onSuccess: () => {
       setSavedMembers(members);
       qc.invalidateQueries({ queryKey: ['clients', clientId] });
       toast.success('Grupo actualizado');
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'No se pudo actualizar el grupo');
     },
   });
 

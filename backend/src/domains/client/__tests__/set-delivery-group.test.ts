@@ -23,6 +23,7 @@ const makeClient = (overrides: object = {}) => ({
 beforeEach(() => {
   jest.clearAllMocks();
   (sequelize.transaction as jest.Mock).mockImplementation((work) => work(transaction));
+  (Client.findAll as jest.Mock).mockResolvedValue([]);
 });
 
 describe('setDeliveryGroup', () => {
@@ -88,6 +89,21 @@ describe('setDeliveryGroup', () => {
       { groupToken: newToken },
       { where: { id: [2, 3] }, transaction },
     );
+  });
+
+  it('rejects a group that mixes La Oliva and external deliveries', async () => {
+    const clientInstance = makeClient({ id: 1, delivery: 'Otro' });
+    (Client.findByPk as jest.Mock).mockResolvedValue(clientInstance);
+    (Client.findAll as jest.Mock).mockResolvedValue([
+      { id: 1, delivery: 'Otro' },
+      { id: 2, delivery: 'La Oliva' },
+    ]);
+
+    await expect(setDeliveryGroup(1, [2])).rejects.toThrow(
+      'No se pueden agrupar clientes con tipos de entrega distintos',
+    );
+
+    expect(Client.update).not.toHaveBeenCalled();
   });
 
   it('reuses existing token without touching client row when adding members', async () => {
