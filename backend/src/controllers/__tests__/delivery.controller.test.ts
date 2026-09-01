@@ -5,7 +5,10 @@ import { findRoute } from '../../domains/delivery';
 jest.mock('../../domains/delivery');
 jest.mock('../../database/sequelize', () => ({ __esModule: true, default: { query: jest.fn() } }));
 jest.mock('../../middleware/auth', () => ({
-  requireAuth: (_req: unknown, _res: unknown, next: () => void) => next(),
+  requireAuth: (req: { user?: unknown }, _res: unknown, next: () => void) => {
+    req.user = { userId: 1, username: 'repartidor', role: 'delivery' };
+    next();
+  },
   requireRole: () => (_req: unknown, _res: unknown, next: () => void) => next(),
 }));
 
@@ -24,6 +27,7 @@ describe('GET /api/delivery', () => {
 
     expect(res.status).toBe(200);
     expect(res.body.data).toEqual(mockRoute);
+    expect(findRoute).toHaveBeenCalledWith('delivery');
   });
 
   it('returns 500 when the service throws', async () => {
