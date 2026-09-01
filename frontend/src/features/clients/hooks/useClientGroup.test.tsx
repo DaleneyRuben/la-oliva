@@ -2,6 +2,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import api from '@/services/api';
+import { queryClient } from '@/services/queryClient';
 import { useClientGroup } from '@/features/clients/hooks/useClientGroup';
 import type { GroupMember } from '@/features/clients/types';
 
@@ -15,15 +16,18 @@ const ana: GroupMember = { id: '2', name: 'Ana' };
 const bob: GroupMember = { id: '3', name: 'Bob' };
 
 function makeWrapper() {
-  const queryClient = new QueryClient({
+  const testQueryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
   return function Wrapper({ children }: { children: React.ReactNode }) {
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    return <QueryClientProvider client={testQueryClient}>{children}</QueryClientProvider>;
   };
 }
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  queryClient.clear();
+});
 
 describe('useClientGroup', () => {
   it('initialises members from prop', () => {
@@ -100,7 +104,9 @@ describe('useClientGroup', () => {
       new Error('No se pueden agrupar clientes con tipos de entrega distintos'),
     );
     const { result } = renderHook(() => useClientGroup('1', [ana]), {
-      wrapper: makeWrapper(),
+      wrapper: ({ children }: { children: React.ReactNode }) => (
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      ),
     });
 
     await expect(act(() => result.current.save())).rejects.toThrow(
