@@ -95,7 +95,7 @@ describe('useClientGroup', () => {
     await waitFor(() => expect(result.current.isDirty).toBe(false));
   });
 
-  it('shows the save error when the group has incompatible delivery types', async () => {
+  it('shows one error when the group has incompatible delivery types', async () => {
     mockPut.mockRejectedValue(
       new Error('No se pueden agrupar clientes con tipos de entrega distintos'),
     );
@@ -112,5 +112,6 @@ describe('useClientGroup', () => {
         'No se pueden agrupar clientes con tipos de entrega distintos',
       ),
     );
+    expect(toast.error).toHaveBeenCalledTimes(1);
   });
 });
