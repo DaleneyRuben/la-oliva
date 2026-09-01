@@ -26,11 +26,17 @@ export function useExpenseMutations() {
     onSuccess: onSettled,
   });
 
+  const voidIncomeMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/finance/payments/${id}`),
+    onSuccess: onSettled,
+  });
+
   return {
     create: (input: ExpenseInput) => createMutation.mutateAsync(input),
     update: (id: string, changes: Partial<ExpenseInput>) =>
       updateMutation.mutateAsync({ id, changes }),
     remove: (id: string) => removeMutation.mutateAsync(id),
+    voidIncome: (id: string) => voidIncomeMutation.mutateAsync(id),
     isSaving: createMutation.isPending || updateMutation.isPending,
   };
 }

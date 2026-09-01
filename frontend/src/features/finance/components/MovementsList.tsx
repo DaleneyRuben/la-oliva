@@ -15,6 +15,7 @@ interface Props {
   onEdit: (movement: Movement) => void;
   onDuplicate: (movement: Movement) => void;
   onDelete: (movement: Movement) => void;
+  onVoidIncome: (movement: Movement) => void;
 }
 
 function EmptyShell({
@@ -41,6 +42,7 @@ export function MovementsList({
   onEdit,
   onDuplicate,
   onDelete,
+  onVoidIncome,
 }: Props) {
   // A month with nothing in it and a filter that matched nothing are different statements. Saying
   // "aún no hay movimientos" over a month holding twelve of them would read as data loss.
@@ -61,6 +63,7 @@ export function MovementsList({
             onEdit={onEdit}
             onDuplicate={onDuplicate}
             onDelete={onDelete}
+            onVoidIncome={onVoidIncome}
           />
         ))}
 

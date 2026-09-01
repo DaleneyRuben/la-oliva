@@ -56,6 +56,15 @@ describe('useExpenseMutations', () => {
     expect(mockApi.delete).toHaveBeenCalledWith('/finance/expenses/EF34GH');
   });
 
+  it('voids archived-client income through DELETE /finance/payments/:id', async () => {
+    mockApi.delete.mockResolvedValue({ voided: true });
+
+    const { result } = renderHook(() => useExpenseMutations(), { wrapper: makeWrapper() });
+    await result.current.voidIncome('P1');
+
+    expect(mockApi.delete).toHaveBeenCalledWith('/finance/payments/P1');
+  });
+
   // Every expense write moves the month's totals, so the register must not be left showing
   // figures that predate the change.
   it('invalidates the finance query after a write', async () => {
