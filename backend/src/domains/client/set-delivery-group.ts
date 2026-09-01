@@ -19,6 +19,14 @@ export const setDeliveryGroup = async (
   // Nothing to rewrite, so no transaction is opened.
   if (memberIds.length === 0 && !oldToken) return;
 
+  if (memberIds.length > 0) {
+    const members = await Client.findAll({ where: { id: memberIds } });
+    const deliveryTypes = new Set([client.delivery, ...members.map((member) => member.delivery)]);
+    if (deliveryTypes.size > 1) {
+      throw new Error('No se pueden agrupar clientes con tipos de entrega distintos');
+    }
+  }
+
   await withTransaction(transaction, async (t) => {
     if (memberIds.length === 0) {
       await client.update({ groupToken: null }, { transaction: t });

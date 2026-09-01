@@ -20,6 +20,9 @@ export function useClientGroup(clientId: string, initialMembers: GroupMember[]) 
       qc.invalidateQueries({ queryKey: ['clients', clientId] });
       toast.success('Grupo actualizado');
     },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'No se pudo actualizar el grupo');
+    },
   });
 
   const add = (member: GroupMember) => {
