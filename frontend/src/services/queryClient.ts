@@ -1,8 +1,3 @@
-import { QueryClient, MutationCache } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { QueryClient } from '@tanstack/react-query';
 
-export const queryClient = new QueryClient({
-  mutationCache: new MutationCache({
-    onError: (error) => toast.error(error.message),
-  }),
-});
+export const queryClient = new QueryClient();
