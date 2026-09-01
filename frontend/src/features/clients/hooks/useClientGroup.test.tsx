@@ -1,5 +1,6 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import api from '@/services/api';
 import { useClientGroup } from '@/features/clients/hooks/useClientGroup';
 import type { GroupMember } from '@/features/clients/types';
@@ -7,6 +8,7 @@ import type { GroupMember } from '@/features/clients/types';
 jest.mock('@/services/api', () => ({
   default: { put: jest.fn(), get: jest.fn() },
 }));
+jest.mock('sonner', () => ({ toast: { success: jest.fn(), error: jest.fn() } }));
 const mockPut = api.put as jest.Mock;
 
 const ana: GroupMember = { id: '2', name: 'Ana' };
@@ -91,5 +93,24 @@ describe('useClientGroup', () => {
     expect(result.current.isDirty).toBe(true);
     await act(() => result.current.save());
     await waitFor(() => expect(result.current.isDirty).toBe(false));
+  });
+
+  it('shows the save error when the group has incompatible delivery types', async () => {
+    mockPut.mockRejectedValue(
+      new Error('No se pueden agrupar clientes con tipos de entrega distintos'),
+    );
+    const { result } = renderHook(() => useClientGroup('1', [ana]), {
+      wrapper: makeWrapper(),
+    });
+
+    await expect(act(() => result.current.save())).rejects.toThrow(
+      'No se pueden agrupar clientes con tipos de entrega distintos',
+    );
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        'No se pueden agrupar clientes con tipos de entrega distintos',
+      ),
+    );
   });
 });
