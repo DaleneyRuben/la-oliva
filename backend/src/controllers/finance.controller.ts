@@ -12,6 +12,7 @@ import {
   reactivateCategory,
   renameCategory,
   updateExpense as updateFinanceExpense,
+  voidPayment as voidFinancePayment,
 } from '../domains/finance';
 import { categoryQuerySchema, monthSchema, movementFiltersSchema } from '../schemas/finance.schema';
 import { appToday } from '../utils/date';
@@ -158,6 +159,22 @@ const removeExpense = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
+const voidPayment = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const voided = await voidFinancePayment(decodeId(req.params.id), {
+      userId: req.user!.userId,
+      username: req.user!.username,
+    });
+    if (!voided) {
+      sendError(res, 'Payment not found', 404);
+      return;
+    }
+    sendSuccess(res, { voided: true });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   getOverview,
   getCategories,
@@ -166,4 +183,5 @@ export default {
   createExpense,
   updateExpense,
   removeExpense,
+  voidPayment,
 };

@@ -13,6 +13,7 @@ import {
   reactivateCategory,
   renameCategory,
   updateExpense,
+  voidPayment,
 } from '../../domains/finance';
 import { ConflictError } from '../../utils/errors';
 import { encodeId } from '../../utils/sqids';
@@ -340,7 +341,9 @@ describe('PATCH /api/finance/categories/:id', () => {
   });
 
   it('rejects a request that changes nothing', async () => {
-    const res = await request(app).patch(`/api/finance/categories/${encodeId(3)}`).send({});
+    const res = await request(app)
+      .patch(`/api/finance/categories/${encodeId(3)}`)
+      .send({});
 
     expect(res.status).toBe(400);
     expect(renameCategory).not.toHaveBeenCalled();
@@ -478,5 +481,18 @@ describe('DELETE /api/finance/expenses/:id', () => {
     const res = await request(app).delete(`/api/finance/expenses/${encodeId(9)}`);
 
     expect(res.status).toBe(404);
+  });
+});
+
+describe('DELETE /api/finance/payments/:id', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('voids income for an archived client', async () => {
+    (voidPayment as jest.Mock).mockResolvedValue(true);
+
+    const res = await request(app).delete(`/api/finance/payments/${encodeId(9)}`);
+
+    expect(res.status).toBe(200);
+    expect(voidPayment).toHaveBeenCalledWith(9, { userId: 7, username: 'ada' });
   });
 });

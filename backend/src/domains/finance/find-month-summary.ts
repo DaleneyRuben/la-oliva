@@ -26,7 +26,8 @@ export const findMonthSummary = async (month: string): Promise<MonthSummary> => 
     sequelize.query<TotalRow>(
       `SELECT COALESCE(SUM(amount), 0) AS total, COUNT(*) AS count
        FROM payments
-       WHERE "paidAt" BETWEEN :start AND :end`,
+       WHERE "voidedAt" IS NULL
+         AND "paidAt" BETWEEN :start AND :end`,
       { replacements, type: QueryTypes.SELECT },
     ),
     sequelize.query<TotalRow>(

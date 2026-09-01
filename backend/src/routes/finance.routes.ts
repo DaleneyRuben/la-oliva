@@ -24,5 +24,6 @@ router.patch('/categories/:id', validate(updateCategorySchema), financeControlle
 router.post('/expenses', validate(createExpenseSchema), financeController.createExpense);
 router.patch('/expenses/:id', validate(updateExpenseSchema), financeController.updateExpense);
 router.delete('/expenses/:id', financeController.removeExpense);
+router.delete('/payments/:id', financeController.voidPayment);
 
 export default router;

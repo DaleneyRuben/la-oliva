@@ -197,7 +197,7 @@ describe('findMovements', () => {
     it('folds accents on both sides of the comparison', async () => {
       await findMovements('2026-08', { q: 'Verdulería' });
 
-      expect(mockedQuery.mock.calls[0][0]).toContain("translate(lower(");
+      expect(mockedQuery.mock.calls[0][0]).toContain('translate(lower(');
       expect(mockedQuery.mock.calls[0][1].replacements.q).toBe('%verduleria%');
     });
 
@@ -237,5 +237,11 @@ describe('findMovements', () => {
     // The column is now read to flag the row (see clientArchived above), but it must never be
     // filtered on: dropping those payments would quietly lower a closed month's income.
     expect(mockedQuery.mock.calls[0][0]).not.toContain('c."deletedAt" IS NULL');
+  });
+
+  it('excludes voided payments from the movement stream', async () => {
+    await findMovements('2026-08');
+
+    expect(mockedQuery.mock.calls[0][0]).toContain('p."voidedAt" IS NULL');
   });
 });

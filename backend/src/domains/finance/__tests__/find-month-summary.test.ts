@@ -177,4 +177,16 @@ describe('findMonthSummary', () => {
     expect(expenseQueries).toHaveLength(2);
     expenseQueries.forEach((sql: string) => expect(sql).toContain('"deletedAt" IS NULL'));
   });
+
+  it('excludes voided payments from income totals', async () => {
+    stubQueries();
+
+    await findMonthSummary('2026-08');
+
+    const incomeQuery = mockedQuery.mock.calls
+      .map(([sql]: [string]) => sql)
+      .find((sql: string) => sql.includes('FROM payments'));
+
+    expect(incomeQuery).toContain('"voidedAt" IS NULL');
+  });
 });
