@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { PageHeader } from '@ui/PageHeader';
 import { Skeleton } from '@ui/Skeleton';
 import { useAuth } from '@/features/auth/AuthContext';
-import { isAdminRole } from '@/constants/roles';
+import { isAdminRole, ROLES } from '@/constants/roles';
 import { useProduction } from '@/features/production/hooks/useProduction';
 import { ProductionCard } from '@/features/production/components/ProductionCard';
 import { WeekCellsSkeleton } from '@/features/production/components/WeekCellsSkeleton';
@@ -50,7 +50,7 @@ function ProductionSkeleton() {
 export function ProductionPage() {
   const { summary, isLoading } = useProduction();
   const { user } = useAuth();
-  const isAdmin = isAdminRole(user?.role);
+  const canInspectActiveClients = isAdminRole(user?.role) || user?.role === ROLES.AUDIT;
   const today = format(new Date(), 'yyyy-MM-dd');
 
   return (
@@ -68,7 +68,7 @@ export function ProductionPage() {
               weeklyCounts={summary.weeklyCounts}
               weekStarts={summary.weekStarts}
               today={today}
-              isAdmin={isAdmin}
+              isAdmin={canInspectActiveClients}
             />
             <ProductionCard summary={summary} />
           </>

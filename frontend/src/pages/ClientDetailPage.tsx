@@ -20,6 +20,8 @@ import { RenewalModal } from '@/features/clients/components/modals/RenewalModal'
 import { AssignStartDateModal } from '@/features/clients/components/modals/AssignStartDateModal';
 import { ConfirmDeleteRenewalModal } from '@/features/clients/components/modals/ConfirmDeleteRenewalModal';
 import { ClientDetailSkeleton } from '@/features/clients/components/detail/ClientDetailSkeleton';
+import { useAuth } from '@/features/auth/AuthContext';
+import { ROLES } from '@/constants/roles';
 
 type TabId = 'overview' | 'plan' | 'entregas' | 'history';
 
@@ -33,6 +35,8 @@ const TABS: { id: TabId; label: string }[] = [
 export function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const readOnly = user?.role === ROLES.AUDIT;
   const {
     client,
     isLoading,
@@ -115,6 +119,7 @@ export function ClientDetailPage() {
         onRenew={() => setRenewOpen(true)}
         onDeleteRenewal={() => setDeleteRenewalOpen(true)}
         onAssignStartDate={() => setAssignStartDateOpen(true)}
+        readOnly={readOnly}
       />
 
       <Tabs
@@ -136,11 +141,17 @@ export function ClientDetailPage() {
           onUpdateContract={(draft) => updateContract(sub!.id, draft)}
           onUpdateTerms={(terms) => updateSubscriptionTerms(sub!.id, terms)}
           onUpdateInstructions={(si) => updateInstructions(sub!.id, si)}
+          readOnly={readOnly}
         />
       )}
 
       {activeTab === 'entregas' && (
-        <ClientDeliveryTab client={client} sub={sub} onSuspend={() => setSuspendOpen(true)} />
+        <ClientDeliveryTab
+          client={client}
+          sub={sub}
+          onSuspend={() => setSuspendOpen(true)}
+          readOnly={readOnly}
+        />
       )}
 
       {activeTab === 'history' && (

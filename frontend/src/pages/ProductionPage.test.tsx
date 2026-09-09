@@ -94,6 +94,15 @@ describe('ProductionPage', () => {
     expect(screen.getByLabelText('Semana siguiente')).toBeInTheDocument();
   });
 
+  it('enables week navigation for audit', () => {
+    setRole(ROLES.AUDIT);
+    mockUseProduction.mockReturnValue({ summary, isLoading: false, error: null });
+
+    render(<ProductionPage />);
+
+    expect(screen.getByLabelText('Semana siguiente')).toBeInTheDocument();
+  });
+
   it('renders no week navigation for kitchen', () => {
     setRole(ROLES.KITCHEN);
     mockUseProduction.mockReturnValue({ summary, isLoading: false, error: null });

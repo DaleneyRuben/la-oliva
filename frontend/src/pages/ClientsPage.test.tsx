@@ -4,11 +4,15 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import api from '@/services/api';
 import { ClientsPage } from '@/pages/ClientsPage';
+import { useAuth } from '@/features/auth/AuthContext';
 
 jest.mock('@/services/api', () => ({
   default: { getPaginated: jest.fn() },
 }));
 const mockGetPaginated = api.getPaginated as jest.Mock;
+
+jest.mock('@/features/auth/AuthContext', () => ({ useAuth: jest.fn() }));
+const mockUseAuth = useAuth as jest.Mock;
 
 const makeSub = (overrides = {}) => ({
   id: 1,
@@ -61,6 +65,9 @@ const paginatedResponse = (clients: ReturnType<typeof makeClient>[], total = cli
 });
 
 describe('ClientsPage', () => {
+  beforeEach(() => {
+    mockUseAuth.mockReturnValue({ user: { role: 'admin' } });
+  });
   it('renders the page heading', async () => {
     mockGetPaginated.mockResolvedValue(paginatedResponse([]));
     renderPage();
@@ -83,6 +90,16 @@ describe('ClientsPage', () => {
     mockGetPaginated.mockResolvedValue(paginatedResponse([]));
     renderPage();
     expect(await screen.findByRole('button', { name: /agregar cliente/i })).toBeInTheDocument();
+  });
+
+  it('does not offer client creation to audit', async () => {
+    mockUseAuth.mockReturnValue({ user: { role: 'audit' } });
+    mockGetPaginated.mockResolvedValue(paginatedResponse([]));
+
+    renderPage();
+
+    expect(await screen.findByRole('heading', { name: 'Clientes' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /agregar cliente/i })).not.toBeInTheDocument();
   });
 
   it('shows pagination when results span multiple pages', async () => {

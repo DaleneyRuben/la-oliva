@@ -156,7 +156,7 @@ They are **standing dietary preferences, not terms of one contract**, so a renew
 
 ## Producción View (Kitchen Prep Planning)
 
-A screen (sidebar item **Producción**, between Menú and Informes) that shows the kitchen tomorrow's headcounts: the next day's active clients grouped by their plan's meal composition. Visible to `kitchen`, `admin`, and `super_admin` roles — same audience as Menú and Informes.
+A screen (sidebar item **Producción**, between Menú and Informes) that shows the kitchen tomorrow's headcounts: the next day's active clients grouped by their plan's meal composition. Visible to `kitchen`, `admin`, `super_admin`, and `audit` roles.
 
 Not to be confused with the **Producción section** of the kitchen `.docx` report (see Daily Menu Processing) — that is a section within a downloadable file; this is a standalone read-only view.
 
@@ -174,11 +174,11 @@ Not to be confused with the **Producción section** of the kitchen `.docx` repor
 
 ### Admin extensions on "Clientes activos por día"
 
-Two features on this card are visible to `admin` and `super_admin` only. The `kitchen` role sees the card exactly as described above — no navigation, no clickable cells, no per-cell dates — and never calls the admin endpoints.
+Two features on this card are visible to `admin`, `super_admin`, and `audit`. The `kitchen` role sees the card exactly as described above — no navigation, no clickable cells, no per-cell dates — and never calls the privileged endpoints. Audit uses these features read-only: it can open the client list for a day and follow a row to the already read-only client detail view.
 
 - **Navigable window is server-owned:** the main `GET /api/production` response includes `weekStarts` — the list of navigable week Mondays (the current display week plus 2 weeks forward; the count comes from `MAX_WEEK_OFFSET` in `constants/production.constants.ts`). The frontend derives the arrows and their bounds from this list and holds no window constant of its own.
-- **Week navigation:** admins page the Mon–Fri grid by **absolute week start**: `GET /api/production/weekly-counts?weekStart=YYYY-MM-DD` (admin/super_admin only; any Monday in `weekStarts` is valid, anything else is a 400). The current week is never fetched from this endpoint — it is served by the main `/api/production` payload. Admin cells additionally show a small dd/MM date beside each weekday label. Future-week counts are a **projection based on contracts already registered** — renewals not yet entered are not included, so they systematically understate; the UI shows a caveat on future weeks and hides the "Hoy" marker outside the current week.
-- **Day drill-down:** clicking a day cell opens a modal listing that day's active clients (name, phone number, delivery zone), each row linking to the client's detail page. Served by `GET /api/production/day-clients?date=YYYY-MM-DD` (admin/super_admin only) — the endpoint applies the **same active-subscription rule as the counts**, so the modal list and the cell count always agree. The date must be a weekday (weekends are rejected with a 400) within the navigable window (first Monday in `weekStarts` through the Friday of the last).
+- **Week navigation:** permitted roles page the Mon–Fri grid by **absolute week start**: `GET /api/production/weekly-counts?weekStart=YYYY-MM-DD` (admin/super_admin/audit; any Monday in `weekStarts` is valid, anything else is a 400). The current week is never fetched from this endpoint — it is served by the main `/api/production` payload. These cells additionally show a small dd/MM date beside each weekday label. Future-week counts are a **projection based on contracts already registered** — renewals not yet entered are not included, so they systematically understate; the UI shows a caveat on future weeks and hides the "Hoy" marker outside the current week.
+- **Day drill-down:** clicking a day cell opens a modal listing that day's active clients (name, phone number, delivery zone), each row linking to the client's detail page. Served by `GET /api/production/day-clients?date=YYYY-MM-DD` (admin/super_admin/audit) — the endpoint applies the **same active-subscription rule as the counts**, so the modal list and the cell count always agree. The date must be a weekday (weekends are rejected with a 400) within the navigable window (first Monday in `weekStarts` through the Friday of the last).
 
 ---
 
@@ -497,15 +497,16 @@ Rows written before the subscription carried its own price record a discount off
 
 ## User Roles
 
-The system has five roles (`super_admin`, `admin`, `kitchen`, `delivery`, `nutritionist`). Role controls what a user can see and do:
+The system has six roles (`super_admin`, `admin`, `kitchen`, `delivery`, `nutritionist`, `audit`). Role controls what a user can see and do:
 
 - **super_admin** — full access including user management (Usuarios) and the Health view; both are super_admin-only.
 - **admin** — full access to clients, plans, menus, production, deliveries, reports, Finanzas, and the dashboard; no user management or Health view.
 - **kitchen** — can view the kitchen report and menu; cannot access the kitchen report download on the Reports page (that card is hidden for this role).
 - **delivery** — delivery route view only.
 - **nutritionist** — Evaluaciones only: resolves appointments (conversions for new clients, and renewals/reactivations for existing clients — see Evaluaciones (Appointments)); no access to Clientes, Planes, menus, production, deliveries, reports, dashboard, user management, or Health.
+- **audit** — read-only access to Clientes, Producción, and Entregas. It cannot create, edit, renew, pause, finalize, delete, or otherwise change client, subscription, or delivery data; it has no access to any other view.
 
-The dashboard's connections widget shows online/offline status for `kitchen` and `delivery` users based on last login time (online = within the last 8 hours, matching the login token's lifetime). The Usuarios table's "Estado" column (Activo/Inactivo) uses the same 8-hour rule, applied to all four roles.
+The dashboard's connections widget shows online/offline status for `kitchen` and `delivery` users based on last login time (online = within the last 8 hours, matching the login token's lifetime). The Usuarios table's "Estado" column (Activo/Inactivo) uses the same 8-hour rule for every role.
 
 ### Login tracking
 

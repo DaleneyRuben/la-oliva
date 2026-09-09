@@ -20,7 +20,10 @@ import { ADMIN_ROLES, ROLES } from '@/constants/roles';
 
 const STAFF_ROLES = [...ADMIN_ROLES, ROLES.KITCHEN] as const;
 const DELIVERY_ROLES = [...ADMIN_ROLES, ROLES.DELIVERY] as const;
-const SHELL_ROLES = [...STAFF_ROLES, ROLES.DELIVERY, ROLES.NUTRITIONIST] as const;
+const CLIENT_READ_ROLES = [...ADMIN_ROLES, ROLES.AUDIT] as const;
+const PRODUCTION_ROLES = [...STAFF_ROLES, ROLES.AUDIT] as const;
+const DELIVERY_ROLES_WITH_AUDIT = [...DELIVERY_ROLES, ROLES.AUDIT] as const;
+const SHELL_ROLES = [...STAFF_ROLES, ROLES.DELIVERY, ROLES.NUTRITIONIST, ROLES.AUDIT] as const;
 
 export function AppRouter() {
   return (
@@ -44,7 +47,7 @@ export function AppRouter() {
                 <Route
                   path="/clientes"
                   element={
-                    <ProtectedRoute allowedRoles={[...ADMIN_ROLES]}>
+                    <ProtectedRoute allowedRoles={[...CLIENT_READ_ROLES]}>
                       <ClientsPage />
                     </ProtectedRoute>
                   }
@@ -60,7 +63,7 @@ export function AppRouter() {
                 <Route
                   path="/clientes/:id"
                   element={
-                    <ProtectedRoute allowedRoles={[...ADMIN_ROLES]}>
+                    <ProtectedRoute allowedRoles={[...CLIENT_READ_ROLES]}>
                       <ClientDetailPage />
                     </ProtectedRoute>
                   }
@@ -100,7 +103,7 @@ export function AppRouter() {
                 <Route
                   path="/produccion"
                   element={
-                    <ProtectedRoute allowedRoles={[...STAFF_ROLES]}>
+                    <ProtectedRoute allowedRoles={[...PRODUCTION_ROLES]}>
                       <ProductionPage />
                     </ProtectedRoute>
                   }
@@ -116,7 +119,7 @@ export function AppRouter() {
                 <Route
                   path="/entregas"
                   element={
-                    <ProtectedRoute allowedRoles={[...DELIVERY_ROLES]}>
+                    <ProtectedRoute allowedRoles={[...DELIVERY_ROLES_WITH_AUDIT]}>
                       <DeliveryPage />
                     </ProtectedRoute>
                   }

@@ -359,6 +359,25 @@ describe('Layout', () => {
     expect(screen.getByText('Entregas')).toBeInTheDocument();
   });
 
+  it('shows only Clientes, Producción and Entregas for the audit role', () => {
+    mockUserRole('audit');
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Clientes')).toBeInTheDocument();
+    expect(screen.getByText('Producción')).toBeInTheDocument();
+    expect(screen.getByText('Entregas')).toBeInTheDocument();
+    expect(screen.queryByText('Panel')).not.toBeInTheDocument();
+    expect(screen.queryByText('Planes')).not.toBeInTheDocument();
+    expect(screen.queryByText('Menú')).not.toBeInTheDocument();
+    expect(screen.queryByText('Informes')).not.toBeInTheDocument();
+    expect(screen.queryByText('Finanzas')).not.toBeInTheDocument();
+  });
+
   it('shows Entregas alongside everything else for the admin role', () => {
     render(
       <MemoryRouter>

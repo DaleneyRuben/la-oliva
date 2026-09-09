@@ -15,6 +15,7 @@ const ROLE_OPTIONS: { value: UserRole; label: string }[] = [
   { value: ROLES.KITCHEN, label: 'Cocina' },
   { value: ROLES.DELIVERY, label: 'Delivery' },
   { value: ROLES.NUTRITIONIST, label: 'Nutricionista' },
+  { value: ROLES.AUDIT, label: 'Auditoría' },
 ];
 
 type CreateProps = {

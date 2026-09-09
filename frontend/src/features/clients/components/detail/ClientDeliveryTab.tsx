@@ -10,9 +10,10 @@ interface Props {
   client: Client;
   sub: Subscription | undefined;
   onSuspend: () => void;
+  readOnly?: boolean;
 }
 
-export function ClientDeliveryTab({ client, sub, onSuspend }: Props) {
+export function ClientDeliveryTab({ client, sub, onSuspend, readOnly = false }: Props) {
   if (!sub) {
     return <p className="text-[13px] text-muted">Sin suscripción activa.</p>;
   }
@@ -52,9 +53,14 @@ export function ClientDeliveryTab({ client, sub, onSuspend }: Props) {
             deliveredCount={calendar.deliveredCount}
             suspendedCount={sub.suspendedDates.length}
             onSuspend={onSuspend}
+            readOnly={readOnly}
           />
         )}
-        <ClientGroupTab clientId={client.id} initialMembers={client.groupMembers} />
+        <ClientGroupTab
+          clientId={client.id}
+          initialMembers={client.groupMembers}
+          readOnly={readOnly}
+        />
       </div>
     </div>
   );

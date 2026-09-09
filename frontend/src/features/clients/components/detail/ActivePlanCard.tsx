@@ -17,10 +17,16 @@ interface Props {
   sub: Subscription;
   onUpdateTerms: (terms: SubscriptionTermsDraft) => Promise<void>;
   onUpdateInstructions: (specialInstructions: Record<string, string>) => Promise<void>;
+  readOnly?: boolean;
 }
 
-export function ActivePlanCard({ sub, onUpdateTerms, onUpdateInstructions }: Props) {
-  const { plans } = usePlans();
+export function ActivePlanCard({
+  sub,
+  onUpdateTerms,
+  onUpdateInstructions,
+  readOnly = false,
+}: Props) {
+  const { plans } = usePlans(!readOnly);
   const assignedPlanPrice = Number(sub.plan.price);
   const storedGap = assignedPlanPrice - Number(sub.price);
   const [editing, setEditing] = useState(false);
@@ -122,28 +128,34 @@ export function ActivePlanCard({ sub, onUpdateTerms, onUpdateInstructions }: Pro
           <Label variant="section" className="mb-[14px]">
             Instrucciones especiales
           </Label>
-          <CheckboxRow
-            id="salad-grande"
-            label="Ensalada grande"
-            icon="salad"
-            checked={!!sub.specialInstructions?.salad}
-            onChange={(checked) => {
-              const updated = { ...sub.specialInstructions };
-              if (checked) {
-                updated.salad = 'DAR GRANDES';
-              } else {
-                delete updated.salad;
-              }
-              onUpdateInstructions(updated);
-            }}
-          />
+          {readOnly ? (
+            <p className="font-mono text-[13px] text-ink">
+              Ensalada grande: {sub.specialInstructions?.salad ? 'Sí' : 'No'}
+            </p>
+          ) : (
+            <CheckboxRow
+              id="salad-grande"
+              label="Ensalada grande"
+              icon="salad"
+              checked={!!sub.specialInstructions?.salad}
+              onChange={(checked) => {
+                const updated = { ...sub.specialInstructions };
+                if (checked) {
+                  updated.salad = 'DAR GRANDES';
+                } else {
+                  delete updated.salad;
+                }
+                onUpdateInstructions(updated);
+              }}
+            />
+          )}
         </>
       )}
 
       <hr className="border-cream-2 my-[18px]" />
       <div className="flex items-center mb-[14px]">
         <Label variant="section">Plan y precio</Label>
-        {!editing && (
+        {!editing && !readOnly && (
           <IconButton
             icon="pencil"
             label="Editar"

@@ -9,6 +9,7 @@ interface Props {
   isPaused: boolean;
   onDelete: () => void;
   onAssignStartDate: () => void;
+  readOnly?: boolean;
 }
 
 // Olive, not amber: a registered renewal is reassuring information, while amber already carries
@@ -35,7 +36,13 @@ const ACTION_STYLE = { padding: '7px 10px', fontSize: '12.5px', gap: '7px' };
 
 const formatDate = (date: string) => format(parseISO(date), 'dd/MM/yyyy');
 
-export function QueuedRenewalNotice({ renewal, isPaused, onDelete, onAssignStartDate }: Props) {
+export function QueuedRenewalNotice({
+  renewal,
+  isPaused,
+  onDelete,
+  onAssignStartDate,
+  readOnly = false,
+}: Props) {
   const styles = isPaused ? PAUSED_STYLES : QUEUED_STYLES;
   const { startDate, contractEndDate } = renewal;
   const dates = startDate && contractEndDate ? { startDate, contractEndDate } : null;
@@ -57,28 +64,30 @@ export function QueuedRenewalNotice({ renewal, isPaused, onDelete, onAssignStart
           {formatRenewalMeta(renewal)}
         </p>
       </div>
-      <div className="flex flex-col items-end gap-1 shrink-0">
-        {!dates && (
+      {!readOnly && (
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          {!dates && (
+            <Button
+              variant="bare"
+              onClick={onAssignStartDate}
+              leftIcon="calendar"
+              className={`font-semibold rounded-lg ${styles.title}`}
+              style={ACTION_STYLE}
+            >
+              Asignar fecha de inicio
+            </Button>
+          )}
           <Button
             variant="bare"
-            onClick={onAssignStartDate}
-            leftIcon="calendar"
-            className={`font-semibold rounded-lg ${styles.title}`}
+            onClick={onDelete}
+            leftIcon="trash"
+            className={`font-semibold rounded-lg ${styles.text} ${styles.deleteHoverBg}`}
             style={ACTION_STYLE}
           >
-            Asignar fecha de inicio
+            Eliminar renovación
           </Button>
-        )}
-        <Button
-          variant="bare"
-          onClick={onDelete}
-          leftIcon="trash"
-          className={`font-semibold rounded-lg ${styles.text} ${styles.deleteHoverBg}`}
-          style={ACTION_STYLE}
-        >
-          Eliminar renovación
-        </Button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

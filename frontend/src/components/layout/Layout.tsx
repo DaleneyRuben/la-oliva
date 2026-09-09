@@ -21,13 +21,16 @@ interface NavSection {
 
 const ADMIN_ROLES: UserRole[] = [ROLES.SUPER_ADMIN, ROLES.ADMIN];
 const KITCHEN_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.KITCHEN];
+const CLIENT_READ_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.AUDIT];
+const PRODUCTION_ROLES: UserRole[] = [...KITCHEN_ROLES, ROLES.AUDIT];
+const DELIVERY_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.DELIVERY, ROLES.AUDIT];
 
 const NAV_SECTIONS: NavSection[] = [
   {
     label: 'Gestión',
     items: [
       { to: '/', label: 'Panel', icon: 'dashboard', allowedRoles: ADMIN_ROLES },
-      { to: '/clientes', label: 'Clientes', icon: 'users', allowedRoles: ADMIN_ROLES },
+      { to: '/clientes', label: 'Clientes', icon: 'users', allowedRoles: CLIENT_READ_ROLES },
       { to: '/planes', label: 'Planes', icon: 'plan', allowedRoles: ADMIN_ROLES },
       {
         to: '/evaluaciones',
@@ -41,7 +44,7 @@ const NAV_SECTIONS: NavSection[] = [
     label: 'Cocina',
     items: [
       { to: '/menu', label: 'Menú', icon: 'chef', allowedRoles: KITCHEN_ROLES },
-      { to: '/produccion', label: 'Producción', icon: 'cloche', allowedRoles: KITCHEN_ROLES },
+      { to: '/produccion', label: 'Producción', icon: 'cloche', allowedRoles: PRODUCTION_ROLES },
       { to: '/informes', label: 'Informes', icon: 'report', allowedRoles: KITCHEN_ROLES },
     ],
   },
@@ -52,7 +55,7 @@ const NAV_SECTIONS: NavSection[] = [
         to: '/entregas',
         label: 'Entregas',
         icon: 'motorcycle',
-        allowedRoles: [...ADMIN_ROLES, ROLES.DELIVERY],
+        allowedRoles: DELIVERY_ROLES,
       },
     ],
   },

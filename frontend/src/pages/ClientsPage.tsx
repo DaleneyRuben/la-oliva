@@ -4,9 +4,12 @@ import { PageHeader } from '@ui/PageHeader';
 import { ClientFilterBar } from '@/features/clients/components/list/ClientFilterBar';
 import { ClientTable } from '@/features/clients/components/list/ClientTable';
 import { useClientListFilters } from '@/features/clients/hooks/useClientListFilters';
+import { useAuth } from '@/features/auth/AuthContext';
+import { ROLES } from '@/constants/roles';
 
 export function ClientsPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const {
     filter,
     changeFilter,
@@ -34,9 +37,11 @@ export function ClientsPage() {
         label="Directorio"
         title="Clientes"
         action={
-          <Button onClick={() => navigate('/clientes/nuevo')} leftIcon="plus">
-            Agregar cliente
-          </Button>
+          user?.role !== ROLES.AUDIT ? (
+            <Button onClick={() => navigate('/clientes/nuevo')} leftIcon="plus">
+              Agregar cliente
+            </Button>
+          ) : undefined
         }
       />
 

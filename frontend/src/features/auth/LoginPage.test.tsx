@@ -124,6 +124,23 @@ describe('LoginPage', () => {
     });
   });
 
+  it('navigates to /clientes for audit role', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({ token: 'tok', user: { id: 'enc5', username: 'audit', role: 'audit' } }),
+    }) as jest.Mock;
+
+    renderPage();
+    await userEvent.type(screen.getByLabelText(/usuario/i, { selector: 'input' }), 'audit');
+    await userEvent.type(screen.getByLabelText(/contraseña/i, { selector: 'input' }), 'secret');
+    await userEvent.click(screen.getByRole('button', { name: 'Ingresar' }));
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/clientes', { replace: true });
+    });
+  });
+
   it('shows error message on failed login', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,

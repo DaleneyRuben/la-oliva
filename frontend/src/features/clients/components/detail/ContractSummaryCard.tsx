@@ -7,6 +7,7 @@ interface Props {
   deliveredCount: number;
   suspendedCount: number;
   onSuspend: () => void;
+  readOnly?: boolean;
 }
 
 export function ContractSummaryCard({
@@ -14,6 +15,7 @@ export function ContractSummaryCard({
   deliveredCount,
   suspendedCount,
   onSuspend,
+  readOnly = false,
 }: Props) {
   return (
     <Card>
@@ -35,9 +37,11 @@ export function ContractSummaryCard({
         </span>
       </div>
 
-      <Button onClick={onSuspend} leftIcon="calendar" className="w-full">
-        Suspender días
-      </Button>
+      {!readOnly && (
+        <Button onClick={onSuspend} leftIcon="calendar" className="w-full">
+          Suspender días
+        </Button>
+      )}
     </Card>
   );
 }

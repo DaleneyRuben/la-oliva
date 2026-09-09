@@ -10,6 +10,7 @@ const ROLE_ICONS: Record<UserRole, string> = {
   kitchen: 'utensils',
   delivery: 'motorcycle',
   nutritionist: 'calendar-check',
+  audit: 'shield-check',
 };
 
 const ROLE_ORDER: UserRole[] = [
@@ -18,6 +19,7 @@ const ROLE_ORDER: UserRole[] = [
   ROLES.KITCHEN,
   ROLES.DELIVERY,
   ROLES.NUTRITIONIST,
+  ROLES.AUDIT,
 ];
 
 interface Props {
