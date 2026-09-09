@@ -81,10 +81,11 @@ describe('admin-only production routes role guard', () => {
     expect(res.status).toBe(403);
   });
 
-  it.each(routes)('rejects audit on $path with 403', async ({ path, query }) => {
+  it.each(routes)('allows audit past the guard on $path', async ({ path, query }) => {
     const res = await request(app).get(path).query(query).set(headersForRole(ROLES.AUDIT));
 
-    expect(res.status).toBe(403);
+    expect(res.status).not.toBe(403);
+    expect(res.status).not.toBe(404);
   });
 
   it.each(routes)('does not 403 admin on $path', async ({ path, query }) => {

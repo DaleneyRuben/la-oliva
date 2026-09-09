@@ -8,15 +8,15 @@ const router = Router();
 router.get('/', productionController.getOverview);
 
 // Stacked on top of the router-level guard (which also admits kitchen):
-// these two are admin/super_admin only.
+// kitchen cannot navigate weeks or inspect active-client lists.
 router.get(
   '/weekly-counts',
-  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.AUDIT),
   productionController.getWeeklyCounts,
 );
 router.get(
   '/day-clients',
-  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.AUDIT),
   productionController.getDayClients,
 );
 
