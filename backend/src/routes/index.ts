@@ -41,7 +41,7 @@ router.use('/finance', requireAuth, requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN),
 router.use(
   '/delivery',
   requireAuth,
-  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.DELIVERY),
+  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.DELIVERY, ROLES.AUDIT),
   deliveryRoutes,
 );
 router.use(
@@ -61,7 +61,7 @@ router.use(
 router.use(
   '/production',
   requireAuth,
-  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.KITCHEN),
+  requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.KITCHEN, ROLES.AUDIT),
   productionRoutes,
 );
 router.use(

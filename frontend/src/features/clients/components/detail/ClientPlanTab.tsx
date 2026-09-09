@@ -12,6 +12,7 @@ interface Props {
   onUpdateContract: (draft: import('./ContractCard').ContractDraft) => Promise<void>;
   onUpdateTerms: (terms: SubscriptionTermsDraft) => Promise<void>;
   onUpdateInstructions: (specialInstructions: Record<string, string>) => Promise<void>;
+  readOnly?: boolean;
 }
 
 export function ClientPlanTab({
@@ -21,6 +22,7 @@ export function ClientPlanTab({
   onUpdateContract,
   onUpdateTerms,
   onUpdateInstructions,
+  readOnly = false,
 }: Props) {
   if (!sub) {
     return <p className="text-[13px] text-muted">Sin suscripción activa.</p>;
@@ -33,10 +35,16 @@ export function ClientPlanTab({
           sub={sub}
           onUpdateTerms={onUpdateTerms}
           onUpdateInstructions={onUpdateInstructions}
+          readOnly={readOnly}
         />
       </div>
       <div className="col-span-12 lg:col-span-5 flex flex-col gap-[20px]">
-        <ContractCard sub={sub} remaining={remaining} onUpdateContract={onUpdateContract} />
+        <ContractCard
+          sub={sub}
+          remaining={remaining}
+          onUpdateContract={onUpdateContract}
+          readOnly={readOnly}
+        />
         <BillingCard nit={client.nit} businessName={client.businessName} />
       </div>
     </div>

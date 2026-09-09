@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import api from '@/services/api';
 import { ClientDetailPage } from '@/pages/ClientDetailPage';
+import { useAuth } from '@/features/auth/AuthContext';
 
 jest.mock('@/services/api', () => ({
   default: { get: jest.fn(), patch: jest.fn(), post: jest.fn() },
@@ -10,6 +11,9 @@ jest.mock('@/services/api', () => ({
 const mockGet = api.get as jest.Mock;
 const mockPatch = api.patch as jest.Mock;
 const mockPost = api.post as jest.Mock;
+
+jest.mock('@/features/auth/AuthContext', () => ({ useAuth: jest.fn() }));
+const mockUseAuth = useAuth as jest.Mock;
 
 const mockClient = {
   id: 1,
@@ -66,7 +70,10 @@ function renderPage(client = mockClient) {
 }
 
 describe('ClientDetailPage', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockUseAuth.mockReturnValue({ user: { role: 'admin' } });
+  });
 
   it('renders the client name', async () => {
     renderPage();
@@ -95,6 +102,17 @@ describe('ClientDetailPage', () => {
   it('shows Pausar button when client is active', async () => {
     renderPage();
     expect(await screen.findByRole('button', { name: /pausar/i })).toBeInTheDocument();
+  });
+
+  it('hides client actions for audit', async () => {
+    mockUseAuth.mockReturnValue({ user: { role: 'audit' } });
+
+    renderPage();
+
+    await screen.findByText('John Doe');
+    expect(screen.queryByRole('button', { name: /pausar/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /renovar/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /más acciones/i })).not.toBeInTheDocument();
   });
 
   it('Pausar button has visible outline styling', async () => {

@@ -495,15 +495,16 @@ Rows written before the subscription carried its own price record a discount off
 
 ## User Roles
 
-The system has five roles (`super_admin`, `admin`, `kitchen`, `delivery`, `nutritionist`). Role controls what a user can see and do:
+The system has six roles (`super_admin`, `admin`, `kitchen`, `delivery`, `nutritionist`, `audit`). Role controls what a user can see and do:
 
 - **super_admin** — full access including user management (Usuarios) and the Health view; both are super_admin-only.
 - **admin** — full access to clients, plans, menus, production, deliveries, reports, Finanzas, and the dashboard; no user management or Health view.
 - **kitchen** — can view the kitchen report and menu; cannot access the kitchen report download on the Reports page (that card is hidden for this role).
 - **delivery** — delivery route view only.
 - **nutritionist** — Evaluaciones only: resolves appointments (conversions for new clients, and renewals/reactivations for existing clients — see Evaluaciones (Appointments)); no access to Clientes, Planes, menus, production, deliveries, reports, dashboard, user management, or Health.
+- **audit** — read-only access to Clientes, Producción, and Entregas. It cannot create, edit, renew, pause, finalize, delete, or otherwise change client, subscription, or delivery data; it has no access to any other view.
 
-The dashboard's connections widget shows online/offline status for `kitchen` and `delivery` users based on last login time (online = within the last 8 hours, matching the login token's lifetime). The Usuarios table's "Estado" column (Activo/Inactivo) uses the same 8-hour rule, applied to all four roles.
+The dashboard's connections widget shows online/offline status for `kitchen` and `delivery` users based on last login time (online = within the last 8 hours, matching the login token's lifetime). The Usuarios table's "Estado" column (Activo/Inactivo) uses the same 8-hour rule for every role.
 
 ### Login tracking
 

@@ -2,7 +2,7 @@ import request from 'supertest';
 import app from '../../app';
 import { verifyToken } from '../../domains/auth';
 import { ROLES } from '../../constants/roles.constants';
-import { findById } from '../../domains/client';
+import { findAll, findById } from '../../domains/client';
 import { clientHasAppointment } from '../../domains/evaluation';
 import { encodeId } from '../../utils/sqids';
 
@@ -22,6 +22,7 @@ const clientId = encodeId(1);
 
 beforeEach(() => {
   jest.clearAllMocks();
+  (findAll as jest.Mock).mockResolvedValue({ rows: [], total: 0 });
   (findById as jest.Mock).mockResolvedValue({ id: 1 });
   (clientHasAppointment as jest.Mock).mockResolvedValue(false);
 });
@@ -84,6 +85,32 @@ describe('admin-only client routes role guard', () => {
 
   it.each(cases)('rejects nutritionist on $method $path with 403', async ({ method, path }) => {
     const res = await request(app)[method](path).set(headersForRole(ROLES.NUTRITIONIST));
+
+    expect(res.status).toBe(403);
+  });
+});
+
+describe('audit client routes role guard', () => {
+  it('allows audit to list clients', async () => {
+    const res = await request(app).get('/api/clients').set(headersForRole(ROLES.AUDIT));
+
+    expect(res.status).toBe(200);
+  });
+
+  it('allows audit to view a client', async () => {
+    const res = await request(app).get(`/api/clients/${clientId}`).set(headersForRole(ROLES.AUDIT));
+
+    expect(res.status).toBe(200);
+  });
+
+  it.each([
+    { method: 'post' as const, path: '/api/clients' },
+    { method: 'patch' as const, path: '/api/clients/abc123' },
+    { method: 'post' as const, path: '/api/clients/abc123/finalize' },
+    { method: 'put' as const, path: '/api/clients/abc123/group' },
+    { method: 'delete' as const, path: '/api/clients/abc123' },
+  ])('rejects audit on $method $path with 403', async ({ method, path }) => {
+    const res = await request(app)[method](path).set(headersForRole(ROLES.AUDIT));
 
     expect(res.status).toBe(403);
   });

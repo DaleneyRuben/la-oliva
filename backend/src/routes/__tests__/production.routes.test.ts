@@ -44,6 +44,12 @@ describe('GET /api/production role guard', () => {
     expect(res.status).toBe(200);
   });
 
+  it('allows audit', async () => {
+    const res = await request(app).get('/api/production').set(headersForRole(ROLES.AUDIT));
+
+    expect(res.status).toBe(200);
+  });
+
   it('rejects delivery with 403', async () => {
     const res = await request(app).get('/api/production').set(headersForRole(ROLES.DELIVERY));
 
@@ -71,6 +77,12 @@ describe('admin-only production routes role guard', () => {
 
   it.each(routes)('rejects delivery on $path with 403', async ({ path, query }) => {
     const res = await request(app).get(path).query(query).set(headersForRole(ROLES.DELIVERY));
+
+    expect(res.status).toBe(403);
+  });
+
+  it.each(routes)('rejects audit on $path with 403', async ({ path, query }) => {
+    const res = await request(app).get(path).query(query).set(headersForRole(ROLES.AUDIT));
 
     expect(res.status).toBe(403);
   });

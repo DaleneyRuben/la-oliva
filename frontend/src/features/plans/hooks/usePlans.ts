@@ -4,7 +4,7 @@ import { toVoid } from '@/utils/toVoid';
 import api from '@/services/api';
 import type { Plan, PlanDraft } from '@/features/plans/types';
 
-export function usePlans() {
+export function usePlans(enabled = true) {
   const qc = useQueryClient();
 
   const plansQuery = useQuery({
@@ -13,6 +13,7 @@ export function usePlans() {
       const plans = await api.get<Plan[]>('/plans');
       return plans.map((p) => ({ ...p, price: Number(p.price) }));
     },
+    enabled,
   });
 
   const clientCountsQuery = useQuery({
@@ -24,6 +25,7 @@ export function usePlans() {
         return acc;
       }, {});
     },
+    enabled,
   });
 
   const planBody = (draft: PlanDraft) => ({

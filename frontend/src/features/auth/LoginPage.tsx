@@ -20,6 +20,7 @@ const redirectForRole = (role: UserRole): string => {
   if (role === ROLES.DELIVERY) return '/entregas';
   if (role === ROLES.KITCHEN) return '/menu';
   if (role === ROLES.NUTRITIONIST) return '/evaluaciones';
+  if (role === ROLES.AUDIT) return '/clientes';
   return '/';
 };
 

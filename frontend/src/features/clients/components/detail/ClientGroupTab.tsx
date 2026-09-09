@@ -12,9 +12,10 @@ import type { GroupMember } from '@/features/clients/types';
 interface Props {
   clientId: string;
   initialMembers: GroupMember[];
+  readOnly?: boolean;
 }
 
-export function ClientGroupTab({ clientId, initialMembers }: Props) {
+export function ClientGroupTab({ clientId, initialMembers, readOnly = false }: Props) {
   const { members, isDirty, add, remove, save, isSaving } = useClientGroup(
     clientId,
     initialMembers,
@@ -43,36 +44,40 @@ export function ClientGroupTab({ clientId, initialMembers }: Props) {
               className="flex items-center justify-between gap-3 px-3 py-2 bg-white border border-rule rounded-md"
             >
               <span className="font-mono text-[12.5px] text-ink">{m.name}</span>
-              <Button
-                variant="secondary"
-                size="sm"
-                aria-label={`Eliminar ${m.name}`}
-                onClick={() => remove(m.id)}
-                className="border-0 bg-transparent text-red-700 hover:text-red-700 p-1"
-              >
-                <Icon name="trash" size={14} />
-              </Button>
+              {!readOnly && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  aria-label={`Eliminar ${m.name}`}
+                  onClick={() => remove(m.id)}
+                  className="border-0 bg-transparent text-red-700 hover:text-red-700 p-1"
+                >
+                  <Icon name="trash" size={14} />
+                </Button>
+              )}
             </li>
           ))}
         </ul>
       )}
 
-      <div className="relative mb-2.5">
-        <Icon
-          name="search"
-          size={15}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-faint"
-        />
-        <input
-          type="text"
-          placeholder="Agregar miembro..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className={`${inputCls()} pl-[35px]`}
-        />
-      </div>
+      {!readOnly && (
+        <div className="relative mb-2.5">
+          <Icon
+            name="search"
+            size={15}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-faint"
+          />
+          <input
+            type="text"
+            placeholder="Agregar miembro..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`${inputCls()} pl-[35px]`}
+          />
+        </div>
+      )}
 
-      {search && (
+      {!readOnly && search && (
         <div className="border border-rule rounded-md overflow-hidden mb-3 bg-white">
           {searchResults.length > 0 ? (
             <ul>
@@ -99,9 +104,11 @@ export function ClientGroupTab({ clientId, initialMembers }: Props) {
         </div>
       )}
 
-      <Button onClick={save} disabled={!isDirty || isSaving} leftIcon="check" className="w-full">
-        Guardar grupo
-      </Button>
+      {!readOnly && (
+        <Button onClick={save} disabled={!isDirty || isSaving} leftIcon="check" className="w-full">
+          Guardar grupo
+        </Button>
+      )}
     </Card>
   );
 }

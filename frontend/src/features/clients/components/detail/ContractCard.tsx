@@ -19,9 +19,10 @@ interface Props {
   sub: Subscription;
   remaining: number;
   onUpdateContract: (draft: ContractDraft) => Promise<void>;
+  readOnly?: boolean;
 }
 
-export function ContractCard({ sub, remaining, onUpdateContract }: Props) {
+export function ContractCard({ sub, remaining, onUpdateContract, readOnly = false }: Props) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [contractDate, setContractDate] = useState(sub.contractDate);
@@ -73,7 +74,7 @@ export function ContractCard({ sub, remaining, onUpdateContract }: Props) {
     <Card>
       <div className="flex items-center mb-3">
         <Label variant="section">Contrato</Label>
-        {!editing && (
+        {!editing && !readOnly && (
           <IconButton
             icon="pencil"
             label="Editar"
