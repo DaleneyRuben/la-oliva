@@ -118,7 +118,9 @@ export function Layout({ children }: LayoutProps) {
       <aside
         className={[
           'fixed inset-y-0 left-0 z-40 w-[236px] flex flex-col',
-          'bg-gradient-to-b from-olive-800 to-sidebar-deep',
+          theme !== THEMES.LA_OLIVA
+            ? 'bg-brand-primary'
+            : 'bg-gradient-to-b from-olive-800 to-sidebar-deep',
           'transition-transform duration-200',
           'md:relative md:translate-x-0',
           menuOpen ? 'translate-x-0' : '-translate-x-full',
@@ -189,7 +191,13 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       <div className="flex flex-col flex-1 min-w-0">
-        <header className="flex items-center gap-3 px-4 h-12 bg-gradient-to-b from-olive-800 to-sidebar-deep md:hidden shrink-0">
+        <header
+          className={`flex items-center gap-3 px-4 h-12 md:hidden shrink-0 ${
+            theme === THEMES.LA_OLIVA
+              ? 'bg-brand-primary'
+              : 'bg-gradient-to-b from-olive-800 to-sidebar-deep'
+          }`}
+        >
           <IconButton
             icon="menu"
             label="Abrir menú"
