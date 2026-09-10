@@ -203,6 +203,8 @@
   /* Finanzas */
   --color-balance-up-bg: #f1f5e8;
   --color-balance-up-border: #d5e2bb;
+  --color-finance-balance-bg: var(--color-balance-up-bg);
+  --color-finance-balance-border: var(--color-balance-up-border);
   --color-balance-down-bg: #faf0eb;
   --color-balance-down-border: #eed6cb;
   --color-expense-icon-bg: #f4e3dc;
@@ -339,8 +341,10 @@ html[data-theme='la-oliva'] {
   --color-menu-sticky-bg: #f7f0e7;
   --color-menu-dish-text: #503c1b;
 
-  --color-balance-up-bg: #ebebd9;
-  --color-balance-up-border: #d1d2ad;
+  --color-balance-up-bg: #f7f0e4;
+  --color-balance-up-border: #d7c8b0;
+  --color-finance-balance-bg: #f7f0e4;
+  --color-finance-balance-border: #d7c8b0;
   --color-balance-down-bg: #f7e3da;
   --color-balance-down-border: #e5c1ad;
   --color-expense-icon-bg: #f3ded2;

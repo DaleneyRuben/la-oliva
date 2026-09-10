@@ -23,6 +23,15 @@ describe('FinanceTiles', () => {
     expect(screen.getByText('+13.350')).toBeInTheDocument();
   });
 
+  it('uses the dedicated calm surface for a non-negative balance', () => {
+    setup();
+
+    expect(screen.getByText('Balance').parentElement?.parentElement).toHaveClass(
+      'bg-finance-balance-bg',
+      'border-finance-balance-border',
+    );
+  });
+
   it('marks a negative balance with a minus rather than a parenthesis', () => {
     setup({ balance: -4200 });
 
