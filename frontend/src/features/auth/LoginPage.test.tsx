@@ -45,6 +45,15 @@ describe('LoginPage', () => {
     expect(screen.getAllByAltText('La Oliva')[0]).toHaveAttribute('src', 'la-oliva-logo.png');
   });
 
+  it('uses semantic primary surfaces for the brand panel and submit action', async () => {
+    renderPage();
+
+    expect(screen.getByTestId('login-brand-panel')).toHaveClass('bg-sidebar');
+    await userEvent.type(screen.getByLabelText(/usuario/i, { selector: 'input' }), 'admin');
+    await userEvent.type(screen.getByLabelText(/contraseña/i, { selector: 'input' }), 'secret');
+    expect(screen.getByRole('button', { name: 'Ingresar' })).toHaveClass('bg-brand-primary');
+  });
+
   it('offers the compact theme selector', () => {
     renderPage();
 

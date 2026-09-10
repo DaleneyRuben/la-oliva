@@ -110,7 +110,7 @@ describe('Layout', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('complementary')).toHaveClass('bg-brand-primary');
+    expect(screen.getByRole('complementary')).toHaveClass('bg-sidebar');
   });
 
   it('renders the brand wordmark and tagline', () => {
