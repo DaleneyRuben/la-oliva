@@ -138,6 +138,18 @@ describe('Layout', () => {
     expect(screen.getByRole('radio', { name: 'Clásica' })).toBeInTheDocument();
   });
 
+  it('makes the sidebar navigation scrollable without displacing the footer', () => {
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('navigation')).toHaveClass('min-h-0', 'overflow-y-auto');
+  });
+
   // Finanzas is the one Administración item an admin reaches, so the section label appears for
   // them too — with nothing else under it.
   it('renders every section label for the admin role', () => {
