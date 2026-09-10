@@ -135,7 +135,7 @@ export function Layout({ children }: LayoutProps) {
             Catering · con altura
           </p>
         </div>
-        <nav className="flex-1 py-[18px] flex flex-col gap-0.5">
+        <nav className="flex-1 min-h-0 overflow-y-auto py-[18px] flex flex-col gap-0.5">
           {NAV_SECTIONS.map(({ label: sectionLabel, items, separated }) => {
             const visibleItems = items.filter(
               ({ allowedRoles }) => user && allowedRoles.includes(user.role),
