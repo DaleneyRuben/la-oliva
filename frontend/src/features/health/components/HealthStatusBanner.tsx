@@ -19,7 +19,7 @@ const BANNER_STYLES: Record<
     title: 'Todos los sistemas operativos',
     desc: 'La API y los servicios conectados responden con normalidad.',
     icon: 'check',
-    bg: 'bg-success-soft-bg',
+    bg: 'bg-health-ok-bg',
     border: 'border-olive-200',
     dotBg: 'bg-ok',
     halo: 'shadow-[var(--shadow-halo-ok)]',

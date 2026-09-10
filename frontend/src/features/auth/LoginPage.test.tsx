@@ -13,6 +13,9 @@ jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
 }));
 
+jest.mock('@/assets/logo.png', () => ({ __esModule: true, default: 'classic-logo.png' }));
+jest.mock('@/assets/la-oliva-logo.png', () => ({ __esModule: true, default: 'la-oliva-logo.png' }));
+
 const mockNavigate = jest.fn();
 const mockSetAuth = jest.fn();
 
@@ -34,6 +37,19 @@ describe('LoginPage', () => {
   it('disables submit when fields are empty', () => {
     renderPage();
     expect(screen.getByRole('button', { name: 'Ingresar' })).toBeDisabled();
+  });
+
+  it('uses the La Oliva logo by default', () => {
+    renderPage();
+
+    expect(screen.getAllByAltText('La Oliva')[0]).toHaveAttribute('src', 'la-oliva-logo.png');
+  });
+
+  it('offers the compact theme selector', () => {
+    renderPage();
+
+    expect(screen.getByRole('radio', { name: 'La Oliva' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Clásica' })).toBeInTheDocument();
   });
 
   it('enables submit when both fields are filled', async () => {

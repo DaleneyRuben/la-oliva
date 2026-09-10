@@ -82,7 +82,7 @@ export function FinanceTiles({
       <div
         className={`border rounded-[13px] px-[26px] py-5 flex items-center justify-between gap-5 ${
           up
-            ? 'bg-balance-up-bg border-balance-up-border'
+            ? 'bg-finance-balance-bg border-finance-balance-border'
             : 'bg-balance-down-bg border-balance-down-border'
         }`}
       >

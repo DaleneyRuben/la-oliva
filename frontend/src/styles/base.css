@@ -8,6 +8,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.brand-oliva {
+  font-family: var(--font-brand-script, var(--font-serif));
+  font-size: 1.4em;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.75;
+}
+
 button {
   cursor: pointer;
 }
@@ -43,6 +51,10 @@ select {
 /* Login panel glow — radial gradient not expressible in Tailwind */
 .login-panel-glow {
   background: radial-gradient(ellipse at 32% 44%, rgba(109, 193, 24, 0.11) 0%, transparent 62%);
+}
+
+html[data-theme='la-oliva'] .login-panel-glow {
+  background: radial-gradient(ellipse at 32% 44%, rgb(200 134 52 / 18%) 0%, transparent 62%);
 }
 
 /* Brand mark — radial gradient not expressible in Tailwind */

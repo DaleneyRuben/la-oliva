@@ -4,6 +4,8 @@ import { Toaster } from 'sonner';
 import { Icon } from '@ui/Icon';
 import { IconButton } from '@ui/IconButton';
 import { useAuth } from '@/features/auth/AuthContext';
+import { ThemeSwitcher } from '@/features/theme/ThemeSwitcher';
+import { THEMES, useTheme } from '@/features/theme/theme';
 import { ROLES, ROLE_LABELS, type UserRole } from '@/constants/roles';
 
 interface NavItem {
@@ -80,7 +82,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   [
     'flex items-center gap-3 border-l-[3px] px-[22px] py-[9px] text-[13.5px] transition-colors',
     isActive
-      ? 'border-olive-400 bg-white/10 text-olive-50 font-semibold'
+      ? 'border-brand-gold bg-white/10 text-olive-50 font-semibold'
       : 'border-transparent text-olive-50/62 hover:text-olive-50 hover:bg-white/6',
   ].join(' ');
 
@@ -89,6 +91,7 @@ export function Layout({ children }: LayoutProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, clearAuth } = useAuth();
+  const { theme } = useTheme();
   const mainRef = useRef<HTMLElement>(null);
 
   const handleLogout = () => {
@@ -122,8 +125,11 @@ export function Layout({ children }: LayoutProps) {
         ].join(' ')}
       >
         <div className="px-[22px] pt-[26px] pb-[22px] border-b border-white/10">
-          <p className="font-serif font-semibold text-[27px] leading-none text-olive-50 tracking-[.01em]">
-            La Oliva
+          <p
+            className="font-serif font-semibold text-[27px] leading-none text-olive-50 tracking-[.01em]"
+            aria-label="La Oliva"
+          >
+            La <span className={theme === THEMES.LA_OLIVA ? 'brand-oliva' : undefined}>Oliva</span>
           </p>
           <p className="font-mono text-[8.5px] tracking-[.32em] text-olive-300 mt-[7px] uppercase">
             Catering · con altura
@@ -151,26 +157,34 @@ export function Layout({ children }: LayoutProps) {
             );
           })}
         </nav>
-        <div className="border-t border-white/10 px-[18px] py-[14px] flex items-center gap-[11px]">
-          <div className="w-[34px] h-[34px] rounded-full bg-olive-400 text-sidebar-deep flex items-center justify-center font-bold text-[13px] shrink-0">
-            {user?.username?.[0]?.toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-olive-50 leading-tight truncate">
-              {user?.username}
+        <div className="border-t border-white/10 px-[18px] py-[14px]">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="font-mono text-[8px] tracking-[.16em] text-olive-300/70 uppercase">
+              Tema
             </p>
-            <p className="font-mono text-[9.5px] tracking-[.08em] text-olive-300/75 uppercase">
-              {user && ROLE_LABELS[user.role]}
-            </p>
+            <ThemeSwitcher />
           </div>
-          <IconButton
-            icon="logout"
-            label="Cerrar sesión"
-            onClick={handleLogout}
-            size={16}
-            title="Cerrar sesión"
-            className="text-olive-50/50 hover:text-olive-50 shrink-0"
-          />
+          <div className="flex items-center gap-[11px]">
+            <div className="w-[34px] h-[34px] rounded-full bg-brand-gold text-sidebar-deep flex items-center justify-center font-bold text-[13px] shrink-0">
+              {user?.username?.[0]?.toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-olive-50 leading-tight truncate">
+                {user?.username}
+              </p>
+              <p className="font-mono text-[9.5px] tracking-[.08em] text-olive-300/75 uppercase">
+                {user && ROLE_LABELS[user.role]}
+              </p>
+            </div>
+            <IconButton
+              icon="logout"
+              label="Cerrar sesión"
+              onClick={handleLogout}
+              size={16}
+              title="Cerrar sesión"
+              className="text-olive-50/50 hover:text-olive-50 shrink-0"
+            />
+          </div>
         </div>
       </aside>
 
@@ -183,8 +197,11 @@ export function Layout({ children }: LayoutProps) {
             size={20}
             className="text-olive-50/60 hover:text-olive-50"
           />
-          <p className="font-serif font-semibold text-[20px] leading-none text-olive-50">
-            La Oliva
+          <p
+            className="font-serif font-semibold text-[20px] leading-none text-olive-50"
+            aria-label="La Oliva"
+          >
+            La <span className={theme === THEMES.LA_OLIVA ? 'brand-oliva' : undefined}>Oliva</span>
           </p>
         </header>
         <main ref={mainRef} className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">

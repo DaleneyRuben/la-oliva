@@ -52,9 +52,10 @@ describe('Field', () => {
 });
 
 describe('inputCls', () => {
-  it('matches the design: white background, 9px radius, 14px font, 11/14 padding', () => {
+  it('uses the shared paper surface and primary focus treatment', () => {
     const cls = inputCls();
-    expect(cls).toContain('bg-white');
+    expect(cls).toContain('bg-paper');
+    expect(cls).toContain('focus:border-brand-primary');
     expect(cls).toContain('rounded-[9px]');
     expect(cls).toContain('text-[14px]');
     expect(cls).toContain('py-[11px]');

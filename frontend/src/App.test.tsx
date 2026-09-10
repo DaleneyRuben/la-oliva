@@ -38,6 +38,15 @@ function renderAt(path: string, role: string = 'admin') {
 }
 
 describe('App', () => {
+  it('applies the default La Oliva theme', () => {
+    window.localStorage.clear();
+    delete document.documentElement.dataset.theme;
+
+    renderAt('/');
+
+    expect(document.documentElement.dataset.theme).toBe('la-oliva');
+  });
+
   it('renders the dashboard at root', () => {
     renderAt('/');
     expect(screen.getByRole('heading', { name: 'Panel' })).toBeInTheDocument();

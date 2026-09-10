@@ -3,6 +3,33 @@
 Glossary of canonical terms for the catering-manager domain. Code identifiers are English;
 UI labels are neutral Spanish. Each entry: term (code identifier) — definition.
 
+## Visual identity
+
+- **Visual theme** (`theme`) — the complete named visual-token set applied to the staff panel,
+  including its typography, colour palette, logo treatment, and related UI styling.
+- **La Oliva theme** (`laOliva`) — the default visual theme, derived from the approved La Oliva
+  brand guide and official logo.
+- **Clásica** (`classic`) — the existing green visual theme, retained as the selectable
+  alternative to the default La Oliva theme. _Avoid_: legacy theme; old theme; Variant 1.
+- **Theme preference** (`themePreference`) — the Visual theme selected in a browser; it persists
+  locally across reloads and authentication sessions, and is not a property of a staff account.
+- **Theme logo** (`themeLogo`) — the logo asset paired with a Visual theme. Clásica keeps its
+  existing assets; the La Oliva theme uses the supplied official La Oliva logo. Both themes use
+  their full logo on login and loading screens; navigation keeps the existing text-lockup layout.
+  The browser favicon follows the active Visual theme too.
+- **Semantic state colour** — a colour that communicates an operational state such as warning,
+  destructive action, success, role, or calendar status. It remains distinct and accessible in
+  every Visual theme; brand-palette colours do not replace its meaning.
+- **Theme scope** — a Visual theme changes styling and theme-specific branding only. It does not
+  change routes, operational behavior, Spanish UI copy, or component layouts, except for the
+  theme selector and responsive logo sizing.
+- **La Oliva primary** — the olive swatch `#706132`, used for primary interactive controls and
+  navigation in the La Oliva theme. Terracotta is a secondary brand-emphasis colour, never a
+  replacement for a semantic state colour.
+- **La Oliva type roles** — Bodoni Moda is the display serif, Montserrat is the interface and
+  numeric sans-serif, and Italianno is reserved for the La Oliva wordmark and intentional
+  ornamental brand copy. Clásica retains Cormorant Garamond, Manrope, and JetBrains Mono.
+
 ## Production (kitchen prep planning)
 
 - **Production view** (`production`) — the kitchen-facing screen listing _tomorrow's_ active

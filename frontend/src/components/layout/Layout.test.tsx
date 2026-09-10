@@ -89,7 +89,7 @@ describe('Layout', () => {
     expect(aside.className).not.toContain('-translate-x-full');
   });
 
-  it('active nav link has the lime accent border', () => {
+  it('active nav link has the La Oliva gold accent border', () => {
     render(
       <MemoryRouter initialEntries={['/clientes']}>
         <Layout>
@@ -98,7 +98,7 @@ describe('Layout', () => {
       </MemoryRouter>,
     );
     const clientesLink = screen.getByRole('link', { name: /clientes/i });
-    expect(clientesLink.className).toContain('border-olive-400');
+    expect(clientesLink.className).toContain('border-brand-gold');
   });
 
   it('renders the brand wordmark and tagline', () => {
@@ -111,6 +111,31 @@ describe('Layout', () => {
     );
     expect(screen.getAllByText('La Oliva').length).toBeGreaterThan(0);
     expect(screen.getByText('Catering · con altura')).toBeInTheDocument();
+  });
+
+  it('uses the La Oliva script treatment for the Oliva wordmark', () => {
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getAllByText('Oliva')[0]).toHaveClass('brand-oliva');
+  });
+
+  it('offers the visual theme switcher in the sidebar', () => {
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('radio', { name: 'La Oliva' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Clásica' })).toBeInTheDocument();
   });
 
   // Finanzas is the one Administración item an admin reaches, so the section label appears for
