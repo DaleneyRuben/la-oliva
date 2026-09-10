@@ -36,6 +36,30 @@ describe('UserTable', () => {
     expect(screen.getByText('chef')).toBeInTheDocument();
   });
 
+  it('orders users by role access level', () => {
+    render(
+      <UserTable
+        users={[
+          makeUser({ id: '1', username: 'nutritionist', role: 'nutritionist' }),
+          makeUser({ id: '2', username: 'delivery', role: 'delivery' }),
+          makeUser({ id: '3', username: 'kitchen', role: 'kitchen' }),
+          makeUser({ id: '4', username: 'audit', role: 'audit' }),
+          makeUser({ id: '5', username: 'admin', role: 'admin' }),
+          makeUser({ id: '6', username: 'super-admin', role: 'super_admin' }),
+        ]}
+        onHistory={() => {}}
+        onEdit={() => {}}
+      />,
+    );
+
+    expect(
+      screen
+        .getAllByRole('row')
+        .slice(1)
+        .map((row) => row.cells[1].textContent),
+    ).toEqual(['Super admin', 'Admin', 'Auditoría', 'Cocina', 'Delivery', 'Nutricionista']);
+  });
+
   it('shows Nunca when the user has never logged in', () => {
     render(
       <UserTable

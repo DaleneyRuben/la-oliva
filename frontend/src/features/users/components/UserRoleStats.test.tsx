@@ -23,6 +23,16 @@ describe('UserRoleStats', () => {
     expect(screen.getByText('Nutricionista')).toBeInTheDocument();
   });
 
+  it('orders role cards by access level', () => {
+    render(<UserRoleStats users={[]} />);
+
+    expect(
+      screen
+        .getAllByText(/^(Super admin|Admin|Auditoría|Cocina|Delivery|Nutricionista)$/)
+        .map((card) => card.textContent),
+    ).toEqual(['Super admin', 'Admin', 'Auditoría', 'Cocina', 'Delivery', 'Nutricionista']);
+  });
+
   it('shows the count of users per role', () => {
     render(
       <UserRoleStats
