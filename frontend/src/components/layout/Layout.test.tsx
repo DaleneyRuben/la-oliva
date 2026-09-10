@@ -101,6 +101,18 @@ describe('Layout', () => {
     expect(clientesLink.className).toContain('border-brand-gold');
   });
 
+  it('uses the semantic primary surface for the sidebar', () => {
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('complementary')).toHaveClass('bg-sidebar');
+  });
+
   it('renders the brand wordmark and tagline', () => {
     render(
       <MemoryRouter>

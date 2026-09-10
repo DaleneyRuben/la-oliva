@@ -13,8 +13,8 @@ describe('ToggleGroup', () => {
 
   it('applies selected class to the active option', () => {
     render(<ToggleGroup options={options} value="Centro" onChange={jest.fn()} />);
-    expect(screen.getByRole('button', { name: 'Centro' }).className).toContain('bg-olive-700');
-    expect(screen.getByRole('button', { name: 'Sur' }).className).not.toContain('bg-olive-700');
+    expect(screen.getByRole('button', { name: 'Centro' }).className).toContain('bg-brand-primary');
+    expect(screen.getByRole('button', { name: 'Sur' }).className).not.toContain('bg-brand-primary');
   });
 
   it('calls onChange with the clicked option', async () => {

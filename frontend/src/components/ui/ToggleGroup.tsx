@@ -9,7 +9,7 @@ export function ToggleGroup({
   options,
   value,
   onChange,
-  selectedClassName = 'bg-olive-700 text-white border-olive-700',
+  selectedClassName = 'bg-brand-primary text-brand-on-primary border-brand-primary',
 }: Props) {
   return (
     <div className="flex gap-[7px]">

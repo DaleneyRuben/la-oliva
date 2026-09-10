@@ -73,8 +73,10 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left decorative panel — hidden on mobile */}
-      <div className="hidden md:flex md:w-[44%] flex-col items-center justify-center bg-olive-900 relative overflow-hidden login-panel-left">
-        <div className="absolute inset-0 pointer-events-none login-panel-glow" />
+      <div
+        data-testid="login-brand-panel"
+        className="hidden md:flex md:w-[44%] flex-col items-center justify-center bg-sidebar relative overflow-hidden login-panel-left"
+      >
         <div className="relative z-10 flex flex-col items-center gap-6 px-14 text-center">
           <div className="w-36 h-36 rounded-full bg-paper/90 flex items-center justify-center p-2 shadow-xl ring-1 ring-white/10">
             <img src={logo} alt="La Oliva" className="w-full h-auto" />
@@ -155,10 +157,10 @@ export function LoginPage() {
                 variant="bare"
                 disabled={busy || !username || !password}
                 className={[
-                  'w-full text-white font-medium transition-all duration-300',
+                  'w-full text-brand-on-primary font-medium transition-all duration-300',
                   submitState === 'success'
-                    ? 'bg-olive-700 cursor-default'
-                    : 'bg-olive-600 hover:bg-olive-700 disabled:opacity-50 disabled:cursor-not-allowed',
+                    ? 'bg-brand-primary cursor-default'
+                    : 'bg-brand-primary hover:bg-brand-primary-hover disabled:opacity-50 disabled:cursor-not-allowed',
                 ].join(' ')}
                 style={{
                   padding: '10px 16px',
