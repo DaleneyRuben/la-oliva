@@ -126,7 +126,7 @@ describe('ConfirmModal', () => {
     const badge = screen.getByTestId('confirm-modal-icon-badge');
     expect(badge.className).toContain('bg-ok-bg');
     const confirmButton = screen.getByRole('button', { name: /confirmar pago/i });
-    expect(confirmButton.className).toContain('bg-olive-700');
+    expect(confirmButton.className).toContain('bg-brand-primary');
   });
 
   it('disables buttons while loading', async () => {

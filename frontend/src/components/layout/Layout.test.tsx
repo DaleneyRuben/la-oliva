@@ -89,7 +89,7 @@ describe('Layout', () => {
     expect(aside.className).not.toContain('-translate-x-full');
   });
 
-  it('active nav link has the lime accent border', () => {
+  it('active nav link has the La Oliva gold accent border', () => {
     render(
       <MemoryRouter initialEntries={['/clientes']}>
         <Layout>
@@ -98,7 +98,7 @@ describe('Layout', () => {
       </MemoryRouter>,
     );
     const clientesLink = screen.getByRole('link', { name: /clientes/i });
-    expect(clientesLink.className).toContain('border-olive-400');
+    expect(clientesLink.className).toContain('border-brand-gold');
   });
 
   it('renders the brand wordmark and tagline', () => {

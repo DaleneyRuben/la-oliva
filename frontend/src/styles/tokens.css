@@ -11,6 +11,15 @@
   --color-olive-800: #1e3c0a;
   --color-olive-900: #142806;
 
+  /* Intent-bearing aliases keep the shared UI independent from a theme's color ramp. */
+  --color-brand-primary: var(--color-olive-700);
+  --color-brand-primary-hover: var(--color-olive-800);
+  --color-brand-on-primary: var(--color-olive-50);
+  --color-brand-gold: var(--color-olive-400);
+  --color-brand-sage: var(--color-olive-300);
+  --color-brand-terracotta: #a8512f;
+  --color-brand-plum: #563044;
+
   /* Semantic colors */
   --color-cream: #f7f6f1;
   --color-cream-2: #efece2;
@@ -233,16 +242,25 @@
 }
 
 html[data-theme='la-oliva'] {
-  --color-olive-50: #fbf6ee;
-  --color-olive-100: #eee2cf;
-  --color-olive-200: #d2c0a7;
-  --color-olive-300: #b6a07b;
-  --color-olive-400: #c88634;
-  --color-olive-500: #8d743d;
+  /* Keep inherited olive utilities olive. Gold and terracotta are deliberate accents below. */
+  --color-olive-50: #fbf8f1;
+  --color-olive-100: #f0eadf;
+  --color-olive-200: #ded4c1;
+  --color-olive-300: #b8aa86;
+  --color-olive-400: #92815b;
+  --color-olive-500: #7d6d43;
   --color-olive-600: #706132;
   --color-olive-700: #503c1b;
-  --color-olive-800: #503c1b;
+  --color-olive-800: #463415;
   --color-olive-900: #37280f;
+
+  --color-brand-primary: #706132;
+  --color-brand-primary-hover: #503c1b;
+  --color-brand-on-primary: #fff9f1;
+  --color-brand-gold: #c88634;
+  --color-brand-sage: #92815b;
+  --color-brand-terracotta: #a9511f;
+  --color-brand-plum: #563044;
 
   --color-cream: #ebe0d3;
   --color-cream-2: #e4d4c1;
@@ -344,6 +362,42 @@ html[data-theme='la-oliva'] {
   --color-open-month-border: #dfc99f;
   --color-open-month-text: #81622f;
   --color-open-month-dot: #c88634;
+
+  /* Delivery groups are a quiet, related family — not leftover green/teal status colors. */
+  --color-delivery-1-accent: #706132;
+  --color-delivery-1-card-bg: #f8f3ea;
+  --color-delivery-1-card-border: #dfd2bf;
+  --color-delivery-1-chip-bg: #eee6d8;
+  --color-delivery-1-chip-text: #503c1b;
+  --color-delivery-1-avatar-border: #d4c3aa;
+
+  --color-delivery-2-accent: #c88634;
+  --color-delivery-2-card-bg: #fcf6e9;
+  --color-delivery-2-card-border: #ead8af;
+  --color-delivery-2-chip-bg: #f3e2bf;
+  --color-delivery-2-chip-text: #81622f;
+  --color-delivery-2-avatar-border: #dfc99f;
+
+  --color-delivery-3-accent: #92815b;
+  --color-delivery-3-card-bg: #f5f3e8;
+  --color-delivery-3-card-border: #d9d7bb;
+  --color-delivery-3-chip-bg: #e8e8d2;
+  --color-delivery-3-chip-text: #5f6334;
+  --color-delivery-3-avatar-border: #d1d2ad;
+
+  --color-delivery-4-accent: #a9511f;
+  --color-delivery-4-card-bg: #fcf0ea;
+  --color-delivery-4-card-border: #ebcdbd;
+  --color-delivery-4-chip-bg: #f3ded2;
+  --color-delivery-4-chip-text: #8a431f;
+  --color-delivery-4-avatar-border: #e2b9a3;
+
+  --color-delivery-5-accent: #563044;
+  --color-delivery-5-card-bg: #f7eff2;
+  --color-delivery-5-card-border: #e1cdd5;
+  --color-delivery-5-chip-bg: #eee0e5;
+  --color-delivery-5-chip-text: #563044;
+  --color-delivery-5-avatar-border: #d9bdc8;
 
   --shadow-dropdown: 0 12px 32px rgb(80 60 27 / 16%);
   --shadow-dialog: 0 24px 60px rgb(80 60 27 / 32%);

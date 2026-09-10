@@ -10,8 +10,8 @@ describe('Button', () => {
 
   it('applies primary variant by default', () => {
     render(<Button>Guardar</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-olive-700');
-    expect(screen.getByRole('button')).toHaveClass('hover:bg-olive-800');
+    expect(screen.getByRole('button')).toHaveClass('bg-brand-primary');
+    expect(screen.getByRole('button')).toHaveClass('hover:bg-brand-primary-hover');
   });
 
   it('applies secondary variant', () => {

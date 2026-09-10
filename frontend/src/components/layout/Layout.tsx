@@ -82,7 +82,7 @@ const navLinkClass = ({ isActive }: { isActive: boolean }): string =>
   [
     'flex items-center gap-3 border-l-[3px] px-[22px] py-[9px] text-[13.5px] transition-colors',
     isActive
-      ? 'border-olive-400 bg-white/10 text-olive-50 font-semibold'
+      ? 'border-brand-gold bg-white/10 text-olive-50 font-semibold'
       : 'border-transparent text-olive-50/62 hover:text-olive-50 hover:bg-white/6',
   ].join(' ');
 
@@ -165,7 +165,7 @@ export function Layout({ children }: LayoutProps) {
             <ThemeSwitcher />
           </div>
           <div className="flex items-center gap-[11px]">
-            <div className="w-[34px] h-[34px] rounded-full bg-olive-400 text-sidebar-deep flex items-center justify-center font-bold text-[13px] shrink-0">
+            <div className="w-[34px] h-[34px] rounded-full bg-brand-gold text-sidebar-deep flex items-center justify-center font-bold text-[13px] shrink-0">
               {user?.username?.[0]?.toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
