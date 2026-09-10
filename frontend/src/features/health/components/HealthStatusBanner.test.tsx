@@ -6,6 +6,9 @@ describe('HealthStatusBanner', () => {
     render(<HealthStatusBanner status="ok" checkedAt="2026-06-22T20:15:00" />);
     expect(screen.getByText('Todos los sistemas operativos')).toBeInTheDocument();
     expect(
+      screen.getByText('Todos los sistemas operativos').parentElement?.parentElement,
+    ).toHaveClass('bg-health-ok-bg');
+    expect(
       screen.getByText('La API y los servicios conectados responden con normalidad.'),
     ).toBeInTheDocument();
   });

@@ -64,6 +64,7 @@
   --color-warn-text: #7a5e0c;
   --color-warn-text-strong: #5e480a;
   --color-success-soft-bg: #e9f0dc;
+  --color-health-ok-bg: var(--color-success-soft-bg);
 
   /* Sidebar */
   --color-sidebar-deep: #152a06;
@@ -283,6 +284,8 @@ html[data-theme='la-oliva'] {
   --color-required: #a9511f;
   --color-row-selected: #f0e7d5;
   --color-success-text: #5f6334;
+  /* Health is informational success, so it receives a warm paper wash rather than status green. */
+  --color-health-ok-bg: #f5f0e6;
 
   --color-ok: #5f6334;
   --color-ok-bg: #e3e2ca;
