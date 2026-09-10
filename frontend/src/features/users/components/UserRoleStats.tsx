@@ -1,6 +1,7 @@
 import { Icon } from '@ui/Icon';
-import { ROLES, ROLE_LABELS } from '@/constants/roles';
+import { ROLE_LABELS } from '@/constants/roles';
 import { ROLE_ICON_CLASSES } from '@/features/users/roleStyles';
+import { USER_ROLE_DISPLAY_ORDER } from '@/features/users/roleOrder';
 import type { AppUser } from '@/features/users/hooks/useUsers';
 import type { UserRole } from '@/features/auth/AuthContext';
 
@@ -13,15 +14,6 @@ const ROLE_ICONS: Record<UserRole, string> = {
   audit: 'shield-check',
 };
 
-const ROLE_ORDER: UserRole[] = [
-  ROLES.SUPER_ADMIN,
-  ROLES.ADMIN,
-  ROLES.KITCHEN,
-  ROLES.DELIVERY,
-  ROLES.NUTRITIONIST,
-  ROLES.AUDIT,
-];
-
 interface Props {
   users: AppUser[];
 }
@@ -29,7 +21,7 @@ interface Props {
 export function UserRoleStats({ users }: Props) {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(155px,1fr))] gap-[18px] mb-5">
-      {ROLE_ORDER.map((role) => (
+      {USER_ROLE_DISPLAY_ORDER.map((role) => (
         <div
           key={role}
           className="bg-paper border border-rule rounded-[13px] px-5 py-[18px] flex items-center gap-3.5"

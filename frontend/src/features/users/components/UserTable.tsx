@@ -3,6 +3,7 @@ import { initials } from '@/utils/string';
 import { formatLastSeen, isOnline } from '@/utils/format';
 import { ROLE_LABELS } from '@/constants/roles';
 import { ROLE_CLASSES, ROLE_ICON_CLASSES } from '@/features/users/roleStyles';
+import { sortUsersByRole } from '@/features/users/roleOrder';
 import type { AppUser } from '@/features/users/hooks/useUsers';
 
 interface Props {
@@ -47,7 +48,7 @@ export function UserTable({ users, onHistory, onEdit }: Props) {
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => {
+            {sortUsersByRole(users).map((u) => {
               const isActive = !!u.lastLoginAt && isOnline(u.lastLoginAt);
               return (
                 <tr
