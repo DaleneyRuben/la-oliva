@@ -245,16 +245,17 @@
 }
 
 html[data-theme='la-oliva'] {
-  /* Keep inherited olive utilities olive. Gold and terracotta are deliberate accents below. */
+  /* Raw olive-700 utilities are legacy primary-action classes, so they intentionally map to
+     Verde oliva principal. Gold and terracotta are deliberate accents below. */
   --color-olive-50: #fbf8f1;
   --color-olive-100: #f0eadf;
   --color-olive-200: #ded4c1;
   --color-olive-300: #b8aa86;
   --color-olive-400: #92815b;
-  --color-olive-500: #7d6d43;
-  --color-olive-600: #706132;
-  --color-olive-700: #503c1b;
-  --color-olive-800: #463415;
+  --color-olive-500: #857653;
+  --color-olive-600: #7d6d43;
+  --color-olive-700: #706132;
+  --color-olive-800: #503c1b;
   --color-olive-900: #37280f;
 
   --color-brand-primary: #706132;
