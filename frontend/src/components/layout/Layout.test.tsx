@@ -113,6 +113,19 @@ describe('Layout', () => {
     expect(screen.getByText('Catering · con altura')).toBeInTheDocument();
   });
 
+  it('offers the visual theme switcher in the sidebar', () => {
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('radio', { name: 'La Oliva' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Clásica' })).toBeInTheDocument();
+  });
+
   // Finanzas is the one Administración item an admin reaches, so the section label appears for
   // them too — with nothing else under it.
   it('renders every section label for the admin role', () => {

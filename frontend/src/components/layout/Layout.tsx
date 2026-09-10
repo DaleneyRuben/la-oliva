@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { Icon } from '@ui/Icon';
 import { IconButton } from '@ui/IconButton';
 import { useAuth } from '@/features/auth/AuthContext';
+import { ThemeSwitcher } from '@/features/theme/ThemeSwitcher';
 import { ROLES, ROLE_LABELS, type UserRole } from '@/constants/roles';
 
 interface NavItem {
@@ -151,26 +152,34 @@ export function Layout({ children }: LayoutProps) {
             );
           })}
         </nav>
-        <div className="border-t border-white/10 px-[18px] py-[14px] flex items-center gap-[11px]">
-          <div className="w-[34px] h-[34px] rounded-full bg-olive-400 text-sidebar-deep flex items-center justify-center font-bold text-[13px] shrink-0">
-            {user?.username?.[0]?.toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-semibold text-olive-50 leading-tight truncate">
-              {user?.username}
+        <div className="border-t border-white/10 px-[18px] py-[14px]">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <p className="font-mono text-[8px] tracking-[.16em] text-olive-300/70 uppercase">
+              Tema
             </p>
-            <p className="font-mono text-[9.5px] tracking-[.08em] text-olive-300/75 uppercase">
-              {user && ROLE_LABELS[user.role]}
-            </p>
+            <ThemeSwitcher />
           </div>
-          <IconButton
-            icon="logout"
-            label="Cerrar sesión"
-            onClick={handleLogout}
-            size={16}
-            title="Cerrar sesión"
-            className="text-olive-50/50 hover:text-olive-50 shrink-0"
-          />
+          <div className="flex items-center gap-[11px]">
+            <div className="w-[34px] h-[34px] rounded-full bg-olive-400 text-sidebar-deep flex items-center justify-center font-bold text-[13px] shrink-0">
+              {user?.username?.[0]?.toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-olive-50 leading-tight truncate">
+                {user?.username}
+              </p>
+              <p className="font-mono text-[9.5px] tracking-[.08em] text-olive-300/75 uppercase">
+                {user && ROLE_LABELS[user.role]}
+              </p>
+            </div>
+            <IconButton
+              icon="logout"
+              label="Cerrar sesión"
+              onClick={handleLogout}
+              size={16}
+              title="Cerrar sesión"
+              className="text-olive-50/50 hover:text-olive-50 shrink-0"
+            />
+          </div>
         </div>
       </aside>
 
