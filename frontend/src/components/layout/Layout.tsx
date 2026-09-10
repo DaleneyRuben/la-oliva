@@ -5,6 +5,7 @@ import { Icon } from '@ui/Icon';
 import { IconButton } from '@ui/IconButton';
 import { useAuth } from '@/features/auth/AuthContext';
 import { ThemeSwitcher } from '@/features/theme/ThemeSwitcher';
+import { THEMES, useTheme } from '@/features/theme/theme';
 import { ROLES, ROLE_LABELS, type UserRole } from '@/constants/roles';
 
 interface NavItem {
@@ -90,6 +91,7 @@ export function Layout({ children }: LayoutProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { user, clearAuth } = useAuth();
+  const { theme } = useTheme();
   const mainRef = useRef<HTMLElement>(null);
 
   const handleLogout = () => {
@@ -123,8 +125,11 @@ export function Layout({ children }: LayoutProps) {
         ].join(' ')}
       >
         <div className="px-[22px] pt-[26px] pb-[22px] border-b border-white/10">
-          <p className="font-serif font-semibold text-[27px] leading-none text-olive-50 tracking-[.01em]">
-            La Oliva
+          <p
+            className="font-serif font-semibold text-[27px] leading-none text-olive-50 tracking-[.01em]"
+            aria-label="La Oliva"
+          >
+            La <span className={theme === THEMES.LA_OLIVA ? 'brand-oliva' : undefined}>Oliva</span>
           </p>
           <p className="font-mono text-[8.5px] tracking-[.32em] text-olive-300 mt-[7px] uppercase">
             Catering · con altura
@@ -192,8 +197,11 @@ export function Layout({ children }: LayoutProps) {
             size={20}
             className="text-olive-50/60 hover:text-olive-50"
           />
-          <p className="font-serif font-semibold text-[20px] leading-none text-olive-50">
-            La Oliva
+          <p
+            className="font-serif font-semibold text-[20px] leading-none text-olive-50"
+            aria-label="La Oliva"
+          >
+            La <span className={theme === THEMES.LA_OLIVA ? 'brand-oliva' : undefined}>Oliva</span>
           </p>
         </header>
         <main ref={mainRef} className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden">

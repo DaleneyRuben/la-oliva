@@ -113,6 +113,18 @@ describe('Layout', () => {
     expect(screen.getByText('Catering · con altura')).toBeInTheDocument();
   });
 
+  it('uses the La Oliva script treatment for the Oliva wordmark', () => {
+    render(
+      <MemoryRouter>
+        <Layout>
+          <span />
+        </Layout>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getAllByText('Oliva')[0]).toHaveClass('brand-oliva');
+  });
+
   it('offers the visual theme switcher in the sidebar', () => {
     render(
       <MemoryRouter>

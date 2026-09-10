@@ -6,8 +6,11 @@ import { Icon } from '@ui/Icon';
 import { IconButton } from '@ui/IconButton';
 import { API_BASE } from '@/utils/env';
 import { useAuth } from '@/features/auth/AuthContext';
+import { THEMES, useTheme } from '@/features/theme/theme';
+import { ThemeSwitcher } from '@/features/theme/ThemeSwitcher';
 import { ROLES, type UserRole } from '@/constants/roles';
-import logo from '@/assets/logo.png';
+import classicLogo from '@/assets/logo.png';
+import laOlivaLogo from '@/assets/la-oliva-logo.png';
 
 type LoginResponse = {
   token: string;
@@ -26,7 +29,9 @@ const redirectForRole = (role: UserRole): string => {
 
 export function LoginPage() {
   const { setAuth } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
+  const logo = theme === THEMES.CLASSIC ? classicLogo : laOlivaLogo;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -86,7 +91,10 @@ export function LoginPage() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex-1 flex flex-col items-center justify-center bg-cream px-6 login-panel-right">
+      <div className="relative flex-1 flex flex-col items-center justify-center bg-cream px-6 login-panel-right">
+        <div className="absolute right-4 top-4">
+          <ThemeSwitcher tone="light" />
+        </div>
         {/* Mobile logo */}
         <div className="md:hidden mb-8">
           <img src={logo} alt="La Oliva" className="h-20 w-auto mx-auto" />

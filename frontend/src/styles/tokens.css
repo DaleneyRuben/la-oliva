@@ -231,3 +231,128 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --font-serif: 'Cormorant Garamond', Georgia, serif;
 }
+
+html[data-theme='la-oliva'] {
+  --color-olive-50: #fbf6ee;
+  --color-olive-100: #eee2cf;
+  --color-olive-200: #d2c0a7;
+  --color-olive-300: #b6a07b;
+  --color-olive-400: #c88634;
+  --color-olive-500: #8d743d;
+  --color-olive-600: #706132;
+  --color-olive-700: #503c1b;
+  --color-olive-800: #503c1b;
+  --color-olive-900: #37280f;
+
+  --color-cream: #ebe0d3;
+  --color-cream-2: #e4d4c1;
+  --color-paper: #fffaf3;
+  --color-ink: #503c1b;
+  --color-ink-2: #665439;
+  --color-muted: #7a684f;
+  --color-faint: #9d8a70;
+  --color-rule: #d2c0a7;
+  --color-rule-2: #b6a07b;
+  --color-hairline: #e4d7c7;
+  --color-row-hover: #f5ede3;
+  --color-empty-bg: #f1e7da;
+  --color-empty-border: #d7c8b4;
+  --color-empty-text: #9b8973;
+  --color-disabled-bg: #eadfce;
+  --color-disabled-solid-bg: #d7c8b4;
+  --color-placeholder: #a8957c;
+  --color-done-line: #92815b;
+  --color-required: #a9511f;
+  --color-row-selected: #f0e7d5;
+  --color-success-text: #5f6334;
+
+  --color-ok: #5f6334;
+  --color-ok-bg: #e3e2ca;
+  --color-warn: #8c5b1b;
+  --color-warn-bg: #f3e2bf;
+  --color-warn-border: #d9b875;
+  --color-warn-dot: #c88634;
+  --color-sidebar-deep: #37280f;
+  --color-modal-backdrop: rgb(80 60 27 / 48%);
+  --color-tooltip-bg: #503c1b;
+  --color-tooltip-text: #fffaf3;
+  --color-device-chip-bg: #f0e7d9;
+  --color-history-row-border: #e4d7c7;
+  --color-day-label: #a28d71;
+
+  --color-calendar-selectable: #b6a07b;
+  --color-calendar-delivered-bg: #b6a07b;
+  --color-calendar-delivered-text: #503c1b;
+  --color-calendar-pending-border: #d2c0a7;
+  --color-progress-track: #e7dac8;
+  --color-toggle-off: #d5c4ad;
+  --color-chip-bg: #f2e9dd;
+  --color-chip-border: #dfcfbb;
+  --color-chip-text: #665439;
+  --color-chip-dot: #92815b;
+  --color-plan-delete: #a9511f;
+  --color-plan-edit: #706132;
+
+  --color-day-badge-bg: #eee7d8;
+  --color-day-badge-border: #d7c7ad;
+  --color-count-chip-border: #d7c7ad;
+  --color-client-row: #503c1b;
+  --color-week-cell-bg: #fffaf3;
+  --color-week-cell-border: #e4d7c7;
+  --color-week-label: #665439;
+  --color-week-count-today: #706132;
+  --color-week-unit-label: #a28d71;
+  --color-empty-italic: #a8957c;
+
+  --color-tier-basic-border: #e3d7c6;
+  --color-tier-mid-bg: #f1e7d5;
+  --color-tier-mid-border: #dbc9ad;
+  --color-tier-premium-bg: #e7ddc7;
+  --color-tier-premium-border: #cdb994;
+
+  --color-today-gradient-start: #706132;
+  --color-today-gradient-end: #503c1b;
+  --color-today-text: #f7eddc;
+  --color-menu-today-empty: #f3ecdf;
+  --color-menu-other-filled: #fffaf3;
+  --color-menu-sticky-bg: #f7f0e7;
+  --color-menu-dish-text: #503c1b;
+
+  --color-balance-up-bg: #ebebd9;
+  --color-balance-up-border: #d1d2ad;
+  --color-balance-down-bg: #f7e3da;
+  --color-balance-down-border: #e5c1ad;
+  --color-expense-icon-bg: #f3ded2;
+  --color-expense-dot: #c98263;
+  --color-cat-bar-track: #e7dac8;
+  --color-movement-tag-bg: #eee4d6;
+  --color-movement-action-hover: #e9dccb;
+  --color-income-icon-bg: #e2e3ca;
+  --color-income-row-bg: #f3f2e4;
+  --color-income-tag-bg: #e8e8d2;
+  --color-income-link: #5f6334;
+  --color-archived-tag-border: #ddd0be;
+  --color-who-chip-bg: #fbf6ee;
+  --color-who-chip-bg-open: #eee7d8;
+  --color-who-chip-border: #e0d2c0;
+  --color-who-chip-text: #85725a;
+  --color-filter-chip-bg: #eee7d8;
+  --color-filter-chip-hover: #e4d7c5;
+  --color-filter-chip-text: #503c1b;
+  --color-filter-note-bg: #f4ecdf;
+  --color-open-month-bg: #f3e8ce;
+  --color-open-month-border: #dfc99f;
+  --color-open-month-text: #81622f;
+  --color-open-month-dot: #c88634;
+
+  --shadow-dropdown: 0 12px 32px rgb(80 60 27 / 16%);
+  --shadow-dialog: 0 24px 60px rgb(80 60 27 / 32%);
+  --shadow-card-hover: 0 8px 24px rgb(80 60 27 / 9%);
+  --shadow-card-elevated: 0 8px 24px rgb(80 60 27 / 14%);
+  --shadow-tooltip: 0 10px 26px rgb(80 60 27 / 28%);
+
+  --font-sans: 'Montserrat', system-ui, sans-serif;
+  --font-mono: 'Montserrat', system-ui, sans-serif;
+  --font-serif: 'Bodoni Moda', Georgia, serif;
+  --font-brand-script: 'Italianno', cursive;
+}

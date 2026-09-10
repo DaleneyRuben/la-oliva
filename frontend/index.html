@@ -2,9 +2,26 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/la-oliva-favicon.png" data-theme-favicon />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Catering Manager</title>
+    <script>
+      (() => {
+        const storageKey = 'la-oliva-theme';
+        let savedTheme;
+        try {
+          savedTheme = localStorage.getItem(storageKey);
+        } catch {
+          savedTheme = null;
+        }
+        const theme = savedTheme === 'classic' ? 'classic' : 'la-oliva';
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('[data-theme-favicon]').setAttribute(
+          'href',
+          theme === 'classic' ? '/favicon.png' : '/la-oliva-favicon.png',
+        );
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
