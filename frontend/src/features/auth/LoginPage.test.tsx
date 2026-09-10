@@ -49,6 +49,7 @@ describe('LoginPage', () => {
     renderPage();
 
     expect(screen.getByTestId('login-brand-panel')).toHaveClass('bg-sidebar');
+    expect(document.querySelector('.login-panel-glow')).not.toBeInTheDocument();
     await userEvent.type(screen.getByLabelText(/usuario/i, { selector: 'input' }), 'admin');
     await userEvent.type(screen.getByLabelText(/contraseña/i, { selector: 'input' }), 'secret');
     expect(screen.getByRole('button', { name: 'Ingresar' })).toHaveClass('bg-brand-primary');
