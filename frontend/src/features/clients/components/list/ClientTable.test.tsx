@@ -63,6 +63,13 @@ describe('ClientTable', () => {
     expect(screen.getByText('Sin resultados')).toBeInTheDocument();
   });
 
+  it('labels the contract end date column as Vencimiento', () => {
+    renderTable({ clients: [makeClient()], total: 1 });
+
+    expect(screen.getByRole('columnheader', { name: 'Vencimiento' })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: 'Contrato' })).not.toBeInTheDocument();
+  });
+
   it('marks a row whose client already has a renewal registered', () => {
     const client = makeClient({
       status: 'expiring',
