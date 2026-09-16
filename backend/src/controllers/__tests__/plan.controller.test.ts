@@ -95,7 +95,7 @@ describe('GET /api/plans/:id', () => {
   it('returns 409 when the plan has a current or future subscription', async () => {
     (remove as jest.Mock).mockRejectedValue(
       new ConflictError(
-        'This plan cannot be deleted because it has 2 current or future subscriptions.',
+        'No se puede eliminar este plan porque tiene 2 suscripciones actuales o futuras.',
       ),
     );
 
@@ -103,7 +103,7 @@ describe('GET /api/plans/:id', () => {
 
     expect(res.status).toBe(409);
     expect(res.body).toEqual({
-      message: 'This plan cannot be deleted because it has 2 current or future subscriptions.',
+      message: 'No se puede eliminar este plan porque tiene 2 suscripciones actuales o futuras.',
     });
   });
 

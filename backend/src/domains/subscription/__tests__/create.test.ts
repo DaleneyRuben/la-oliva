@@ -74,7 +74,7 @@ describe('create', () => {
       create(1, { planId: 2, startDate, contractDate: today, duration: 20, price: 1200 }, actor),
     ).rejects.toMatchObject({
       statusCode: 409,
-      message: 'The selected plan is no longer available.',
+      message: 'El plan seleccionado ya no está disponible.',
     });
     expect(Subscription.create).not.toHaveBeenCalled();
   });

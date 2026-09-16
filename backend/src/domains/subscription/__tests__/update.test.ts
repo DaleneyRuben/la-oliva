@@ -425,7 +425,7 @@ describe('update', () => {
 
     await expect(update(1, 1, { planId: 5 }, actor)).rejects.toMatchObject({
       statusCode: 409,
-      message: 'The selected plan is no longer available.',
+      message: 'El plan seleccionado ya no está disponible.',
     });
     expect(mockInstance.update).not.toHaveBeenCalled();
   });

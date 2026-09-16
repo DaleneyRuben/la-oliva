@@ -50,9 +50,20 @@ describe('remove', () => {
 
     await expect(remove(1)).rejects.toMatchObject({
       statusCode: 409,
-      message: 'This plan cannot be deleted because it has 2 current or future subscriptions.',
+      message: 'No se puede eliminar este plan porque tiene 2 suscripciones actuales o futuras.',
     });
     expect(mockInstance.destroy).not.toHaveBeenCalled();
+  });
+
+  it('uses singular Spanish copy when one subscription blocks deletion', async () => {
+    const mockInstance = { destroy: jest.fn().mockResolvedValue(undefined) };
+    (Plan.findByPk as jest.Mock).mockResolvedValue(mockInstance);
+    (Subscription.count as jest.Mock).mockResolvedValue(1);
+
+    await expect(remove(1)).rejects.toMatchObject({
+      statusCode: 409,
+      message: 'No se puede eliminar este plan porque tiene 1 suscripción actual o futura.',
+    });
   });
 
   it('returns false when plan not found', async () => {

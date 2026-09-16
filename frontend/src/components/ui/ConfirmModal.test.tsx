@@ -112,7 +112,9 @@ describe('ConfirmModal', () => {
   });
 
   it('shows the error and stays open when confirmation fails', async () => {
-    const onConfirm = jest.fn().mockRejectedValue(new Error('The plan still has subscriptions.'));
+    const onConfirm = jest
+      .fn()
+      .mockRejectedValue(new Error('El plan todavía tiene suscripciones.'));
     const onClose = jest.fn();
     render(
       <ConfirmModal
@@ -126,7 +128,7 @@ describe('ConfirmModal', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /confirmar/i }));
 
-    expect(await screen.findByText('The plan still has subscriptions.')).toBeInTheDocument();
+    expect(await screen.findByText('El plan todavía tiene suscripciones.')).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
