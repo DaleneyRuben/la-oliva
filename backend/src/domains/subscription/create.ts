@@ -1,4 +1,5 @@
 import { Transaction } from 'sequelize';
+import { PLAN_UNAVAILABLE_MESSAGE } from '../../constants/plan.constants';
 import { withTransaction } from '../../database/with-transaction';
 import Client from '../../models/Client';
 import Plan from '../../models/Plan';
@@ -31,7 +32,7 @@ const createWithinTransaction = async (
     transaction,
     lock: transaction.LOCK.KEY_SHARE,
   });
-  if (!plan) throw new ConflictError('The selected plan is no longer available.');
+  if (!plan) throw new ConflictError(PLAN_UNAVAILABLE_MESSAGE);
 
   const today = appToday();
   const paid = data.paid ?? true;

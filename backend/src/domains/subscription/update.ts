@@ -1,4 +1,5 @@
 import { Transaction } from 'sequelize';
+import { PLAN_UNAVAILABLE_MESSAGE } from '../../constants/plan.constants';
 import { HISTORY_EVENTS } from '../../constants/history.constants';
 import Plan from '../../models/Plan';
 import Subscription from '../../models/Subscription';
@@ -47,7 +48,7 @@ const resolvePlanChange = async (
           lock: transaction.LOCK.KEY_SHARE,
         });
   if (planId !== subscription.planId && !plan) {
-    throw new ConflictError('The selected plan is no longer available.');
+    throw new ConflictError(PLAN_UNAVAILABLE_MESSAGE);
   }
 
   return {

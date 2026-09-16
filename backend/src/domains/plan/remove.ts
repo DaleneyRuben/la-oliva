@@ -1,4 +1,5 @@
 import { Op, Transaction } from 'sequelize';
+import { planHasSubscriptionsMessage } from '../../constants/plan.constants';
 import { withTransaction } from '../../database/with-transaction';
 import Plan from '../../models/Plan';
 import Subscription from '../../models/Subscription';
@@ -19,10 +20,7 @@ export const remove = async (id: number, transaction?: Transaction): Promise<boo
       transaction: t,
     });
     if (blockingSubscriptions > 0) {
-      const label = blockingSubscriptions === 1 ? 'subscription' : 'subscriptions';
-      throw new ConflictError(
-        `This plan cannot be deleted because it has ${blockingSubscriptions} current or future ${label}.`,
-      );
+      throw new ConflictError(planHasSubscriptionsMessage(blockingSubscriptions));
     }
 
     await plan.destroy({ transaction: t });
