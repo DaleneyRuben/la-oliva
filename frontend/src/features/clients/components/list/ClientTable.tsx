@@ -65,7 +65,7 @@ export function ClientTable({
                 )}
                 <th className="text-left px-5 py-[13px] font-semibold">Zona</th>
                 <th className="text-left px-5 py-[13px] font-semibold">Nacimiento</th>
-                <th className="text-left px-5 py-[13px] font-semibold">Contrato</th>
+                <th className="text-left px-5 py-[13px] font-semibold">Vencimiento</th>
                 <th className="text-left px-5 py-[13px] font-semibold">Estado</th>
                 <th className="text-right px-5 py-[13px] font-semibold">Precio</th>
               </tr>
