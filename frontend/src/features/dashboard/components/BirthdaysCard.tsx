@@ -16,6 +16,14 @@ const AVATAR_TODAY = 'bg-olive-700 border-olive-700 text-olive-50';
 const AVATAR_DEFAULT = 'bg-cream-2 border-hairline text-muted';
 const DATE_CHIP_TODAY = 'bg-ok-bg text-ok font-semibold';
 const DATE_CHIP_DEFAULT = 'bg-cream-2 text-muted';
+const PLAN_STATUS_STYLE = {
+  active: 'bg-ok-bg text-ok',
+  finalized: 'bg-cream-2 text-muted',
+};
+const PLAN_STATUS_LABEL = {
+  active: 'Activo',
+  finalized: 'Finalizado',
+};
 
 export function BirthdaysCard({ birthdays, monthLabel }: Props) {
   const [showAll, setShowAll] = useState(false);
@@ -43,7 +51,14 @@ export function BirthdaysCard({ birthdays, monthLabel }: Props) {
             >
               {initials(b.name)}
             </div>
-            <div className="flex-1 min-w-0 text-[13.5px] font-semibold text-ink">{b.name}</div>
+            <div className="flex-1 min-w-0 flex items-center gap-2">
+              <span className="truncate text-[13.5px] font-semibold text-ink">{b.name}</span>
+              <span
+                className={`font-mono text-[9.5px] tracking-[.04em] rounded-[4px] px-1.5 py-[2px] whitespace-nowrap ${PLAN_STATUS_STYLE[b.planStatus]}`}
+              >
+                {PLAN_STATUS_LABEL[b.planStatus]}
+              </span>
+            </div>
             <span
               className={`font-mono text-[11px] tracking-[.04em] rounded-[5px] px-2 py-[3px] whitespace-nowrap ${b.isToday ? DATE_CHIP_TODAY : DATE_CHIP_DEFAULT}`}
             >
