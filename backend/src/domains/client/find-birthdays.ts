@@ -4,6 +4,7 @@ import Client from '../../models/Client';
 import Subscription from '../../models/Subscription';
 import { appToday, nextDeliveryDay } from '../../utils/date';
 import { getPrimarySubscription } from './_helpers';
+import { deriveClientStatus } from './derive-client-status';
 
 export type BirthdayPerson = {
   id: number;
@@ -15,6 +16,7 @@ export type BirthdayPerson = {
 
 export const findBirthdays = async (): Promise<BirthdayPerson[]> => {
   const today = nextDeliveryDay(appToday());
+  const statusToday = appToday();
   const todayDate = parseISO(today);
   // getMonth returns 0-based; SQL EXTRACT(MONTH) is 1-based
   const currentMonth = getMonth(todayDate) + 1;
@@ -26,7 +28,15 @@ export const findBirthdays = async (): Promise<BirthdayPerson[]> => {
     include: [
       {
         model: Subscription,
-        attributes: ['id', 'finalizedAt', 'paid'],
+        attributes: [
+          'id',
+          'startDate',
+          'contractEndDate',
+          'suspendedDates',
+          'finalizedAt',
+          'pausedSince',
+          'paid',
+        ],
         separate: true,
         order: [['id', 'DESC']],
       },
@@ -38,9 +48,25 @@ export const findBirthdays = async (): Promise<BirthdayPerson[]> => {
     const currentPlan = getPrimarySubscription(
       (c.subscriptions ?? []).map((subscription) => ({
         id: Number(subscription.id),
+        startDate: subscription.startDate,
+        contractEndDate: subscription.contractEndDate,
+        suspendedDates: subscription.suspendedDates,
         finalizedAt: subscription.finalizedAt,
+        pausedSince: subscription.pausedSince,
         paid: subscription.paid,
       })),
+    );
+    const status = deriveClientStatus(
+      currentPlan
+        ? {
+            startDate: currentPlan.startDate ?? null,
+            contractEndDate: currentPlan.contractEndDate ?? null,
+            suspendedDates: currentPlan.suspendedDates ?? [],
+            finalizedAt: currentPlan.finalizedAt ?? null,
+            pausedSince: currentPlan.pausedSince ?? null,
+          }
+        : null,
+      statusToday,
     );
 
     return {
@@ -48,7 +74,7 @@ export const findBirthdays = async (): Promise<BirthdayPerson[]> => {
       name: c.name,
       dateOfBirth: c.dateOfBirth,
       isToday: format(parseISO(c.dateOfBirth), 'MM-dd') === todayMonthDay,
-      planStatus: currentPlan?.finalizedAt ? 'finalized' : 'active',
+      planStatus: status === 'ended' ? 'finalized' : 'active',
     };
   });
 };
