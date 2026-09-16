@@ -8,6 +8,7 @@ const person = (overrides: Partial<BirthdayPerson> = {}): BirthdayPerson => ({
   name: 'Jorge Rengel',
   dateOfBirth: '1990-06-06',
   isToday: false,
+  planStatus: 'active',
   ...overrides,
 });
 
@@ -24,6 +25,21 @@ describe('BirthdaysCard', () => {
     );
     expect(screen.getByText('Jorge Rengel')).toBeInTheDocument();
     expect(screen.getByText('06/06')).toBeInTheDocument();
+  });
+
+  it('shows whether the plan is active or finalized', () => {
+    render(
+      <BirthdaysCard
+        birthdays={[
+          person({ id: 'active', planStatus: 'active' }),
+          person({ id: 'finalized', planStatus: 'finalized' }),
+        ]}
+        monthLabel="Junio"
+      />,
+    );
+
+    expect(screen.getByText('Activo')).toBeInTheDocument();
+    expect(screen.getByText('Finalizado')).toBeInTheDocument();
   });
 
   it('shows only the first 5 birthdays by default with a "ver más" toggle', async () => {

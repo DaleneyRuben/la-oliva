@@ -10,6 +10,7 @@ export interface BirthdayPerson {
   name: string;
   dateOfBirth: string;
   isToday: boolean;
+  planStatus: 'active' | 'finalized';
 }
 
 export interface Connection {
