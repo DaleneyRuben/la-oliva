@@ -124,6 +124,13 @@ describe('ClientTable', () => {
     expect(screen.getByText('480')).toBeInTheDocument();
   });
 
+  it('shows only the contract end date', () => {
+    renderTable({ clients: [makeClient()], total: 1 });
+
+    expect(screen.getByText('05/06/2026')).toBeInTheDocument();
+    expect(screen.queryByText('01/05/2026')).not.toBeInTheDocument();
+  });
+
   it('shows an em-dash for price when the client has no subscription', () => {
     renderTable({ clients: [makeClient({ subscriptions: [] })], total: 1 });
     expect(screen.getAllByText('—').length).toBeGreaterThan(0);
