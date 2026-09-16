@@ -19,7 +19,7 @@ jest.mock('../../../database/sequelize', () => ({
   default: { transaction: jest.fn() },
 }));
 
-const transaction = { id: 'own' };
+const transaction = { id: 'own', LOCK: { KEY_SHARE: 'KEY SHARE' } };
 const callerTransaction = { id: 'caller' } as never;
 
 beforeEach(() => {
@@ -382,6 +382,15 @@ describe('update', () => {
 
     await update(1, 1, { planId: 5 }, actor);
 
+    expect(Plan.findByPk).toHaveBeenNthCalledWith(1, 2, {
+      transaction,
+      paranoid: false,
+    });
+    expect(Plan.findByPk).toHaveBeenNthCalledWith(2, 5, {
+      transaction,
+      lock: transaction.LOCK.KEY_SHARE,
+    });
+
     expect(record).toHaveBeenCalledWith(
       actor,
       {
@@ -399,6 +408,26 @@ describe('update', () => {
       },
       transaction,
     );
+  });
+
+  it('rejects changing a subscription to an archived or missing plan', async () => {
+    const mockInstance = {
+      clientId: 1,
+      planId: 2,
+      price: 1200,
+      suspendedDates: [],
+      update: jest.fn().mockResolvedValue({}),
+    };
+    (Subscription.findOne as jest.Mock).mockResolvedValue(mockInstance);
+    (Plan.findByPk as jest.Mock)
+      .mockResolvedValueOnce({ id: 2, name: 'Ligero', price: 1200 })
+      .mockResolvedValueOnce(null);
+
+    await expect(update(1, 1, { planId: 5 }, actor)).rejects.toMatchObject({
+      statusCode: 409,
+      message: 'El plan seleccionado ya no está disponible.',
+    });
+    expect(mockInstance.update).not.toHaveBeenCalled();
   });
 
   // A cambio de plan sends both halves in one PATCH: the new plan, and the duration the admin

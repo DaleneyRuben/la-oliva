@@ -72,6 +72,17 @@ Meal types (stored as English keys in the DB, displayed in Spanish in the UI):
 
 A plan can include any combination of meal types.
 
+### Plan deletion
+
+Deleting a plan archives it with a soft delete. Archived plans are excluded from the plan catalog
+and cannot be assigned to a new or existing subscription, but past subscriptions continue to load
+the archived plan so client records retain the plan name, price, and meal composition.
+
+A plan cannot be archived while it has a non-finalized subscription whose contract end date is
+today or later, or whose contract end date is not set. This includes active, future, paused,
+unpaid, and start-date-pending subscriptions. A plan may be archived once every subscription using
+it is finalized or ended before today.
+
 ---
 
 ## Price

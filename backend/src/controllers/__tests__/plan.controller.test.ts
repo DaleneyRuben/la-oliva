@@ -2,6 +2,7 @@ import request from 'supertest';
 import app from '../../app';
 import { create, findAll, findById, getClientCounts, remove, update } from '../../domains/plan';
 import { encodeId } from '../../utils/sqids';
+import { ConflictError } from '../../utils/errors';
 
 jest.mock('../../domains/plan');
 jest.mock('../../database/sequelize', () => ({ __esModule: true, default: { query: jest.fn() } }));
@@ -89,6 +90,21 @@ describe('GET /api/plans/:id', () => {
     const res = await request(app).get(`/api/plans/${id999}`);
 
     expect(res.status).toBe(404);
+  });
+
+  it('returns 409 when the plan has a current or future subscription', async () => {
+    (remove as jest.Mock).mockRejectedValue(
+      new ConflictError(
+        'No se puede eliminar este plan porque tiene 2 suscripciones actuales o futuras.',
+      ),
+    );
+
+    const res = await request(app).delete(`/api/plans/${id1}`);
+
+    expect(res.status).toBe(409);
+    expect(res.body).toEqual({
+      message: 'No se puede eliminar este plan porque tiene 2 suscripciones actuales o futuras.',
+    });
   });
 
   it('returns 500 when service throws', async () => {
