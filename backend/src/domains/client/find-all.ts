@@ -146,7 +146,14 @@ export const findAll = (filters: FindAllFilters = {}) => {
         required: subscriptionRequired,
       },
     ],
-    order: [['createdAt', 'ASC']],
+    order: [
+      [
+        literal(
+          '(SELECT MAX(s."createdAt") FROM subscriptions s WHERE s."clientId" = "Client"."id")',
+        ),
+        'DESC NULLS LAST',
+      ],
+    ],
     limit,
     offset,
     distinct: true,

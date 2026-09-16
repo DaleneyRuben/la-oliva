@@ -233,15 +233,21 @@ describe('findAll', () => {
     expect(pausedGuard?.val).toMatch(/^NOT /);
   });
 
-  it('orders results by createdAt ascending, oldest first', async () => {
-    (Client.findAndCountAll as jest.Mock).mockResolvedValue({ rows: [], count: 0 });
+  it.each([undefined, 'active', 'expiring', 'paused', 'ended'])(
+    'orders status=%s by the most recently created subscription, with clients without one last',
+    async (status) => {
+      (Client.findAndCountAll as jest.Mock).mockResolvedValue({ rows: [], count: 0 });
 
-    await findAll();
+      await findAll(status ? { status } : undefined);
 
-    expect(Client.findAndCountAll).toHaveBeenCalledWith(
-      expect.objectContaining({ order: [['createdAt', 'ASC']] }),
-    );
-  });
+      const call = (Client.findAndCountAll as jest.Mock).mock.calls[0][0];
+      const [latestSubscriptionOrder] = call.order;
+
+      expect(latestSubscriptionOrder[0].val).toContain('MAX(s."createdAt")');
+      expect(latestSubscriptionOrder[0].val).toContain('s."clientId" = "Client"."id"');
+      expect(latestSubscriptionOrder[1]).toBe('DESC NULLS LAST');
+    },
+  );
 
   it('defaults to page 1 and limit 25', async () => {
     (Client.findAndCountAll as jest.Mock).mockResolvedValue({ rows: [], count: 0 });
