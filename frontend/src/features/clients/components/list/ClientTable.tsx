@@ -120,9 +120,7 @@ export function ClientTable({
                       className="px-5 py-[13px] font-mono text-[11.5px] text-muted tabular-nums whitespace-nowrap"
                       title={queuedRenewal ? RENEWAL_TITLE : undefined}
                     >
-                      {sub
-                        ? `${formatDate(sub.startDate)} → ${formatDate(sub.contractEndDate)}`
-                        : '—'}
+                      {sub ? formatDate(sub.contractEndDate) : '—'}
                       {queuedRenewal && (
                         <span className="flex items-center gap-1 mt-1 text-[10.5px] text-success-text">
                           <Icon name="refresh" size={11} className="text-olive-600 shrink-0" />
