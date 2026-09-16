@@ -49,6 +49,30 @@ describe('findBirthdays', () => {
     expect(result[0].planStatus).toBe('finalized');
   });
 
+  it('marks an expired plan as finalized', async () => {
+    (Client.findAll as jest.Mock).mockResolvedValue([
+      {
+        id: 1,
+        name: 'Indira Mercado',
+        dateOfBirth: '1990-06-06',
+        subscriptions: [
+          {
+            id: 1,
+            startDate: '2026-08-01',
+            contractEndDate: '2026-06-24',
+            finalizedAt: null,
+            suspendedDates: [],
+            pausedSince: null,
+          },
+        ],
+      },
+    ]);
+
+    const result = await findBirthdays();
+
+    expect(result[0].planStatus).toBe('finalized');
+  });
+
   it('uses the latest plan when an older one was finalized', async () => {
     (Client.findAll as jest.Mock).mockResolvedValue([
       {
