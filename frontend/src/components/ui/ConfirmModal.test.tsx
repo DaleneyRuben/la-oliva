@@ -111,6 +111,26 @@ describe('ConfirmModal', () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
+  it('shows the error and stays open when confirmation fails', async () => {
+    const onConfirm = jest.fn().mockRejectedValue(new Error('The plan still has subscriptions.'));
+    const onClose = jest.fn();
+    render(
+      <ConfirmModal
+        title="Test"
+        message="Test message"
+        confirmLabel="Confirmar"
+        onClose={onClose}
+        onConfirm={onConfirm}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /confirmar/i }));
+
+    expect(await screen.findByText('The plan still has subscriptions.')).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
   it('renders an olive icon badge and primary confirm button when variant is primary', async () => {
     render(
       <ConfirmModal

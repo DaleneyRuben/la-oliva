@@ -3,6 +3,7 @@ import { HISTORY_EVENTS } from '../../../constants/history.constants';
 import Subscription from '../../../models/Subscription';
 import Client from '../../../models/Client';
 import Plan from '../../../models/Plan';
+import sequelize from '../../../database/sequelize';
 import { record } from '../../client-history';
 import { recordPayment } from '../../finance';
 import { create } from '../create';
@@ -20,8 +21,12 @@ jest.mock('../../../database/sequelize', () => ({
   default: { query: jest.fn(), transaction: jest.fn() },
 }));
 
+const ownTransaction = { id: 'own', LOCK: { KEY_SHARE: 'KEY SHARE' } };
+
 beforeEach(() => {
   jest.clearAllMocks();
+  (sequelize.transaction as jest.Mock).mockImplementation((work) => work(ownTransaction));
+  (Plan.findByPk as jest.Mock).mockResolvedValue({ id: 2, name: 'Completo', price: 1200 });
 });
 
 const today = appToday();
@@ -41,6 +46,39 @@ const mockSubscription = {
 const actor = { userId: 9, username: 'ada' };
 
 describe('create', () => {
+  it('keeps plan validation and subscription creation in the same transaction', async () => {
+    (Client.findByPk as jest.Mock).mockResolvedValue({ id: 1 });
+    (Subscription.create as jest.Mock).mockResolvedValue(mockSubscription);
+
+    await create(
+      1,
+      { planId: 2, startDate, contractDate: today, duration: 20, price: 1200 },
+      actor,
+    );
+
+    expect(sequelize.transaction).toHaveBeenCalledTimes(1);
+    expect(Plan.findByPk).toHaveBeenCalledWith(2, {
+      transaction: ownTransaction,
+      lock: ownTransaction.LOCK.KEY_SHARE,
+    });
+    expect(Subscription.create).toHaveBeenCalledWith(expect.anything(), {
+      transaction: ownTransaction,
+    });
+  });
+
+  it('rejects an archived or missing plan before creating the subscription', async () => {
+    (Client.findByPk as jest.Mock).mockResolvedValue({ id: 1 });
+    (Plan.findByPk as jest.Mock).mockResolvedValue(null);
+
+    await expect(
+      create(1, { planId: 2, startDate, contractDate: today, duration: 20, price: 1200 }, actor),
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      message: 'The selected plan is no longer available.',
+    });
+    expect(Subscription.create).not.toHaveBeenCalled();
+  });
+
   it('creates a subscription and calculates contractEndDate', async () => {
     (Client.findByPk as jest.Mock).mockResolvedValue({ id: 1 });
     (Subscription.create as jest.Mock).mockResolvedValue(mockSubscription);
@@ -51,7 +89,9 @@ describe('create', () => {
       actor,
     );
 
-    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ contractEndDate }));
+    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ contractEndDate }), {
+      transaction: ownTransaction,
+    });
     expect(result).toMatchObject({ clientId: 1, planId: 2 });
   });
 
@@ -65,7 +105,9 @@ describe('create', () => {
       actor,
     );
 
-    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ price: 1200 }));
+    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ price: 1200 }), {
+      transaction: ownTransaction,
+    });
   });
 
   // A plan's price is quoted for 20 delivery days. A longer contract is negotiated upward, so the
@@ -82,7 +124,9 @@ describe('create', () => {
       actor,
     );
 
-    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ price: 1800 }));
+    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ price: 1800 }), {
+      transaction: ownTransaction,
+    });
   });
 
   it('records the agreed price in the history metadata', async () => {
@@ -100,7 +144,7 @@ describe('create', () => {
     expect(record).toHaveBeenCalledWith(
       actor,
       expect.objectContaining({ metadata: expect.objectContaining({ price: 1200 }) }),
-      undefined,
+      ownTransaction,
     );
   });
 
@@ -114,7 +158,9 @@ describe('create', () => {
       actor,
     );
 
-    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ paid: true }));
+    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ paid: true }), {
+      transaction: ownTransaction,
+    });
   });
 
   it('passes paid false through when creating an unpaid subscription', async () => {
@@ -127,7 +173,9 @@ describe('create', () => {
       actor,
     );
 
-    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ paid: false }));
+    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ paid: false }), {
+      transaction: ownTransaction,
+    });
   });
 
   it('returns null when client does not exist', async () => {
@@ -155,6 +203,7 @@ describe('create', () => {
 
     expect(Subscription.create).toHaveBeenCalledWith(
       expect.objectContaining({ startDate: null, contractEndDate: null }),
+      { transaction: ownTransaction },
     );
   });
 
@@ -173,7 +222,7 @@ describe('create', () => {
     expect(record).toHaveBeenCalledWith(
       actor,
       expect.objectContaining({ type: HISTORY_EVENTS.PLAN_ASSIGNED, clientId: 1 }),
-      undefined,
+      ownTransaction,
     );
   });
 
@@ -192,7 +241,7 @@ describe('create', () => {
     expect(record).toHaveBeenCalledWith(
       expect.objectContaining({ userId: 9, username: 'ada' }),
       expect.anything(),
-      undefined,
+      ownTransaction,
     );
   });
 
@@ -226,7 +275,7 @@ describe('create', () => {
     expect(recordPayment).toHaveBeenCalledWith(
       { clientId: 1, subscriptionId: 1, amount: 1200 },
       actor,
-      undefined,
+      ownTransaction,
     );
   });
 
@@ -245,7 +294,7 @@ describe('create', () => {
   });
 
   it("passes the caller's transaction to recordPayment", async () => {
-    const transaction = { id: 'caller' } as never;
+    const transaction = { id: 'caller', LOCK: { KEY_SHARE: 'KEY SHARE' } } as never;
     (Client.findByPk as jest.Mock).mockResolvedValue({ id: 1 });
     (Subscription.create as jest.Mock).mockResolvedValue(mockSubscription);
     (Plan.findByPk as jest.Mock).mockResolvedValue({ id: 2, name: 'Completo', price: 5000 });
@@ -282,7 +331,7 @@ describe('create', () => {
     expect(record).toHaveBeenCalledWith(
       actor,
       expect.objectContaining({ type: HISTORY_EVENTS.PLAN_RENEWED, clientId: 1 }),
-      undefined,
+      ownTransaction,
     );
   });
 
@@ -327,6 +376,7 @@ describe('create', () => {
 
       expect(Subscription.create).toHaveBeenCalledWith(
         expect.objectContaining({ specialInstructions: { lunch: 'DAR GRANDES' } }),
+        { transaction: ownTransaction },
       );
     });
 
@@ -338,6 +388,7 @@ describe('create', () => {
 
       expect(Subscription.create).toHaveBeenCalledWith(
         expect.objectContaining({ specialInstructions: { salad: 'SIN CEBOLLA' } }),
+        { transaction: ownTransaction },
       );
     });
 
@@ -348,6 +399,7 @@ describe('create', () => {
 
       expect(Subscription.create).toHaveBeenCalledWith(
         expect.not.objectContaining({ specialInstructions: expect.anything() }),
+        { transaction: ownTransaction },
       );
     });
 
@@ -363,6 +415,7 @@ describe('create', () => {
 
       expect(Subscription.create).toHaveBeenCalledWith(
         expect.not.objectContaining({ specialInstructions: expect.anything() }),
+        { transaction: ownTransaction },
       );
     });
   });
@@ -412,7 +465,10 @@ describe('create', () => {
       actor,
     );
 
-    expect(created.update).toHaveBeenCalledWith({ pausedSince: today });
+    expect(created.update).toHaveBeenCalledWith(
+      { pausedSince: today },
+      { transaction: ownTransaction },
+    );
     expect(mockClient.update).not.toHaveBeenCalled();
   });
 
@@ -436,7 +492,10 @@ describe('create', () => {
       actor,
     );
 
-    expect(created.update).toHaveBeenCalledWith({ pausedSince: today });
+    expect(created.update).toHaveBeenCalledWith(
+      { pausedSince: today },
+      { transaction: ownTransaction },
+    );
   });
 
   it('persists renewalType on the subscription row when provided', async () => {
@@ -459,6 +518,7 @@ describe('create', () => {
 
     expect(Subscription.create).toHaveBeenCalledWith(
       expect.objectContaining({ renewalType: 'reactivation' }),
+      { transaction: ownTransaction },
     );
   });
 
@@ -475,6 +535,7 @@ describe('create', () => {
 
     expect(Subscription.create).toHaveBeenCalledWith(
       expect.objectContaining({ renewalType: null }),
+      { transaction: ownTransaction },
     );
   });
 
@@ -490,7 +551,12 @@ describe('create', () => {
       actor,
     );
 
-    expect(Subscription.create).toHaveBeenCalledWith(expect.objectContaining({ appointmentId: 4 }));
+    expect(Subscription.create).toHaveBeenCalledWith(
+      expect.objectContaining({ appointmentId: 4 }),
+      {
+        transaction: ownTransaction,
+      },
+    );
   });
 
   it('persists appointmentId as null when not provided', async () => {
@@ -506,6 +572,7 @@ describe('create', () => {
 
     expect(Subscription.create).toHaveBeenCalledWith(
       expect.objectContaining({ appointmentId: null }),
+      { transaction: ownTransaction },
     );
   });
 
@@ -524,7 +591,7 @@ describe('create', () => {
     expect(record).toHaveBeenCalledWith(
       actor,
       expect.objectContaining({ metadata: expect.objectContaining({ appointmentId: 4 }) }),
-      undefined,
+      ownTransaction,
     );
   });
 
@@ -724,10 +791,13 @@ describe('create with overlapping prior subscriptions', () => {
       actor,
     );
 
-    expect(oldSub.update).toHaveBeenCalledWith({
-      contractEndDate: subtractDeliveryDays('2026-07-03', 1),
-      finalizedAt: today,
-    });
+    expect(oldSub.update).toHaveBeenCalledWith(
+      {
+        contractEndDate: subtractDeliveryDays('2026-07-03', 1),
+        finalizedAt: today,
+      },
+      { transaction: ownTransaction },
+    );
   });
 
   it('queries only non-finalized subscriptions of the client ending on or after the new startDate', async () => {
@@ -747,6 +817,7 @@ describe('create with overlapping prior subscriptions', () => {
         finalizedAt: null,
         contractEndDate: { [Op.gte]: '2026-07-03' },
       }),
+      transaction: ownTransaction,
     });
   });
 
@@ -792,7 +863,7 @@ describe('create with overlapping prior subscriptions', () => {
 
 describe('create with a transaction', () => {
   it('threads the transaction through every model call', async () => {
-    const transaction = { id: 'txn-1' };
+    const transaction = { id: 'txn-1', LOCK: { KEY_SHARE: 'KEY SHARE' } };
     const oldSub = { id: 7, update: jest.fn().mockResolvedValue({}) };
     (Client.findByPk as jest.Mock).mockResolvedValue({ id: 1, update: jest.fn() });
     (Subscription.findAll as jest.Mock).mockResolvedValue([oldSub]);
@@ -818,7 +889,10 @@ describe('create with a transaction', () => {
     expect(Subscription.findAll).toHaveBeenCalledWith(expect.objectContaining({ transaction }));
     expect(oldSub.update).toHaveBeenCalledWith(expect.anything(), { transaction });
     expect(Subscription.create).toHaveBeenCalledWith(expect.anything(), { transaction });
-    expect(Plan.findByPk).toHaveBeenCalledWith(2, { transaction });
+    expect(Plan.findByPk).toHaveBeenCalledWith(2, {
+      transaction,
+      lock: transaction.LOCK.KEY_SHARE,
+    });
     expect(record).toHaveBeenCalledWith(actor, expect.anything(), transaction);
   });
 });

@@ -31,12 +31,16 @@ export function ConfirmModal({
   onConfirm,
 }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleConfirm = async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       await onConfirm();
       onClose();
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : 'No se pudo completar la acción.');
     } finally {
       setIsLoading(false);
     }
@@ -62,6 +66,14 @@ export function ConfirmModal({
         )}
         <p className="text-[13.5px] text-ink-2 leading-[1.55]">{message}</p>
         {details ? <div className="mt-3.5">{details}</div> : null}
+        {errorMessage ? (
+          <p
+            role="alert"
+            className="mt-3.5 rounded-[9px] border border-danger/25 bg-danger-bg px-3 py-2.5 text-[12.5px] leading-[1.5] text-danger"
+          >
+            {errorMessage}
+          </p>
+        ) : null}
         <div className="flex justify-end gap-2.5 mt-[22px]">
           <Button
             variant="secondary"

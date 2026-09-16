@@ -1,4 +1,5 @@
-import { getPrimarySubscription, withStatus } from '../_helpers';
+import Plan from '../../../models/Plan';
+import { getPrimarySubscription, INCLUDE_SUBSCRIPTION_ORDERED, withStatus } from '../_helpers';
 
 jest.mock('../../../models/Subscription');
 jest.mock('../../../models/Plan');
@@ -41,6 +42,14 @@ describe('getPrimarySubscription', () => {
     getPrimarySubscription(subs);
 
     expect(subs).toEqual([unpaid, paid]);
+  });
+});
+
+describe('INCLUDE_SUBSCRIPTION_ORDERED', () => {
+  it('includes soft-deleted plans so historical subscriptions retain their plan', () => {
+    expect(INCLUDE_SUBSCRIPTION_ORDERED[0].include).toEqual([
+      expect.objectContaining({ model: Plan, paranoid: false }),
+    ]);
   });
 });
 
@@ -211,6 +220,8 @@ describe('withStatus', () => {
       pausedSince: new Date('2026-06-05'),
     });
 
-    expect(withStatus({ ...baseClient, subscriptions: [sinFecha, running] }).pausedSince).toBeNull();
+    expect(
+      withStatus({ ...baseClient, subscriptions: [sinFecha, running] }).pausedSince,
+    ).toBeNull();
   });
 });

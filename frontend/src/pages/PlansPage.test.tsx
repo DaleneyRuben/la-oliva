@@ -174,7 +174,12 @@ describe('PlansPage', () => {
     fireEvent.click(within(getCard(1)).getByRole('button', { name: /eliminar plan/i }));
 
     expect(await screen.findByText('Eliminar plan')).toBeInTheDocument();
-    expect(screen.getByText(/¿Seguro que quieres eliminar el plan/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/dejará de estar disponible para nuevas asignaciones/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/contratos anteriores conservarán su información/i),
+    ).toBeInTheDocument();
     expect(mockDelete).not.toHaveBeenCalled();
   });
 

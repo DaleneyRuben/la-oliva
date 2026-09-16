@@ -1,4 +1,5 @@
 import { Transaction } from 'sequelize';
+import { withTransaction } from '../../database/with-transaction';
 import Client from '../../models/Client';
 import Plan from '../../models/Plan';
 import Subscription from '../../models/Subscription';
@@ -17,16 +18,20 @@ import {
 } from './_helpers';
 
 // TODO: restore contractDate === today validation once backfilling of existing clients is complete
-export const create = async (
+const createWithinTransaction = async (
   clientId: number,
   data: CreateSubscriptionDto,
   actor: Actor,
-  transaction?: Transaction,
+  transaction: Transaction,
 ) => {
-  const client = transaction
-    ? await Client.findByPk(clientId, { transaction })
-    : await Client.findByPk(clientId);
+  const client = await Client.findByPk(clientId, { transaction });
   if (!client) return null;
+
+  const plan = await Plan.findByPk(data.planId, {
+    transaction,
+    lock: transaction.LOCK.KEY_SHARE,
+  });
+  if (!plan) throw new ConflictError('The selected plan is no longer available.');
 
   const today = appToday();
   const paid = data.paid ?? true;
@@ -65,17 +70,12 @@ export const create = async (
     appointmentId: data.appointmentId ?? null,
     ...(specialInstructions ? { specialInstructions } : {}),
   } as never;
-  const subscription = transaction
-    ? await Subscription.create(subscriptionData, { transaction })
-    : await Subscription.create(subscriptionData);
+  const subscription = await Subscription.create(subscriptionData, { transaction });
 
   const eventType = historyEventTypeFor(data.renewalType ?? null);
 
   // unpaid subscriptions of any kind defer their history write until an admin marks them paid
   if (paid) {
-    const plan = transaction
-      ? await Plan.findByPk(data.planId, { transaction })
-      : await Plan.findByPk(data.planId);
     await record(
       actor,
       {
@@ -115,3 +115,10 @@ export const create = async (
 
   return subscription;
 };
+
+export const create = (
+  clientId: number,
+  data: CreateSubscriptionDto,
+  actor: Actor,
+  transaction?: Transaction,
+) => withTransaction(transaction, (t) => createWithinTransaction(clientId, data, actor, t));

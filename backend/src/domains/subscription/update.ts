@@ -6,6 +6,7 @@ import { withTransaction } from '../../database/with-transaction';
 import { UpdateSubscriptionDto } from '../../schemas/subscription.schema';
 import type { Actor } from '../../types/actor';
 import { addDeliveryDays, subtractDeliveryDays, calcContractEndDate } from '../../utils/date';
+import { ConflictError } from '../../utils/errors';
 import { record } from '../client-history';
 import { adjustPayment } from '../finance';
 import { finalizeOverlappingSubscriptions } from './finalize-overlapping';
@@ -34,9 +35,20 @@ const resolvePlanChange = async (
   const price = data.price ?? previousPrice;
   if (planId === subscription.planId && price === previousPrice) return null;
 
-  const previousPlan = await Plan.findByPk(subscription.planId, { transaction });
+  const previousPlan = await Plan.findByPk(subscription.planId, {
+    transaction,
+    paranoid: false,
+  });
   const plan =
-    planId === subscription.planId ? previousPlan : await Plan.findByPk(planId, { transaction });
+    planId === subscription.planId
+      ? previousPlan
+      : await Plan.findByPk(planId, {
+          transaction,
+          lock: transaction.LOCK.KEY_SHARE,
+        });
+  if (planId !== subscription.planId && !plan) {
+    throw new ConflictError('The selected plan is no longer available.');
+  }
 
   return {
     planId,

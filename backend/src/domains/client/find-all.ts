@@ -1,7 +1,7 @@
 import { Op, literal } from 'sequelize';
 import Client from '../../models/Client';
-import Plan from '../../models/Plan';
 import Subscription from '../../models/Subscription';
+import { INCLUDE_HISTORICAL_PLAN } from '../../models/plan-includes';
 import { appToday, addDeliveryDays } from '../../utils/date';
 import { EXPIRY_THRESHOLD_DAYS } from '../../constants/subscription.constants';
 import { CLIENT_STATUS } from '../../constants/client.constants';
@@ -141,7 +141,7 @@ export const findAll = (filters: FindAllFilters = {}) => {
     include: [
       {
         model: Subscription,
-        include: [Plan],
+        include: [INCLUDE_HISTORICAL_PLAN],
         ...(Object.keys(subscriptionWhere).length ? { where: subscriptionWhere } : {}),
         required: subscriptionRequired,
       },

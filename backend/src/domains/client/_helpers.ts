@@ -1,10 +1,15 @@
-import Plan from '../../models/Plan';
 import Subscription from '../../models/Subscription';
+import { INCLUDE_HISTORICAL_PLAN } from '../../models/plan-includes';
 import { appToday } from '../../utils/date';
 import { deriveClientStatus } from './derive-client-status';
 
 export const INCLUDE_SUBSCRIPTION_ORDERED = [
-  { model: Subscription, include: [Plan], separate: true, order: [['id', 'DESC']] as never },
+  {
+    model: Subscription,
+    include: [INCLUDE_HISTORICAL_PLAN],
+    separate: true,
+    order: [['id', 'DESC']] as never,
+  },
 ];
 
 type SubscriptionPriorityLike = { id: number; paid?: boolean };

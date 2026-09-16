@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import Client from '../../../models/Client';
+import Plan from '../../../models/Plan';
 import { findAll } from '../find-all';
 
 jest.mock('../../../models/Client');
@@ -62,6 +63,17 @@ describe('findAll', () => {
         include: expect.arrayContaining([expect.objectContaining({ required: false })]),
       }),
     );
+  });
+
+  it('includes soft-deleted plans for historical subscriptions', async () => {
+    (Client.findAndCountAll as jest.Mock).mockResolvedValue({ rows: [], count: 0 });
+
+    await findAll();
+
+    const call = (Client.findAndCountAll as jest.Mock).mock.calls[0][0];
+    expect(call.include[0].include).toEqual([
+      expect.objectContaining({ model: Plan, paranoid: false }),
+    ]);
   });
 
   it('restriction filter adds a parameterized EXISTS/unnest condition', async () => {
