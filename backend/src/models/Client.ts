@@ -23,8 +23,8 @@ class Client extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   declare deliveryZone: string;
 
-  @Column({ type: DataType.STRING, allowNull: false })
-  declare delivery: string;
+  @Column({ type: DataType.STRING, allowNull: true })
+  declare delivery: string | null;
 
   @Column({ type: DataType.STRING, allowNull: true })
   declare nit: string | null;
@@ -37,6 +37,24 @@ class Client extends Model {
 
   @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: false, defaultValue: [] })
   declare restrictions: string[];
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  declare isDraft: boolean;
+
+  @Column({ type: DataType.DATEONLY, allowNull: true })
+  declare preferredStartDate: string | null;
+
+  @Column({ type: DataType.DECIMAL(6, 2), allowNull: true })
+  declare weight: number | null;
+
+  @Column({ type: DataType.DECIMAL(6, 2), allowNull: true })
+  declare height: number | null;
+
+  @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: false, defaultValue: [] })
+  declare operations: string[];
+
+  @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: false, defaultValue: [] })
+  declare medications: string[];
 
   @Column({ type: DataType.UUID, allowNull: true, defaultValue: null })
   declare groupToken: string | null;

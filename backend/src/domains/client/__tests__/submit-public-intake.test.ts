@@ -1,4 +1,5 @@
 import Client from '../../../models/Client';
+import type { PublicClientIntakeDto } from '../../../schemas/public-intake.schema';
 import { ConflictError } from '../../../utils/errors';
 // The module is intentionally absent in this red TDD commit.
 // eslint-disable-next-line import/extensions
@@ -23,7 +24,7 @@ const intake = {
   operations: ['Apendicectomía'],
   medications: ['Levotiroxina'],
   website: '',
-} as const;
+} satisfies PublicClientIntakeDto;
 
 describe('submitPublicIntake', () => {
   beforeEach(() => jest.clearAllMocks());
