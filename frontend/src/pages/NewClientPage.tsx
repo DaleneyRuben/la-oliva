@@ -15,6 +15,7 @@ import { StepIdentity } from '@/features/clients/components/wizard/StepIdentity'
 import { StepPlan } from '@/features/clients/components/wizard/StepPlan';
 import { StepRestrictions } from '@/features/clients/components/wizard/StepRestrictions';
 import type { NewClientFormValues, RestrictionsState } from '@/features/clients/types';
+import { normalizeUnderlyingDiseases } from '@/features/clients/utils/underlyingDiseases';
 
 const STEPS = ['Identidad', 'Restricciones', 'Plan', 'Confirmar'];
 
@@ -108,7 +109,7 @@ export function NewClientPage() {
     setValue('startDate', draft.preferredStartDate ?? '');
     setRestrictions({
       restrictions: draft.restrictions,
-      underlyingDiseases: draft.underlyingDiseases,
+      ...normalizeUnderlyingDiseases(draft.underlyingDiseases),
     });
   }, [draft, setValue]);
 

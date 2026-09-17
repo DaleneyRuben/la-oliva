@@ -14,6 +14,7 @@ import { TogglePill } from '@ui/TogglePill';
 import { DISEASES } from '@/features/clients/constants/diseases';
 import { ZONES, DELIVERIES, SEX_OPTIONS } from '@/features/clients/constants/clientOptions';
 import type { Client } from '@/features/clients/types';
+import { normalizeUnderlyingDiseases } from '@/features/clients/utils/underlyingDiseases';
 
 export interface EditDraft {
   name: string;
@@ -45,16 +46,12 @@ export function draftFromClient(c: Client): EditDraft {
     delivery: c.delivery ?? '',
     nit: c.nit ?? '',
     businessName: c.businessName ?? '',
-    underlyingDiseases: c.underlyingDiseases.filter((disease) =>
-      DISEASES.includes(disease as never),
-    ),
+    ...normalizeUnderlyingDiseases(c.underlyingDiseases),
     restrictions: [...c.restrictions],
     weight: c.weight,
     height: c.height,
     operations: [...(c.operations ?? [])],
     medications: [...(c.medications ?? [])],
-    otherUnderlyingDisease:
-      c.underlyingDiseases.find((disease) => !DISEASES.includes(disease as never)) ?? '',
   };
 }
 
