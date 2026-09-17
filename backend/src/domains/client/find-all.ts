@@ -14,6 +14,7 @@ export interface FindAllFilters {
   restriction?: string;
   page?: number;
   limit?: number;
+  includeDrafts?: boolean;
 }
 
 export const findAll = (filters: FindAllFilters = {}) => {
@@ -95,6 +96,18 @@ export const findAll = (filters: FindAllFilters = {}) => {
       break;
   }
 
+  if (filters.includeDrafts && !filters.status) {
+    subscriptionRequired = false;
+    andConditions.push({
+      [Op.or]: [
+        { isDraft: true },
+        literal('EXISTS (SELECT 1 FROM subscriptions sl WHERE sl."clientId" = "Client"."id")'),
+      ],
+    });
+  } else {
+    clientWhere.isDraft = false;
+  }
+
   // A client whose ONLY subscription is unpaid (an Evaluaciones conversion awaiting payment)
   // must never surface here — only Evaluaciones' own "Pendientes de pago" query can see them.
   // A client with a real paid subscription plus a newer unpaid renewal must stay visible
@@ -147,13 +160,22 @@ export const findAll = (filters: FindAllFilters = {}) => {
       },
     ],
     order: [
+      ...(filters.includeDrafts && !filters.status
+        ? [
+            ['isDraft', 'DESC'] as const,
+            [
+              literal('CASE WHEN "Client"."isDraft" THEN "Client"."createdAt" END'),
+              'ASC NULLS LAST',
+            ] as const,
+          ]
+        : []),
       [
         literal(
           '(SELECT MAX(s."createdAt") FROM subscriptions s WHERE s."clientId" = "Client"."id")',
         ),
         'DESC NULLS LAST',
       ],
-    ],
+    ] as never,
     limit,
     offset,
     distinct: true,

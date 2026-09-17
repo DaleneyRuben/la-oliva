@@ -1,5 +1,6 @@
 import Client from '../../../models/Client';
 import { create } from '../create';
+import { ConflictError } from '../../../utils/errors';
 
 jest.mock('../../../models/Client');
 jest.mock('../../../database/sequelize', () => ({
@@ -34,6 +35,7 @@ const validPayload = {
 
 describe('create', () => {
   it('creates a client with valid data', async () => {
+    (Client.findOne as jest.Mock).mockResolvedValue(null);
     (Client.create as jest.Mock).mockResolvedValue(mockClient);
 
     const result = await create(validPayload as never);
@@ -43,17 +45,31 @@ describe('create', () => {
   });
 
   it('propagates db errors', async () => {
+    (Client.findOne as jest.Mock).mockResolvedValue(null);
     (Client.create as jest.Mock).mockRejectedValue(new Error('db error'));
 
     await expect(create(validPayload as never)).rejects.toThrow('db error');
   });
 
   it('threads an optional transaction through to Client.create', async () => {
+    (Client.findOne as jest.Mock).mockResolvedValue(null);
     (Client.create as jest.Mock).mockResolvedValue(mockClient);
     const transaction = { id: 'txn-1' } as never;
 
     await create(validPayload as never, transaction);
 
     expect(Client.create).toHaveBeenCalledWith(validPayload, { transaction });
+  });
+
+  it('rejects an active duplicate phone number with the shared message', async () => {
+    jest.clearAllMocks();
+    (Client.findOne as jest.Mock).mockResolvedValue(mockClient);
+
+    await expect(create(validPayload as never)).rejects.toEqual(
+      new ConflictError(
+        'Este número de celular ya está registrado. Si necesitas ayuda, contáctanos.',
+      ),
+    );
+    expect(Client.create).not.toHaveBeenCalled();
   });
 });

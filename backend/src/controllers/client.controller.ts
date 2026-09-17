@@ -8,6 +8,7 @@ import {
   softDelete as softDeleteClient,
   search as searchClients,
   setDeliveryGroup,
+  reviewDraft,
 } from '../domains/client';
 import { clientHasAppointment } from '../domains/evaluation';
 import { ROLES } from '../constants/roles.constants';
@@ -34,6 +35,7 @@ const getAll = async (req: Request, res: Response, next: NextFunction) => {
       restriction: typeof restriction === 'string' && restriction ? restriction : undefined,
       page: resolvedPage,
       limit: resolvedLimit,
+      includeDrafts: req.user!.role === ROLES.SUPER_ADMIN || req.user!.role === ROLES.ADMIN,
     });
     sendPaginated(res, rows, total, resolvedPage, resolvedLimit);
   } catch (err) {
@@ -74,6 +76,14 @@ const getById = async (req: Request, res: Response, next: NextFunction) => {
       sendError(res, 'Client not found', 404);
       return;
     }
+    if (
+      (client as { isDraft?: boolean }).isDraft &&
+      req.user!.role !== ROLES.SUPER_ADMIN &&
+      req.user!.role !== ROLES.ADMIN
+    ) {
+      sendError(res, 'Client not found', 404);
+      return;
+    }
     sendSuccess(res, client);
   } catch (err) {
     next(err);
@@ -86,6 +96,27 @@ const update = async (req: Request, res: Response, next: NextFunction) => {
       userId: req.user!.userId,
       username: req.user!.username,
     });
+    if (!client) {
+      sendError(res, 'Client not found', 404);
+      return;
+    }
+    sendSuccess(res, client);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const review = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const client = await reviewDraft(
+      decodeId(req.params.id),
+      req.body.client,
+      req.body.subscription,
+      {
+        userId: req.user!.userId,
+        username: req.user!.username,
+      },
+    );
     if (!client) {
       sendError(res, 'Client not found', 404);
       return;
@@ -149,6 +180,7 @@ export default {
   getAll,
   getById,
   update,
+  review,
   finalize,
   remove,
   setGroup: setGroupHandler,

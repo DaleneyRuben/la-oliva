@@ -80,6 +80,10 @@ export function ClientDetailPage() {
       businessName: draft.businessName || null,
       underlyingDiseases: draft.underlyingDiseases,
       restrictions: draft.restrictions,
+      weight: draft.weight ?? undefined,
+      height: draft.height ?? undefined,
+      operations: draft.operations,
+      medications: draft.medications,
     });
     setEditOpen(false);
   };
@@ -119,17 +123,20 @@ export function ClientDetailPage() {
         onRenew={() => setRenewOpen(true)}
         onDeleteRenewal={() => setDeleteRenewalOpen(true)}
         onAssignStartDate={() => setAssignStartDateOpen(true)}
+        onReview={() => navigate(`/clientes/nuevo?draftId=${client.id}`)}
         readOnly={readOnly}
       />
 
-      <Tabs
-        tabs={visibleTabs}
-        activeId={activeTab}
-        onChange={(tabId) => setTab(tabId as TabId)}
-        className="mb-5"
-      />
+      {!client.isDraft && (
+        <Tabs
+          tabs={visibleTabs}
+          activeId={activeTab}
+          onChange={(tabId) => setTab(tabId as TabId)}
+          className="mb-5"
+        />
+      )}
 
-      {activeTab === 'overview' && (
+      {(client.isDraft || activeTab === 'overview') && (
         <ClientOverviewTab client={client} sub={sub} remaining={remaining} />
       )}
 

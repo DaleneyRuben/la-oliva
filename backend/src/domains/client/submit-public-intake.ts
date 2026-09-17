@@ -10,7 +10,7 @@ export const submitPublicIntake = async (intake: PublicClientIntakeDto) => {
   if (existing) throw new ConflictError(DUPLICATE_PHONE_MESSAGE);
 
   const underlyingDiseases = intake.underlyingDiseases.flatMap((disease) =>
-    disease === 'Other' ? [intake.otherUnderlyingDisease!] : [disease],
+    disease === 'Otro' || disease === 'Other' ? [intake.otherUnderlyingDisease!] : [disease],
   );
 
   return Client.create({

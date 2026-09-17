@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Button } from '@ui/Button';
 import { Field, inputCls } from '@ui/Field';
 import { API_BASE } from '@/utils/env';
+import { DISEASES } from '@/features/clients/constants/diseases';
 
 const initial = {
   firstName: '',
@@ -15,7 +16,24 @@ const initial = {
   weight: '',
   height: '',
   website: '',
+  restrictions: '',
+  underlyingDiseases: [] as string[],
+  otherUnderlyingDisease: '',
+  operations: '',
+  medications: '',
 };
+
+const tomorrow = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().slice(0, 10);
+};
+
+const splitList = (value: string) =>
+  value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
 
 export function PublicRegistrationPage() {
   const [form, setForm] = useState(initial);
@@ -23,13 +41,33 @@ export function PublicRegistrationPage() {
   const [error, setError] = useState('');
   const update = (key: keyof typeof initial, value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
+  const toggleDisease = (disease: string) =>
+    setForm((prev) => ({
+      ...prev,
+      underlyingDiseases: prev.underlyingDiseases.includes(disease)
+        ? prev.underlyingDiseases.filter((item) => item !== disease)
+        : [...prev.underlyingDiseases, disease],
+    }));
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setError('');
+    const preferredStart = new Date(`${form.preferredStartDate}T12:00:00`);
+    if (preferredStart.getDay() === 0 || preferredStart.getDay() === 6) {
+      setError('Elige un día de lunes a viernes para iniciar tu plan.');
+      return;
+    }
     const res = await fetch(`${API_BASE}/public/client-intakes`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...form, weight: Number(form.weight), height: Number(form.height) }),
+      body: JSON.stringify({
+        ...form,
+        restrictions: splitList(form.restrictions),
+        underlyingDiseases: form.underlyingDiseases,
+        operations: splitList(form.operations),
+        medications: splitList(form.medications),
+        weight: Number(form.weight),
+        height: Number(form.height),
+      }),
     });
     if (res.ok) setSent(true);
     else setError('No pudimos enviar tu solicitud. Intenta nuevamente.');
@@ -153,8 +191,67 @@ export function PublicRegistrationPage() {
             id="preferredStartDate"
             type="date"
             required
+            min={tomorrow()}
             value={form.preferredStartDate}
             onChange={(e) => update('preferredStartDate', e.target.value)}
+            className={inputCls()}
+          />
+        </Field>
+        <Field label="Alergias, intolerancias y gustos" htmlFor="restrictions">
+          <input
+            id="restrictions"
+            placeholder="Ej. maní, lácteos, cebolla"
+            value={form.restrictions}
+            onChange={(e) => update('restrictions', e.target.value)}
+            className={inputCls()}
+          />
+        </Field>
+        <div>
+          <p className="text-[13.5px] font-bold text-ink mb-2">Enfermedades de base</p>
+          <div className="flex flex-wrap gap-2">
+            {DISEASES.map((disease) => (
+              <label
+                key={disease}
+                htmlFor={`disease-${disease}`}
+                className="inline-flex items-center gap-1.5 text-sm text-ink-2"
+              >
+                <input
+                  id={`disease-${disease}`}
+                  type="checkbox"
+                  checked={form.underlyingDiseases.includes(disease)}
+                  onChange={() => toggleDisease(disease)}
+                />
+                {disease}
+              </label>
+            ))}
+          </div>
+          {form.underlyingDiseases.includes('Otro') && (
+            <Field label="Especificar enfermedad" htmlFor="otherUnderlyingDisease" required>
+              <input
+                id="otherUnderlyingDisease"
+                required
+                value={form.otherUnderlyingDisease}
+                onChange={(e) => update('otherUnderlyingDisease', e.target.value)}
+                className={inputCls()}
+              />
+            </Field>
+          )}
+        </div>
+        <Field label="Operaciones" htmlFor="operations">
+          <input
+            id="operations"
+            placeholder="Separar con comas"
+            value={form.operations}
+            onChange={(e) => update('operations', e.target.value)}
+            className={inputCls()}
+          />
+        </Field>
+        <Field label="Medicamentos" htmlFor="medications">
+          <input
+            id="medications"
+            placeholder="Separar con comas"
+            value={form.medications}
+            onChange={(e) => update('medications', e.target.value)}
             className={inputCls()}
           />
         </Field>

@@ -27,6 +27,10 @@ export interface EditDraft {
   businessName: string;
   underlyingDiseases: string[];
   restrictions: string[];
+  weight: number | null;
+  height: number | null;
+  operations: string[];
+  medications: string[];
 }
 
 export function draftFromClient(c: Client): EditDraft {
@@ -37,11 +41,15 @@ export function draftFromClient(c: Client): EditDraft {
     phoneNumber: c.phoneNumber,
     address: c.address,
     deliveryZone: c.deliveryZone,
-    delivery: c.delivery,
+    delivery: c.delivery ?? '',
     nit: c.nit ?? '',
     businessName: c.businessName ?? '',
     underlyingDiseases: [...c.underlyingDiseases],
     restrictions: [...c.restrictions],
+    weight: c.weight,
+    height: c.height,
+    operations: [...(c.operations ?? [])],
+    medications: [...(c.medications ?? [])],
   };
 }
 
@@ -152,6 +160,70 @@ export function ClientEditModal({
                   />
                 </Field>
               </div>
+            </div>
+          </div>
+
+          <hr className="border-hairline" />
+
+          <div>
+            <Label variant="section" className="mb-[13px]">
+              Información de salud
+            </Label>
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Peso (kg)" htmlFor="em-weight" required variant="plain">
+                <input
+                  id="em-weight"
+                  type="number"
+                  min="1"
+                  step="0.1"
+                  required
+                  value={draft.weight ?? ''}
+                  onChange={(e) => set({ weight: Number(e.target.value) || null })}
+                  className={inputCls()}
+                />
+              </Field>
+              <Field label="Talla (cm)" htmlFor="em-height" required variant="plain">
+                <input
+                  id="em-height"
+                  type="number"
+                  min="1"
+                  step="0.1"
+                  required
+                  value={draft.height ?? ''}
+                  onChange={(e) => set({ height: Number(e.target.value) || null })}
+                  className={inputCls()}
+                />
+              </Field>
+              <Field label="Operaciones" htmlFor="em-operations" variant="plain">
+                <input
+                  id="em-operations"
+                  value={draft.operations.join(', ')}
+                  onChange={(e) =>
+                    set({
+                      operations: e.target.value
+                        .split(',')
+                        .map((x) => x.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  className={inputCls()}
+                />
+              </Field>
+              <Field label="Medicamentos" htmlFor="em-medications" variant="plain">
+                <input
+                  id="em-medications"
+                  value={draft.medications.join(', ')}
+                  onChange={(e) =>
+                    set({
+                      medications: e.target.value
+                        .split(',')
+                        .map((x) => x.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  className={inputCls()}
+                />
+              </Field>
             </div>
           </div>
 

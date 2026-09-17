@@ -3,7 +3,12 @@ import clientController from '../controllers/client.controller';
 import historyController from '../controllers/history.controller';
 import { requireRole } from '../middleware/auth';
 import validate from '../middleware/validate';
-import { createClientSchema, updateClientSchema, setGroupSchema } from '../schemas/client.schema';
+import {
+  createClientSchema,
+  reviewDraftSchema,
+  updateClientSchema,
+  setGroupSchema,
+} from '../schemas/client.schema';
 import { ROLES } from '../constants/roles.constants';
 
 const router = Router();
@@ -21,6 +26,7 @@ router.get(
 );
 router.get('/:id/history', clientReadOnly, historyController.getByClient);
 router.post('/', adminOnly, validate(createClientSchema), clientController.create);
+router.post('/:id/review', adminOnly, validate(reviewDraftSchema), clientController.review);
 router.patch('/:id', adminOnly, validate(updateClientSchema), clientController.update);
 router.post('/:id/finalize', adminOnly, clientController.finalize);
 router.put('/:id/group', adminOnly, validate(setGroupSchema), clientController.setGroup);

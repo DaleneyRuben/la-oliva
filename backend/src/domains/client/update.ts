@@ -1,4 +1,4 @@
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import Client from '../../models/Client';
 import { withTransaction } from '../../database/with-transaction';
 import { UpdateClientDto } from '../../schemas/client.schema';
@@ -6,6 +6,8 @@ import type { Actor } from '../../types/actor';
 import { appToday } from '../../utils/date';
 import { pause, resume } from '../subscription';
 import { withStatus, getCurrentSubscription, INCLUDE_SUBSCRIPTION_ORDERED } from './_helpers';
+import { DUPLICATE_PHONE_MESSAGE } from './create';
+import { ConflictError } from '../../utils/errors';
 
 type SubLike = {
   id: number;
@@ -31,6 +33,14 @@ export const update = async (
 
   const updated = await withTransaction(transaction, async (t) => {
     let pauseChanged = false;
+
+    if (clientFields.phoneNumber && clientFields.phoneNumber !== client.phoneNumber) {
+      const existing = await Client.findOne({
+        where: { phoneNumber: clientFields.phoneNumber, id: { [Op.ne]: id } },
+        transaction: t,
+      });
+      if (existing) throw new ConflictError(DUPLICATE_PHONE_MESSAGE);
+    }
 
     if (pausedSince !== undefined) {
       const subs = (client as never as { subscriptions: SubLike[] }).subscriptions ?? [];

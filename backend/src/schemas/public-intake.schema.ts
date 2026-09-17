@@ -36,7 +36,10 @@ export const publicClientIntakeSchema = z
     website: z.literal('').default(''),
   })
   .superRefine((data, context) => {
-    if (data.underlyingDiseases.includes('Other') && !data.otherUnderlyingDisease) {
+    if (
+      (data.underlyingDiseases.includes('Otro') || data.underlyingDiseases.includes('Other')) &&
+      !data.otherUnderlyingDisease
+    ) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['otherUnderlyingDisease'],

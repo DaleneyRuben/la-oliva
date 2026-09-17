@@ -15,6 +15,10 @@ export interface ClientCreateDraft {
   businessName?: string;
   underlyingDiseases: string[];
   restrictions: string[];
+  weight: number;
+  height: number;
+  operations: string[];
+  medications: string[];
 }
 
 export interface SubscriptionCreateDraft {
@@ -38,6 +42,10 @@ export interface ClientUpdateDraft {
   businessName?: string | null;
   underlyingDiseases?: string[];
   restrictions?: string[];
+  weight?: number;
+  height?: number;
+  operations?: string[];
+  medications?: string[];
   pausedSince?: string | null;
 }
 

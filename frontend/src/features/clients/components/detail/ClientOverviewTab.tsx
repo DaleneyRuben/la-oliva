@@ -100,6 +100,30 @@ export function ClientOverviewTab({ client, sub, remaining }: Props) {
 
         <Card>
           <Label variant="section" className="mb-4">
+            Información de salud
+          </Label>
+          <div className="grid grid-cols-2 gap-4 text-[13.5px] text-ink">
+            <div>
+              <Label variant="field">Peso</Label>
+              <p>{client.weight ? `${client.weight} kg` : 'Sin registrar'}</p>
+            </div>
+            <div>
+              <Label variant="field">Talla</Label>
+              <p>{client.height ? `${client.height} cm` : 'Sin registrar'}</p>
+            </div>
+            <div className="col-span-2">
+              <Label variant="field">Operaciones</Label>
+              <p>{client.operations?.length ? client.operations.join(', ') : 'Sin registrar'}</p>
+            </div>
+            <div className="col-span-2">
+              <Label variant="field">Medicamentos</Label>
+              <p>{client.medications?.length ? client.medications.join(', ') : 'Sin registrar'}</p>
+            </div>
+          </div>
+        </Card>
+
+        <Card>
+          <Label variant="section" className="mb-4">
             Contacto
           </Label>
           <div className="flex flex-col gap-[14px]">
