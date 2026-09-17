@@ -19,6 +19,8 @@ const payload = {
 };
 
 describe('POST /api/public/client-intakes', () => {
+  beforeEach(() => jest.clearAllMocks());
+
   it('creates a public draft without requiring authentication', async () => {
     (submitPublicIntake as jest.Mock).mockResolvedValue({ id: 1 });
 

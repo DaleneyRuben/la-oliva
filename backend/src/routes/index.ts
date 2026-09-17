@@ -13,6 +13,7 @@ import productionRoutes from './production.routes';
 import reportRoutes from './report.routes';
 import subscriptionRoutes from './subscription.routes';
 import userRoutes from './user.routes';
+import publicIntakeRoutes from './public-intake.routes';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { ROLES } from '../constants/roles.constants';
 
@@ -21,6 +22,7 @@ const router = Router();
 router.use('/health', requireAuth, requireRole(ROLES.SUPER_ADMIN), healthRoutes);
 
 router.use('/auth', authRoutes);
+router.use('/public', publicIntakeRoutes);
 
 // per-route role checks live in client.routes.ts: GET /:id also allows nutritionist
 router.use('/clients', requireAuth, clientRoutes);
