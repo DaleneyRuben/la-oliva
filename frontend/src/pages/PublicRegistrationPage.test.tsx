@@ -18,6 +18,7 @@ it('shows the public registration heading', () => {
   expect(screen.getByRole('main').firstElementChild).toHaveClass('md:h-[calc(100vh-48px)]');
   expect(screen.queryByText('Formulario')).not.toBeInTheDocument();
   expect(screen.queryByText('Confirmación')).not.toBeInTheDocument();
+  expect(document.getElementById('address')?.tagName).toBe('TEXTAREA');
 });
 
 it('shows a retry message when submitting the form fails due to a network error', async () => {
