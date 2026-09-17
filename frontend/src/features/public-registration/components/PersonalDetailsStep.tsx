@@ -88,13 +88,14 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
       </div>
       <label htmlFor="address" className="mt-4 block text-[11px] font-semibold text-ink-2">
         Dirección detallada <span className="text-required">*</span>
-        <input
+        <textarea
           id="address"
+          rows={2}
           required
           value={form.address}
           onChange={(event) => update('address', event.target.value)}
           placeholder="Calle, número, edificio y referencia"
-          className={`${publicRegistrationFieldClass} mt-2`}
+          className={`${publicRegistrationFieldClass} mt-2 resize-none`}
         />
       </label>
       <fieldset className="mt-4">
