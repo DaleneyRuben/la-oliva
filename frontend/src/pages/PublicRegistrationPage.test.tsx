@@ -13,6 +13,7 @@ it('shows the public registration heading', () => {
   expect(screen.getByRole('heading', { name: 'Datos personales' })).toBeInTheDocument();
   expect(screen.getByText('Paso 1 de 3')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument();
+  expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('aria-current', 'step');
 });
 
 it('shows a retry message when submitting the form fails due to a network error', async () => {
