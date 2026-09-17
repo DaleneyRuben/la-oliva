@@ -94,4 +94,5 @@ export interface NewClientFormValues {
 export interface RestrictionsState {
   restrictions: string[];
   underlyingDiseases: string[];
+  otherUnderlyingDisease?: string;
 }

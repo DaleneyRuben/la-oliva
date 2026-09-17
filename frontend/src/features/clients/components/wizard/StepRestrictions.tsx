@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TagInput } from '@ui/TagInput';
 import { TogglePill } from '@ui/TogglePill';
+import { Field, inputCls } from '@ui/Field';
 import { WizardSectionCard } from '@ui/WizardSectionCard';
 import { DISEASES } from '@/features/clients/constants/diseases';
 import type { RestrictionsState } from '@/features/clients/types';
@@ -79,6 +80,19 @@ export function StepRestrictions({ value, onChange }: Props) {
             );
           })}
         </div>
+        {value.underlyingDiseases.includes('Otro') && (
+          <div className="mt-4 max-w-md">
+            <Field label="Especificar enfermedad" htmlFor="otherUnderlyingDisease" required>
+              <input
+                id="otherUnderlyingDisease"
+                required
+                value={value.otherUnderlyingDisease ?? ''}
+                onChange={(event) => onChange({ otherUnderlyingDisease: event.target.value })}
+                className={inputCls()}
+              />
+            </Field>
+          </div>
+        )}
       </WizardSectionCard>
     </div>
   );

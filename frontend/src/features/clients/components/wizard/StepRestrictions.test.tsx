@@ -31,6 +31,18 @@ it('calls onChange with toggled disease when pill is clicked', async () => {
   expect(onChange).toHaveBeenCalledWith({ underlyingDiseases: ['Diabetes'] });
 });
 
+it('reveals a required disease description when Other is selected', async () => {
+  const onChange = jest.fn();
+  const { rerender } = render(<StepRestrictions value={baseValue} onChange={onChange} />);
+
+  await userEvent.click(screen.getByRole('button', { name: 'Otro' }));
+  rerender(
+    <StepRestrictions value={{ ...baseValue, underlyingDiseases: ['Otro'] }} onChange={onChange} />,
+  );
+
+  expect(screen.getByLabelText(/Especificar enfermedad/)).toBeRequired();
+});
+
 it('calls onChange to deselect a disease that is already selected', async () => {
   const onChange = jest.fn();
   const value: RestrictionsState = { restrictions: [], underlyingDiseases: ['Diabetes'] };
