@@ -8,6 +8,10 @@ export function RegistrationReviewStep({ form }: { form: RegistrationForm }) {
     ['Zona', form.deliveryZone],
     ['Inicio preferido', formatRegistrationDate(form.preferredStartDate)],
     ['Peso · talla', `${form.weight} kg · ${form.height} cm`],
+    [
+      'Alergias, intolerancias y gustos',
+      form.restrictions.length ? form.restrictions.join(' · ') : 'Ninguno',
+    ],
   ];
 
   return (

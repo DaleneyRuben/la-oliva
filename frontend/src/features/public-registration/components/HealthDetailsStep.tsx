@@ -23,7 +23,10 @@ export function HealthDetailsStep({
   toggleDisease,
 }: HealthDetailsStepProps) {
   return (
-    <div className="space-y-5">
+    <div className="mt-7 space-y-5">
+      <p className="text-[12px] leading-[1.45] text-muted">
+        Si no tiene el dato exacto puede poner un aproximado
+      </p>
       <div className="grid grid-cols-2 gap-4">
         <label htmlFor="weight" className="text-[11px] font-semibold text-ink-2">
           Peso (kg) <span className="text-required">*</span>

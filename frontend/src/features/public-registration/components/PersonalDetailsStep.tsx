@@ -1,5 +1,7 @@
+import { addDays, parseISO, startOfToday } from 'date-fns';
+import { DatePickerInput } from '@/components/ui/DatePickerInput';
 import { RegistrationForm, UpdateRegistrationForm } from '@/features/public-registration/types';
-import { getTomorrow, publicRegistrationFieldClass } from '@/features/public-registration/utils';
+import { publicRegistrationFieldClass } from '@/features/public-registration/utils';
 
 interface PersonalDetailsStepProps {
   form: RegistrationForm;
@@ -50,20 +52,27 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
             <option value="other">Otro</option>
           </select>
         </label>
-        <label htmlFor="dateOfBirth" className="text-[11px] font-semibold text-ink-2">
-          Fecha de nacimiento <span className="text-required">*</span>
-          <input
+        <div>
+          <p className="text-[11px] font-semibold text-ink-2">
+            Fecha de nacimiento <span className="text-required">*</span>
+          </p>
+          <DatePickerInput
             id="dateOfBirth"
-            type="date"
+            ariaLabel="Fecha de nacimiento"
             required
-            max={new Date().toISOString().slice(0, 10)}
             value={form.dateOfBirth}
-            onChange={(event) => update('dateOfBirth', event.target.value)}
-            className={`${publicRegistrationFieldClass} mt-2`}
+            onChange={(value) => update('dateOfBirth', value)}
+            inputClassName={`${publicRegistrationFieldClass} mt-2`}
+            captionLayout="dropdown"
+            startMonth={parseISO('1940-01-01')}
+            endMonth={startOfToday()}
+            disabled={{ after: startOfToday() }}
           />
-        </label>
-        <label htmlFor="phoneNumber" className="text-[11px] font-semibold text-ink-2">
-          Celular <span className="text-required">*</span>
+        </div>
+        <label htmlFor="phoneNumber" className="flex flex-col text-[11px] font-semibold text-ink-2">
+          <span className="min-h-[30px] md:min-h-0">
+            Celular <span className="text-required">*</span>
+          </span>
           <input
             id="phoneNumber"
             required
@@ -73,18 +82,21 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
             className={`${publicRegistrationFieldClass} mt-2`}
           />
         </label>
-        <label htmlFor="preferredStartDate" className="text-[11px] font-semibold text-ink-2">
-          ¿Cuándo quiere iniciar su plan? <span className="text-required">*</span>
-          <input
+        <div className="flex flex-col">
+          <p className="min-h-[30px] text-[11px] font-semibold text-ink-2 md:min-h-0">
+            ¿Cuándo quiere iniciar su plan? <span className="text-required">*</span>
+          </p>
+          <DatePickerInput
             id="preferredStartDate"
-            type="date"
+            ariaLabel="¿Cuándo quiere iniciar su plan?"
             required
-            min={getTomorrow()}
             value={form.preferredStartDate}
-            onChange={(event) => update('preferredStartDate', event.target.value)}
-            className={`${publicRegistrationFieldClass} mt-2`}
+            onChange={(value) => update('preferredStartDate', value)}
+            inputClassName={`${publicRegistrationFieldClass} mt-2`}
+            startMonth={addDays(startOfToday(), 1)}
+            disabled={[{ before: addDays(startOfToday(), 1) }, { dayOfWeek: [0, 6] }]}
           />
-        </label>
+        </div>
       </div>
       <label htmlFor="address" className="mt-4 block text-[11px] font-semibold text-ink-2">
         Dirección detallada <span className="text-required">*</span>
