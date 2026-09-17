@@ -14,7 +14,7 @@ function BrandHeader() {
 export function RegistrationShell({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-screen bg-[#171717] px-0 py-0 md:flex md:items-center md:justify-center md:bg-cream">
-      <div className="mx-auto flex min-h-screen max-w-[430px] overflow-hidden rounded-[24px] border border-rule bg-paper md:h-[min(708px,100vh)] md:min-h-0 md:max-w-[918px] md:rounded-[24px]">
+      <div className="mx-auto flex min-h-screen max-w-[430px] overflow-hidden rounded-[24px] border border-rule bg-paper md:h-[calc(100vh-48px)] md:min-h-0 md:max-w-[918px] md:rounded-[24px]">
         <aside className="hidden w-[40%] flex-col justify-between bg-brand-primary p-[44px] text-brand-on-primary md:flex">
           <BrandHeader />
           <div>
