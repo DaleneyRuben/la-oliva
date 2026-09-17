@@ -38,6 +38,7 @@ interface Props {
   onRenew: () => void;
   onDeleteRenewal: () => void;
   onAssignStartDate: () => void;
+  onReview?: () => void;
   readOnly?: boolean;
 }
 
@@ -59,6 +60,7 @@ export function ClientHeader({
   onRenew,
   onDeleteRenewal,
   onAssignStartDate,
+  onReview,
   readOnly = false,
 }: Props) {
   const age = differenceInYears(startOfToday(), parseISO(client.dateOfBirth));
@@ -108,7 +110,7 @@ export function ClientHeader({
                 className={`inline-flex items-center gap-[7px] pl-[10px] pr-3 py-[5px] rounded-full text-[12px] font-semibold ${STATUS_CLASSES[status]}`}
               >
                 <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT_CLASSES[status]}`} />
-                {STATUS_LABELS[status]}
+                {client.isDraft ? 'Borrador / Pendiente de revisión' : STATUS_LABELS[status]}
               </span>
             </div>
             <p className="font-mono text-[11.5px] tracking-[.04em] text-faint mt-[9px]">
@@ -120,59 +122,72 @@ export function ClientHeader({
 
         {!readOnly && (
           <div className="flex gap-2.5">
-            {toggleConfig && (
-              <Button
-                variant={status === CLIENT_STATUS.PAUSED ? 'primary' : 'secondary'}
-                onClick={onToggleActive}
-                disabled={isUpdating}
-                loading={isUpdating}
-                leftIcon={toggleConfig.icon}
-                className={toggleConfig.className}
-                style={status === CLIENT_STATUS.PAUSED ? RESUME_BTN_STYLE : PAUSE_BTN_STYLE}
-              >
-                {toggleConfig.label}
-              </Button>
-            )}
-            {renewalBlockedReason ? (
-              <Tooltip content={renewalBlockedReason} align="end">
-                <Button
-                  variant="secondary"
-                  onClick={onRenew}
-                  leftIcon="refresh"
-                  disabled
-                  className={OUTLINE_BTN_CLS}
-                  style={RENEW_BTN_STYLE}
-                >
-                  {status === CLIENT_STATUS.ENDED ? 'Reactivar' : 'Renovar'}
+            {client.isDraft ? (
+              <>
+                <Button onClick={onReview} leftIcon="check">
+                  Revisar
                 </Button>
-              </Tooltip>
+                <Button variant="secondary" onClick={onDelete} leftIcon="trash">
+                  Eliminar
+                </Button>
+              </>
             ) : (
-              <Button
-                variant="secondary"
-                onClick={onRenew}
-                leftIcon="refresh"
-                className={OUTLINE_OLIVE_BTN_CLS}
-                style={RENEW_BTN_STYLE}
-              >
-                {status === CLIENT_STATUS.ENDED ? 'Reactivar' : 'Renovar'}
-              </Button>
+              <>
+                {toggleConfig && (
+                  <Button
+                    variant={status === CLIENT_STATUS.PAUSED ? 'primary' : 'secondary'}
+                    onClick={onToggleActive}
+                    disabled={isUpdating}
+                    loading={isUpdating}
+                    leftIcon={toggleConfig.icon}
+                    className={toggleConfig.className}
+                    style={status === CLIENT_STATUS.PAUSED ? RESUME_BTN_STYLE : PAUSE_BTN_STYLE}
+                  >
+                    {toggleConfig.label}
+                  </Button>
+                )}
+                {renewalBlockedReason ? (
+                  <Tooltip content={renewalBlockedReason} align="end">
+                    <Button
+                      variant="secondary"
+                      onClick={onRenew}
+                      leftIcon="refresh"
+                      disabled
+                      className={OUTLINE_BTN_CLS}
+                      style={RENEW_BTN_STYLE}
+                    >
+                      {status === CLIENT_STATUS.ENDED ? 'Reactivar' : 'Renovar'}
+                    </Button>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={onRenew}
+                    leftIcon="refresh"
+                    className={OUTLINE_OLIVE_BTN_CLS}
+                    style={RENEW_BTN_STYLE}
+                  >
+                    {status === CLIENT_STATUS.ENDED ? 'Reactivar' : 'Renovar'}
+                  </Button>
+                )}
+                <OverflowMenu
+                  items={[
+                    { label: 'Editar datos', icon: 'pencil', onClick: onEdit },
+                    ...(status !== CLIENT_STATUS.ENDED
+                      ? [
+                          {
+                            label: 'Finalizar plan',
+                            icon: 'x',
+                            onClick: onFinalize,
+                            variant: 'alert' as const,
+                          },
+                        ]
+                      : []),
+                    { label: 'Eliminar', icon: 'trash', onClick: onDelete, variant: 'alert' },
+                  ]}
+                />
+              </>
             )}
-            <OverflowMenu
-              items={[
-                { label: 'Editar datos', icon: 'pencil', onClick: onEdit },
-                ...(status !== CLIENT_STATUS.ENDED
-                  ? [
-                      {
-                        label: 'Finalizar plan',
-                        icon: 'x',
-                        onClick: onFinalize,
-                        variant: 'alert' as const,
-                      },
-                    ]
-                  : []),
-                { label: 'Eliminar', icon: 'trash', onClick: onDelete, variant: 'alert' },
-              ]}
-            />
           </div>
         )}
       </div>

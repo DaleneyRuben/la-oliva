@@ -11,3 +11,5 @@ export { findBirthdays } from './find-birthdays';
 export type { BirthdayPerson } from './find-birthdays';
 export { deriveClientStatus } from './derive-client-status';
 export type { ClientStatusValue } from './derive-client-status';
+export { submitPublicIntake } from './submit-public-intake';
+export { reviewDraft } from './review-draft';

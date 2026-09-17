@@ -9,6 +9,7 @@ export const DISEASES = [
   'Anemia',
   'Postoperatorias',
   'Adulto mayor',
+  'Otro',
 ] as const;
 
 export type Disease = (typeof DISEASES)[number];

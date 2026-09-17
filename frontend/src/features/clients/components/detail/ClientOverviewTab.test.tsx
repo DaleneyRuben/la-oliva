@@ -95,3 +95,24 @@ it('shows restrictions when present', () => {
   expect(screen.getByText('Gluten')).toBeInTheDocument();
   expect(screen.getByText('Diabetes')).toBeInTheDocument();
 });
+
+it('hides health information when an existing client has no health data', () => {
+  render(<ClientOverviewTab client={client} sub={sub} remaining={15} />);
+
+  expect(screen.queryByText('Información de salud')).not.toBeInTheDocument();
+});
+
+it('shows health information below restrictions when health data is available', () => {
+  const withHealthData: Client = {
+    ...client,
+    weight: 65,
+    height: 165,
+    operations: ['Apendicectomía'],
+    medications: ['Vitamina D'],
+  };
+  render(<ClientOverviewTab client={withHealthData} sub={sub} remaining={15} />);
+
+  const restrictions = screen.getByRole('heading', { name: 'Restricciones' });
+  const health = screen.getByText('Información de salud');
+  expect(restrictions.compareDocumentPosition(health)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+});

@@ -14,6 +14,7 @@ describe('search', () => {
 
     expect(Client.findAll).toHaveBeenCalledWith({
       where: {
+        isDraft: false,
         [Op.or]: [{ name: { [Op.iLike]: '%ana%' } }, { phoneNumber: { [Op.iLike]: '%ana%' } }],
       },
       attributes: ['id', 'name', 'phoneNumber'],
@@ -30,6 +31,7 @@ describe('search', () => {
     expect(Client.findAll).toHaveBeenCalledWith(
       expect.objectContaining({
         where: {
+          isDraft: false,
           [Op.or]: [
             { name: { [Op.iLike]: '%50\\%\\_off\\\\x%' } },
             { phoneNumber: { [Op.iLike]: '%50\\%\\_off\\\\x%' } },
@@ -37,5 +39,14 @@ describe('search', () => {
         },
       }),
     );
+  });
+
+  it('excludes drafts from type-ahead search', async () => {
+    (Client.findAll as jest.Mock).mockResolvedValue([]);
+
+    await search('ana');
+
+    const call = (Client.findAll as jest.Mock).mock.calls[0][0];
+    expect(call.where.isDraft).toBe(false);
   });
 });

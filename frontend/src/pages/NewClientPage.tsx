@@ -5,6 +5,8 @@ import { format, startOfToday } from 'date-fns';
 import { Button } from '@ui/Button';
 import { StepIndicator } from '@ui/StepIndicator';
 import { useCreateClient } from '@/features/clients/hooks/useCreateClient';
+import { useClient } from '@/features/clients/hooks/useClient';
+import { useReviewDraft } from '@/features/clients/hooks/useReviewDraft';
 import { usePlans } from '@/features/plans/hooks/usePlans';
 import { useConvertAppointment } from '@/features/evaluations/hooks/useConvertAppointment';
 import { useNutritionistQueue } from '@/features/evaluations/hooks/useNutritionistQueue';
@@ -13,6 +15,7 @@ import { StepIdentity } from '@/features/clients/components/wizard/StepIdentity'
 import { StepPlan } from '@/features/clients/components/wizard/StepPlan';
 import { StepRestrictions } from '@/features/clients/components/wizard/StepRestrictions';
 import type { NewClientFormValues, RestrictionsState } from '@/features/clients/types';
+import { normalizeUnderlyingDiseases } from '@/features/clients/utils/underlyingDiseases';
 
 const STEPS = ['Identidad', 'Restricciones', 'Plan', 'Confirmar'];
 
@@ -25,8 +28,11 @@ export function NewClientPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const appointmentId = searchParams.get('appointmentId');
+  const draftId = searchParams.get('draftId');
   const origen: 'Directo' | 'Cita' = appointmentId ? 'Cita' : 'Directo';
   const { create, isCreating } = useCreateClient();
+  const { client: draft } = useClient(draftId ?? '');
+  const { review, isReviewing } = useReviewDraft(draftId);
   const { convert, isConverting } = useConvertAppointment();
   const { appointments } = useNutritionistQueue({ enabled: origen === 'Cita' });
   const appointment = appointments.find((a) => a.id === appointmentId) ?? null;
@@ -64,6 +70,10 @@ export function NewClientPage() {
       duration: 20,
       price: 0,
       specialInstructions: {},
+      weight: null,
+      height: null,
+      operations: [],
+      medications: [],
     },
   });
 
@@ -84,6 +94,25 @@ export function NewClientPage() {
     if (!getValues('phoneNumber')) setValue('phoneNumber', appointment.phone);
   }, [appointment, getValues, setValue]);
 
+  useEffect(() => {
+    if (!draft || !draft.isDraft) return;
+    setValue('name', draft.name);
+    setValue('sex', draft.sex);
+    setValue('dateOfBirth', draft.dateOfBirth);
+    setValue('phoneNumber', draft.phoneNumber);
+    setValue('address', draft.address);
+    setValue('deliveryZone', draft.deliveryZone);
+    setValue('weight', draft.weight);
+    setValue('height', draft.height);
+    setValue('operations', draft.operations);
+    setValue('medications', draft.medications);
+    setValue('startDate', draft.preferredStartDate ?? '');
+    setRestrictions({
+      restrictions: draft.restrictions,
+      ...normalizeUnderlyingDiseases(draft.underlyingDiseases),
+    });
+  }, [draft, setValue]);
+
   const submit = handleSubmit(async (data) => {
     setSubmitError('');
     const client = {
@@ -96,8 +125,14 @@ export function NewClientPage() {
       delivery: data.delivery,
       ...(data.nit ? { nit: data.nit } : {}),
       ...(data.businessName ? { businessName: data.businessName } : {}),
-      underlyingDiseases: restrictions.underlyingDiseases,
+      underlyingDiseases: restrictions.underlyingDiseases.map((disease) =>
+        disease === 'Otro' ? restrictions.otherUnderlyingDisease!.trim() : disease,
+      ),
       restrictions: restrictions.restrictions,
+      weight: data.weight!,
+      height: data.height!,
+      operations: data.operations,
+      medications: data.medications,
     };
     const subscription = {
       planId: data.planId!,
@@ -110,7 +145,10 @@ export function NewClientPage() {
         : {}),
     };
     try {
-      if (origen === 'Cita' && appointmentId) {
+      if (draftId) {
+        await review(client, subscription);
+        navigate('/clientes');
+      } else if (origen === 'Cita' && appointmentId) {
         await convert(appointmentId, client, { ...subscription, paid: paid! });
         navigate('/evaluaciones');
       } else {
@@ -140,7 +178,7 @@ export function NewClientPage() {
           <span>Directorio</span>
         </div>
         <h1 className="font-serif font-semibold text-[28px] lg:text-[38px] leading-none tracking-[.005em] text-ink">
-          Agregar cliente
+          {draftId ? 'Revisar solicitud' : 'Agregar cliente'}
         </h1>
       </div>
 
@@ -157,6 +195,8 @@ export function NewClientPage() {
             <StepRestrictions
               value={restrictions}
               onChange={(u) => setRestrictions((prev) => ({ ...prev, ...u }))}
+              register={register}
+              errors={errors}
             />
           )}
           {step === 3 && (
@@ -206,11 +246,11 @@ export function NewClientPage() {
             ) : (
               <Button
                 onClick={submit}
-                loading={isCreating || isConverting}
+                loading={isCreating || isConverting || isReviewing}
                 disabled={origen === 'Cita' && paid === null}
                 rightIcon="check"
               >
-                Crear cliente
+                {draftId ? 'Confirmar cliente' : 'Crear cliente'}
               </Button>
             )}
           </div>

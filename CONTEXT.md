@@ -70,6 +70,19 @@ UI labels are neutral Spanish. Each entry: term (code identifier) — definition
   displayed in Spanish ("Móvil" / "Escritorio" / "Tableta"). `null` when the login request
   carried no User-Agent.
 
+## Public client intake
+
+- **Public client intake** (`publicClientIntake`) — the unauthenticated form through which a person supplies their initial information to request the service. Submitting it creates a **Draft client**, not an Appointment or a Subscription. _Avoid_: user registration; appointment; active client.
+- **Draft client** (`draftClient`) — a Client created by a Public client intake that an Admin or Super Admin has not yet verified and that has no first Subscription. It appears in the Clients table with a **Draft / Pending review** badge and only **Review** and **Delete** actions, but does not participate in operational counts, production, deliveries, reports, or finance; it stops being a Draft client only when an Admin or Super Admin completes the prefilled new-client wizard and creates its first Subscription in the same operation. Deleting it requires confirmation and soft-deletes the Client, making its phone number eligible for reuse. ⚠ Distinct from the **displayed client status**, which is derived from a Subscription and is never stored and never labels a Draft client.
+- **Intake name** — a public intake collects one given name and one surname in separate inputs, then stores their trimmed concatenation in the Client's existing canonical `name` field. The system does not persist name components separately.
+- **Preferred start date** (`preferredStartDate`) — the date requested in a Public client intake. It belongs to the Draft client rather than to a Subscription, and prepopulates the first Subscription's `startDate` during Review; the Admin or Super Admin may change it before confirmation.
+- **Delivery selection** — a Client's `delivery` is not collected by a Public client intake. An Admin or Super Admin must select it during Review before the first Subscription can be created.
+- **Client phone number** (`phoneNumber`) — a Client contact number. It may be shared by multiple Clients, for example when a minor uses a parent or guardian's number.
+- **Underlying disease entry** — the Client's single diseases field. An underlying disease may be selected from the system's standard options or entered as free text through **Other**; selecting **Other** reveals a required field for the disease name. Both forms are stored as values in the Client's `underlyingDiseases` list and are available in every client creation, review, and edit flow. _Avoid_: a second diseases list.
+- **Body measurements** (`weight`, `height`) — a Client's required weight in kilograms (decimal allowed) and height in centimetres, collected during every client intake and review and editable from the client profile.
+- **Medical background** — a Client's operations and medications, retained on the Client profile and editable with the other health information. Both fields are optional lists of individual free-text tags.
+- **Public intake consent** — no consent checkbox or privacy-notice acknowledgement is required to submit a Public client intake.
+
 ## Evaluaciones (appointments → client conversion or renewal)
 
 - **Appointment** (`appointment`, UI: "Cita") — a placeholder record for a prospective or

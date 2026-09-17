@@ -38,11 +38,17 @@ export interface Client {
   phoneNumber: string;
   address: string;
   deliveryZone: string;
-  delivery: string;
+  delivery: string | null;
   nit: string | null;
   businessName: string | null;
   underlyingDiseases: string[];
   restrictions: string[];
+  isDraft: boolean;
+  preferredStartDate: string | null;
+  weight: number | null;
+  height: number | null;
+  operations: string[];
+  medications: string[];
   pausedSince: string | null;
   subscriptions: Subscription[];
   status: ClientStatus;
@@ -89,9 +95,14 @@ export interface NewClientFormValues {
   duration: number;
   price: number;
   specialInstructions: Record<string, string>;
+  weight: number | null;
+  height: number | null;
+  operations: string[];
+  medications: string[];
 }
 
 export interface RestrictionsState {
   restrictions: string[];
   underlyingDiseases: string[];
+  otherUnderlyingDisease?: string;
 }

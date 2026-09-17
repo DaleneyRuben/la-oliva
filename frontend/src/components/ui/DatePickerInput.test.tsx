@@ -45,6 +45,8 @@ it('calls onChange with ISO date when a complete date value is entered', () => {
 
 it('opens the calendar popover when the calendar button is clicked', async () => {
   render(<DatePickerInput value="" onChange={jest.fn()} />);
-  await userEvent.click(screen.getByRole('button'));
+  const calendarButton = screen.getByRole('button');
+  expect(calendarButton).toHaveClass('top-1/2', '-translate-y-1/2');
+  await userEvent.click(calendarButton);
   expect(document.querySelector('[data-datepicker-portal]')).toBeInTheDocument();
 });

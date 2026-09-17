@@ -300,6 +300,10 @@ describe('POST /api/appointments/:id/convert', () => {
     address: 'Calle 1',
     deliveryZone: 'Centro',
     delivery: 'La Oliva',
+    weight: 70,
+    height: 170,
+    operations: [],
+    medications: [],
   };
 
   const subscriptionData = {

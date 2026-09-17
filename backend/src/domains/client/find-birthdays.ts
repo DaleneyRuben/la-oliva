@@ -24,7 +24,10 @@ export const findBirthdays = async (): Promise<BirthdayPerson[]> => {
 
   const clients = await Client.findAll({
     attributes: ['id', 'name', 'dateOfBirth'],
-    where: where(fn('EXTRACT', literal('MONTH FROM "dateOfBirth"')), Op.eq, currentMonth),
+    where: {
+      isDraft: false,
+      [Op.and]: where(fn('EXTRACT', literal('MONTH FROM "dateOfBirth"')), Op.eq, currentMonth),
+    },
     include: [
       {
         model: Subscription,

@@ -53,6 +53,10 @@ const validPayload = {
   delivery: 'La Oliva',
   underlyingDiseases: ['diabetes'],
   restrictions: ['gluten'],
+  weight: 70,
+  height: 170,
+  operations: [],
+  medications: [],
 };
 
 describe('GET /api/clients', () => {

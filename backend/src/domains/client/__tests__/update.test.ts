@@ -136,6 +136,15 @@ describe('update', () => {
     expect(instance.update).toHaveBeenCalledWith({ name: 'Jane Doe' }, { transaction });
   });
 
+  it('allows changing a phone number to one used by another client', async () => {
+    const instance = clientWith([runningSub()], { phoneNumber: '+59170000001' });
+    (Client.findByPk as jest.Mock).mockResolvedValue(instance);
+    (Client.findOne as jest.Mock).mockResolvedValue({ id: 2 });
+
+    await update(1, { phoneNumber: '+59170000002' }, actor);
+    expect(instance.update).toHaveBeenCalledWith({ phoneNumber: '+59170000002' }, { transaction });
+  });
+
   it("joins the caller's transaction rather than opening its own", async () => {
     const instance = clientWith([runningSub()]);
     (Client.findByPk as jest.Mock).mockResolvedValue(instance);

@@ -12,8 +12,11 @@ interface Props {
   id?: string;
   value: string;
   onChange: (v: string) => void;
+  ariaLabel?: string;
+  required?: boolean;
   hasError?: boolean;
   placeholder?: string;
+  inputClassName?: string;
   captionLayout?: CaptionLayout;
   startMonth?: Date;
   endMonth?: Date;
@@ -67,8 +70,11 @@ export function DatePickerInput({
   id,
   value,
   onChange,
+  ariaLabel,
+  required,
   hasError,
   placeholder = 'dd/mm/aaaa',
+  inputClassName,
   captionLayout = 'label',
   startMonth,
   endMonth,
@@ -154,21 +160,23 @@ export function DatePickerInput({
   };
 
   return (
-    <div ref={containerRef} className="relative flex items-center">
+    <div ref={containerRef} className="relative flex w-full items-center">
       <input
         id={id}
         type="text"
+        aria-label={ariaLabel}
+        required={required}
         value={inputText}
         onChange={handleTextChange}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className={`${inputCls(hasError)} pr-9`}
+        className={`${inputClassName ?? inputCls(hasError)} pr-9`}
       />
       <button
         type="button"
         tabIndex={-1}
         onClick={() => setOpen((o) => !o)}
-        className="absolute right-2.5 flex items-center text-muted hover:text-ink transition-colors"
+        className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center text-muted transition-colors hover:text-ink"
       >
         <Icon name="calendar" size={14} />
       </button>

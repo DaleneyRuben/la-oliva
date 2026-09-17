@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { Icon } from '@ui/Icon';
 import { Pagination } from '@ui/Pagination';
 import { ClientTableSkeleton } from '@/features/clients/components/list/ClientTableSkeleton';
@@ -76,6 +77,12 @@ export function ClientTable({
                 const queuedRenewal = findQueuedRenewal(c.subscriptions);
                 const { status } = c;
                 const price = sub ? Number(sub.price) : 0;
+                let planCell: ReactNode = <span className="text-faint">—</span>;
+                if (c.isDraft) {
+                  planCell = <span className="text-warn font-semibold">Pendiente de revisión</span>;
+                } else if (sub) {
+                  planCell = sub.plan.name;
+                }
                 return (
                   <tr
                     key={c.id}
@@ -97,9 +104,7 @@ export function ClientTable({
                         </div>
                       </div>
                     </td>
-                    <td className="px-5 py-[13px] text-[13.5px] text-ink-2">
-                      {sub ? sub.plan.name : <span className="text-faint">—</span>}
-                    </td>
+                    <td className="px-5 py-[13px] text-[13.5px] text-ink-2">{planCell}</td>
                     {showRestrictionsColumn && (
                       <td className="px-5 py-[13px]">
                         <ClientRestrictionPills
@@ -137,7 +142,7 @@ export function ClientTable({
                         <span
                           className={`w-[6px] h-[6px] rounded-full shrink-0 ${STATUS_DOT_CLASSES[status]}`}
                         />
-                        {STATUS_LABELS[status]}
+                        {c.isDraft ? 'Borrador / Pendiente de revisión' : STATUS_LABELS[status]}
                       </span>
                     </td>
                     <td className="px-5 py-[13px] text-right font-sans text-[13px] font-bold tabular-nums whitespace-nowrap">

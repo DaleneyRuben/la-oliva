@@ -45,7 +45,7 @@ type DeliveryClientRow = {
   groupToken: string | null;
   address: string;
   startDate: string | null;
-  delivery: string;
+  delivery: string | null;
 };
 
 const byName = (a: DeliveryPerson, b: DeliveryPerson) => a.name.localeCompare(b.name, 'es');

@@ -6,6 +6,7 @@ export const search = (query: string) => {
   const pattern = `%${escapeLikePattern(query)}%`;
   return Client.findAll({
     where: {
+      isDraft: false,
       [Op.or]: [{ name: { [Op.iLike]: pattern } }, { phoneNumber: { [Op.iLike]: pattern } }],
     },
     attributes: ['id', 'name', 'phoneNumber'],

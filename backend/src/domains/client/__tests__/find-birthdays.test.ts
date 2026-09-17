@@ -108,5 +108,6 @@ describe('findBirthdays', () => {
 
     const call = (Client.findAll as jest.Mock).mock.calls[0][0];
     expect(call.where).toBeDefined();
+    expect(call.where.isDraft).toBe(false);
   });
 });
