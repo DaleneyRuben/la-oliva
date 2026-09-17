@@ -19,8 +19,8 @@ it('shows the public registration heading', () => {
   expect(screen.queryByText('Formulario')).not.toBeInTheDocument();
   expect(screen.queryByText('Confirmación')).not.toBeInTheDocument();
   expect(document.getElementById('address')?.tagName).toBe('TEXTAREA');
-  expect(screen.getAllByText('Empecemos por conocerte mejor.')).toHaveLength(2);
-  expect(screen.queryByText('Cuéntanos un poco sobre ti.')).not.toBeInTheDocument();
+  expect(screen.getAllByText('Queremos conocerte mejor')).toHaveLength(2);
+  expect(screen.queryByText('Empecemos por conocerte mejor.')).not.toBeInTheDocument();
 });
 
 it('shows a retry message when submitting the form fails due to a network error', async () => {
