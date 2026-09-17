@@ -78,7 +78,9 @@ export function ClientDetailPage() {
       delivery: draft.delivery,
       nit: draft.nit || null,
       businessName: draft.businessName || null,
-      underlyingDiseases: draft.underlyingDiseases,
+      underlyingDiseases: draft.underlyingDiseases.map((disease) =>
+        disease === 'Otro' ? draft.otherUnderlyingDisease.trim() : disease,
+      ),
       restrictions: draft.restrictions,
       weight: draft.weight ?? undefined,
       height: draft.height ?? undefined,

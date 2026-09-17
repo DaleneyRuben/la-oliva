@@ -31,6 +31,7 @@ export interface EditDraft {
   height: number | null;
   operations: string[];
   medications: string[];
+  otherUnderlyingDisease: string;
 }
 
 export function draftFromClient(c: Client): EditDraft {
@@ -44,12 +45,16 @@ export function draftFromClient(c: Client): EditDraft {
     delivery: c.delivery ?? '',
     nit: c.nit ?? '',
     businessName: c.businessName ?? '',
-    underlyingDiseases: [...c.underlyingDiseases],
+    underlyingDiseases: c.underlyingDiseases.filter((disease) =>
+      DISEASES.includes(disease as never),
+    ),
     restrictions: [...c.restrictions],
     weight: c.weight,
     height: c.height,
     operations: [...(c.operations ?? [])],
     medications: [...(c.medications ?? [])],
+    otherUnderlyingDisease:
+      c.underlyingDiseases.find((disease) => !DISEASES.includes(disease as never)) ?? '',
   };
 }
 
@@ -298,6 +303,24 @@ export function ClientEditModal({
                 );
               })}
             </div>
+            {draft.underlyingDiseases.includes('Otro') && (
+              <div className="mt-4">
+                <Field
+                  label="Especificar enfermedad"
+                  htmlFor="em-other-disease"
+                  required
+                  variant="plain"
+                >
+                  <input
+                    id="em-other-disease"
+                    required
+                    value={draft.otherUnderlyingDisease}
+                    onChange={(e) => set({ otherUnderlyingDisease: e.target.value })}
+                    className={inputCls()}
+                  />
+                </Field>
+              </div>
+            )}
           </div>
 
           <hr className="border-hairline" />
