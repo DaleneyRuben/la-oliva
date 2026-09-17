@@ -3,7 +3,6 @@ import sequelize from '../../../database/sequelize';
 import { record } from '../../client-history';
 import { pause, resume } from '../../subscription';
 import { update } from '../update';
-import { ConflictError } from '../../../utils/errors';
 
 jest.mock('../../../models/Client');
 jest.mock('../../client-history');
@@ -137,17 +136,13 @@ describe('update', () => {
     expect(instance.update).toHaveBeenCalledWith({ name: 'Jane Doe' }, { transaction });
   });
 
-  it('rejects changing a phone number to one used by another active client', async () => {
+  it('allows changing a phone number to one used by another client', async () => {
     const instance = clientWith([runningSub()], { phoneNumber: '+59170000001' });
     (Client.findByPk as jest.Mock).mockResolvedValue(instance);
     (Client.findOne as jest.Mock).mockResolvedValue({ id: 2 });
 
-    await expect(update(1, { phoneNumber: '+59170000002' }, actor)).rejects.toEqual(
-      new ConflictError(
-        'Este número de celular ya está registrado. Si necesitas ayuda, contáctanos.',
-      ),
-    );
-    expect(instance.update).not.toHaveBeenCalled();
+    await update(1, { phoneNumber: '+59170000002' }, actor);
+    expect(instance.update).toHaveBeenCalledWith({ phoneNumber: '+59170000002' }, { transaction });
   });
 
   it("joins the caller's transaction rather than opening its own", async () => {

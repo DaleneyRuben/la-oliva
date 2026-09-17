@@ -2,29 +2,33 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn('clients', 'isDraft', {
+    const columns = await queryInterface.describeTable('clients');
+    const addColumnIfMissing = (name, definition) =>
+      columns[name] ? Promise.resolve() : queryInterface.addColumn('clients', name, definition);
+
+    await addColumnIfMissing('isDraft', {
       type: Sequelize.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     });
-    await queryInterface.addColumn('clients', 'preferredStartDate', {
+    await addColumnIfMissing('preferredStartDate', {
       type: Sequelize.DATEONLY,
       allowNull: true,
     });
-    await queryInterface.addColumn('clients', 'weight', {
+    await addColumnIfMissing('weight', {
       type: Sequelize.DECIMAL(6, 2),
       allowNull: true,
     });
-    await queryInterface.addColumn('clients', 'height', {
+    await addColumnIfMissing('height', {
       type: Sequelize.DECIMAL(6, 2),
       allowNull: true,
     });
-    await queryInterface.addColumn('clients', 'operations', {
+    await addColumnIfMissing('operations', {
       type: Sequelize.ARRAY(Sequelize.STRING),
       allowNull: false,
       defaultValue: [],
     });
-    await queryInterface.addColumn('clients', 'medications', {
+    await addColumnIfMissing('medications', {
       type: Sequelize.ARRAY(Sequelize.STRING),
       allowNull: false,
       defaultValue: [],
@@ -33,15 +37,9 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: true,
     });
-    await queryInterface.addIndex('clients', ['phoneNumber'], {
-      name: 'clients_phone_number_active_unique',
-      unique: true,
-      where: { deletedAt: null },
-    });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeIndex('clients', 'clients_phone_number_active_unique');
     await queryInterface.changeColumn('clients', 'delivery', {
       type: Sequelize.STRING,
       allowNull: false,

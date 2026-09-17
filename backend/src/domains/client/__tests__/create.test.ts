@@ -1,6 +1,5 @@
 import Client from '../../../models/Client';
 import { create } from '../create';
-import { ConflictError } from '../../../utils/errors';
 
 jest.mock('../../../models/Client');
 jest.mock('../../../database/sequelize', () => ({
@@ -61,15 +60,12 @@ describe('create', () => {
     expect(Client.create).toHaveBeenCalledWith(validPayload, { transaction });
   });
 
-  it('rejects an active duplicate phone number with the shared message', async () => {
+  it('allows a phone number shared by multiple clients', async () => {
     jest.clearAllMocks();
     (Client.findOne as jest.Mock).mockResolvedValue(mockClient);
+    (Client.create as jest.Mock).mockResolvedValue(mockClient);
 
-    await expect(create(validPayload as never)).rejects.toEqual(
-      new ConflictError(
-        'Este número de celular ya está registrado. Si necesitas ayuda, contáctanos.',
-      ),
-    );
-    expect(Client.create).not.toHaveBeenCalled();
+    await expect(create(validPayload as never)).resolves.toEqual(mockClient);
+    expect(Client.create).toHaveBeenCalledWith(validPayload);
   });
 });

@@ -394,7 +394,7 @@ When scheduling, the Admin chooses one of two explicit modes:
 - **Cliente nuevo** — free-text name and phone, exactly as today. Resolving this appointment always creates a brand-new client + subscription (a **Conversion**).
 - **Cliente existente** — search an existing client by name or phone (single combined search) and select one. The appointment's `clientId` is set to that client, and its `name`/`phone` fields are copied from the client record and locked (read-only) — not independently editable. Resolving this appointment renews or reactivates that client's plan instead of creating a new one.
 
-An Appointment cannot be created in "Cliente nuevo" mode with a phone number already held by a non-deleted Client (including a Draft client). Phone number is a unique Client field in every creation and update flow; a phone belonging only to a soft-deleted Client may be reused.
+Clients may share a phone number, for example when a minor uses a parent or guardian's number. Every creation and update flow accepts an already-used phone number, including public drafts and appointment conversions.
 
 ### Appointment visibility and pruning
 

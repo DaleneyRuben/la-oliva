@@ -1,6 +1,5 @@
 import Client from '../../../models/Client';
 import type { PublicClientIntakeDto } from '../../../schemas/public-intake.schema';
-import { ConflictError } from '../../../utils/errors';
 // The module is intentionally absent in this red TDD commit.
 // eslint-disable-next-line import/extensions
 import { submitPublicIntake } from '../submit-public-intake';
@@ -54,14 +53,11 @@ describe('submitPublicIntake', () => {
     });
   });
 
-  it('rejects a phone number already held by a non-deleted client', async () => {
+  it('allows a public draft to share a phone number with an existing client', async () => {
     (Client.findOne as jest.Mock).mockResolvedValue({ id: 4 });
+    (Client.create as jest.Mock).mockResolvedValue({ id: 18 });
 
-    await expect(submitPublicIntake(intake)).rejects.toEqual(
-      new ConflictError(
-        'Este número de celular ya está registrado. Si necesitas ayuda, contáctanos.',
-      ),
-    );
-    expect(Client.create).not.toHaveBeenCalled();
+    await expect(submitPublicIntake(intake)).resolves.toEqual({ id: 18 });
+    expect(Client.create).toHaveBeenCalled();
   });
 });
