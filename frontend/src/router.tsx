@@ -16,6 +16,7 @@ import { FinancePage } from '@/pages/FinancePage';
 import { HealthPage } from '@/pages/HealthPage';
 import { UsersPage } from '@/pages/UsersPage';
 import { DeliveryPage } from '@/pages/DeliveryPage';
+import { PublicRegistrationPage } from '@/pages/PublicRegistrationPage';
 import { ADMIN_ROLES, ROLES } from '@/constants/roles';
 
 const STAFF_ROLES = [...ADMIN_ROLES, ROLES.KITCHEN] as const;
@@ -29,6 +30,7 @@ export function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/registro" element={<PublicRegistrationPage />} />
 
       <Route
         path="/*"
