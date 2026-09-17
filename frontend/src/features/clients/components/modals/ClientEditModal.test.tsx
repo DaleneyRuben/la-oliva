@@ -80,3 +80,24 @@ it('toggles disease pill selection on click', async () => {
   await userEvent.click(pill);
   expect(pill).toHaveAttribute('aria-pressed', 'true');
 });
+
+it('pre-fills a custom underlying disease through the Otro field', () => {
+  const clientWithCustomDisease: Client = {
+    ...client,
+    underlyingDiseases: ['Adulto mayor', 'test'],
+  };
+  render(
+    <ClientEditModal
+      client={clientWithCustomDisease}
+      onSave={jest.fn()}
+      onClose={jest.fn()}
+      isSaving={false}
+    />,
+  );
+
+  const otherDisease = screen
+    .getAllByRole('button', { name: 'Otro' })
+    .find((button) => button.hasAttribute('aria-pressed'));
+  expect(otherDisease).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.getByLabelText(/especificar enfermedad/i)).toHaveValue('test');
+});

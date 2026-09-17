@@ -97,6 +97,46 @@ describe('NewClientPage', () => {
     expect(screen.getByLabelText(/nombre/i)).toBeInTheDocument();
   });
 
+  it('prefills a custom underlying disease as Otro during draft review', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/clients/draft-1') {
+        return Promise.resolve({
+          id: 'draft-1',
+          name: 'María Prueba',
+          sex: 'female',
+          dateOfBirth: '1990-01-01',
+          phoneNumber: '70000000',
+          address: 'Calle de prueba 123',
+          deliveryZone: 'Centro',
+          delivery: null,
+          nit: null,
+          businessName: null,
+          underlyingDiseases: ['Adulto mayor', 'test'],
+          restrictions: [],
+          weight: 65,
+          height: 165,
+          operations: [],
+          medications: [],
+          isDraft: true,
+          preferredStartDate: '2026-09-18',
+          pausedSince: null,
+          subscriptions: [],
+          status: 'active',
+          groupMembers: [],
+        });
+      }
+      return Promise.resolve([makePlan()]);
+    });
+
+    renderPage('/clientes/nuevo?draftId=draft-1');
+    await waitFor(() => expect(screen.getByLabelText(/nombre/i)).toHaveValue('María Prueba'));
+    await userEvent.click(screen.getByRole('button', { name: 'La Oliva' }));
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+
+    expect(screen.getByRole('button', { name: 'Otro' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByLabelText(/especificar enfermedad/i)).toHaveValue('test');
+  });
+
   it('shows validation error when advancing step 1 without filling name', async () => {
     renderPage();
     await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
