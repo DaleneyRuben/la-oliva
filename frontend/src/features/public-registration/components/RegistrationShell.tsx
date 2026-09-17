@@ -21,7 +21,9 @@ export function RegistrationShell({ children }: { children: ReactNode }) {
             <h1 className="max-w-[360px] font-serif text-[42px] leading-[1.05]">
               Comencemos a cuidar de ti
             </h1>
-            <p className="mt-5 text-[14px] text-brand-on-primary/90">Cuéntanos un poco sobre ti.</p>
+            <p className="mt-5 text-[14px] text-brand-on-primary/90">
+              Empecemos por conocerte mejor.
+            </p>
           </div>
           <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-brand-on-primary/80">
             Tu bienestar, a tu ritmo
@@ -43,7 +45,7 @@ export function RegistrationMobileIntro() {
   return (
     <div className="md:hidden">
       <h1 className="font-serif text-[30px] leading-none text-ink">Comencemos a cuidar de ti</h1>
-      <p className="mt-3 text-[13px] text-muted">Cuéntanos un poco sobre ti.</p>
+      <p className="mt-3 text-[13px] text-muted">Empecemos por conocerte mejor.</p>
     </div>
   );
 }
