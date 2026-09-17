@@ -94,12 +94,6 @@ export function PublicRegistrationPage() {
             {error && <p className="mt-4 text-[12px] text-alert">{error}</p>}
             <RegistrationActions step={step} onPrevious={previous} />
           </form>
-          <div className="mt-5 flex justify-center gap-5 text-[10px]">
-            <span className="rounded-[8px] bg-cream-2 px-3 py-2 font-semibold text-ink">
-              Formulario
-            </span>
-            <span className="px-1 py-2 text-muted">Confirmación</span>
-          </div>
         </div>
       )}
     </RegistrationShell>
