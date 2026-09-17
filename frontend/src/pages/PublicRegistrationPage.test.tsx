@@ -10,7 +10,9 @@ it('shows the public registration heading', () => {
     </MemoryRouter>,
   );
 
-  expect(screen.getByRole('heading', { name: 'Cuéntanos un poco sobre ti.' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Datos personales' })).toBeInTheDocument();
+  expect(screen.getByText('Paso 1 de 3')).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument();
 });
 
 it('shows a retry message when submitting the form fails due to a network error', async () => {
@@ -28,12 +30,18 @@ it('shows a retry message when submitting the form fails due to a network error'
   await user.type(field('lastName'), 'Prueba');
   await user.type(field('dateOfBirth'), '1990-01-01');
   await user.type(field('phoneNumber'), '70000001');
-  await user.type(field('weight'), '60');
-  await user.type(field('height'), '165');
   await user.selectOptions(field('sex'), 'female');
   await user.type(field('address'), 'Calle de prueba 123');
-  await user.selectOptions(field('deliveryZone'), 'Centro');
   await user.type(field('preferredStartDate'), '2026-09-18');
+  await user.click(screen.getByRole('button', { name: 'Centro' }));
+  await user.click(screen.getByRole('button', { name: 'Continuar' }));
+
+  await screen.findByRole('heading', { name: 'Tu salud' });
+  await user.type(field('weight'), '60');
+  await user.type(field('height'), '165');
+  await user.click(screen.getByRole('button', { name: 'Continuar' }));
+
+  await screen.findByRole('heading', { name: 'Revisa tus datos' });
 
   await user.click(screen.getByRole('button', { name: 'Enviar solicitud' }));
 
