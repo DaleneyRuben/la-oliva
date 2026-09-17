@@ -18,7 +18,7 @@ Each client has:
 - Name
 - Sex
 - Date of birth
-- Phone number
+- Phone number (unique among non-deleted clients, including drafts)
 - Address
 - Delivery zone (`deliveryZone` — `Centro` | `Sur`)
 - Delivery (`La Oliva` | `Otro`)
@@ -26,6 +26,10 @@ Each client has:
 - Razón Social (optional — business name for billing)
 - Underlying diseases (list)
 - Restrictions (list — allergies, intolerances, and preferences combined in a single field)
+- Weight (required)
+- Height (required)
+- Operations (list)
+- Medications (list)
 - Contract date (always set to the current date on creation)
 - Contract end date (auto-calculated — see Plan Duration)
 - Start date
@@ -36,6 +40,78 @@ Each client has:
 ### Delivery groups
 
 Clients at the same address can be linked into a delivery group via a shared `groupToken` (UUID). A group counts as **one delivery stop** regardless of how many members it has — this is reflected in the dashboard's delivery count. Managing groups (adding/removing members) is done through the client detail view. If a group is reduced to one member, the token is cleared automatically.
+
+### Underlying diseases field
+
+Underlying diseases are the Client's only diseases field and are stored as a list. A user may
+select any standard condition offered by the system or use **Other** to reveal a required free-text
+field for the condition name; both are preserved as values in the same list. This is available in
+every client creation, review, and edit flow.
+
+### Client health profile
+
+Weight (kilograms; decimals allowed) and height (centimetres) are required Client data. Operations
+and medications are optional lists of individual free-text tags. These fields are collected in the
+client intake and review flows, displayed in the client profile below restrictions, and editable
+from the same profile.
+
+Public client intake does not require a consent checkbox or privacy-notice acknowledgement.
+
+### Public client intake
+
+An unauthenticated person may submit a Public client intake. It creates a Draft client, never an
+Appointment or a Subscription. The intake collects one given name and one surname, storing their
+trimmed concatenation in the Client's existing `name` field; sex; date of birth; phone number;
+detailed address; delivery zone; preferred start date; restrictions; underlying diseases; weight;
+height; operations; and medications. Delivery is not collected publicly and must be selected by an
+Admin or Super Admin in Review.
+
+Given name, surname, sex, date of birth, phone number, detailed address, delivery zone, preferred
+start date, weight, and height are required. Restrictions, underlying diseases, operations, and
+medications are optional.
+
+Date of birth cannot be in the future. Preferred start date must be after today and fall on a
+Monday through Friday; when the next calendar day is a weekend, the earliest eligible date is the
+following Monday.
+
+Draft clients appear before normal Clients in the Clients table, ordered by oldest submission
+first. Normal Client ordering follows after all Draft clients.
+
+Only Admin and Super Admin may view a Draft client in the Clients table or access its profile.
+
+Creating a Draft client's first Subscription during Review follows direct client creation: it is
+paid by default. The paid/unpaid choice remains exclusive to appointment resolution by a
+Nutritionist.
+
+Review prepopulates the new-client wizard with every value submitted in the Public client intake.
+An Admin or Super Admin may edit any of those values before confirmation.
+
+Draft is an explicit, persisted Client lifecycle flag. It is never inferred merely because a
+Client has no Subscription.
+
+Submitting a Public client intake creates no client activity-history entry. Client history begins
+when staff confirms the first Subscription; the Draft client's creation timestamp orders the
+review queue.
+
+No notification is created for a new Draft client. The drafts-first Clients table is the sole
+review worklist.
+
+Weight and height remain nullable for Clients that existed before these fields were introduced;
+the system does not invent health data during migration. They are required whenever a Client is
+created or edited, and an older profile with missing values prompts staff to complete them.
+
+The applicant's preferred start date is stored on the Draft client and prepopulates the first
+Subscription's start date during Review; staff may change it before confirmation. Public intake
+submissions are protected by a server-side per-IP rate limit and an invisible honeypot field, with
+no CAPTCHA. A submission whose phone number belongs to a non-deleted Client is rejected without
+creating a Draft client and shows the neutral-Spanish validation message: "Este número de celular
+ya está registrado. Si necesitas ayuda, contáctanos."
+
+After a successful submission, the public form is replaced by the neutral-Spanish confirmation:
+"Recibimos tu solicitud. Nos comunicaremos contigo pronto." It exposes no Client data, Draft
+client information, or internal status.
+
+The public form lives at `/registro`, outside the staff layout, and is designed mobile-first.
 
 ### Restrictions field
 
@@ -318,7 +394,7 @@ When scheduling, the Admin chooses one of two explicit modes:
 - **Cliente nuevo** — free-text name and phone, exactly as today. Resolving this appointment always creates a brand-new client + subscription (a **Conversion**).
 - **Cliente existente** — search an existing client by name or phone (single combined search) and select one. The appointment's `clientId` is set to that client, and its `name`/`phone` fields are copied from the client record and locked (read-only) — not independently editable. Resolving this appointment renews or reactivates that client's plan instead of creating a new one.
 
-As a safety net, if the Admin is in "Cliente nuevo" mode and types a phone number matching an existing client, a non-blocking inline warning appears ("Ya existe un cliente con este número — ¿quisiste buscarlo en su lugar?"). It never blocks submission — phone is not a unique field on Client.
+An Appointment cannot be created in "Cliente nuevo" mode with a phone number already held by a non-deleted Client (including a Draft client). Phone number is a unique Client field in every creation and update flow; a phone belonging only to a soft-deleted Client may be reused.
 
 ### Appointment visibility and pruning
 
