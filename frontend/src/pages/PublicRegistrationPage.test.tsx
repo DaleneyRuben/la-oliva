@@ -15,6 +15,7 @@ it('shows the public registration heading', () => {
   expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument();
   expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('aria-current', 'step');
   expect(screen.getByRole('main')).toHaveClass('md:items-center');
+  expect(screen.getByRole('main').firstElementChild).toHaveClass('md:h-[calc(100vh-48px)]');
 });
 
 it('shows a retry message when submitting the form fails due to a network error', async () => {
