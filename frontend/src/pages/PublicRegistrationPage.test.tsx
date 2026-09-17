@@ -36,11 +36,11 @@ it('shows a retry message when submitting the form fails due to a network error'
   const field = (id: string) => document.getElementById(id) as HTMLInputElement;
   await user.type(field('firstName'), 'María');
   await user.type(field('lastName'), 'Prueba');
-  await user.type(field('dateOfBirth'), '1990-01-01');
+  await user.type(field('dateOfBirth'), '01011990');
   await user.type(field('phoneNumber'), '70000001');
   await user.selectOptions(field('sex'), 'female');
   await user.type(field('address'), 'Calle de prueba 123');
-  await user.type(field('preferredStartDate'), '2026-09-18');
+  await user.type(field('preferredStartDate'), '18092026');
   await user.click(screen.getByRole('button', { name: 'Centro' }));
   await user.click(screen.getByRole('button', { name: 'Continuar' }));
 
