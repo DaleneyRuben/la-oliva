@@ -56,21 +56,25 @@ export function PublicRegistrationPage() {
       setError('Elige un día de lunes a viernes para iniciar tu plan.');
       return;
     }
-    const res = await fetch(`${API_BASE}/public/client-intakes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        ...form,
-        restrictions: splitList(form.restrictions),
-        underlyingDiseases: form.underlyingDiseases,
-        operations: splitList(form.operations),
-        medications: splitList(form.medications),
-        weight: Number(form.weight),
-        height: Number(form.height),
-      }),
-    });
-    if (res.ok) setSent(true);
-    else setError('No pudimos enviar tu solicitud. Intenta nuevamente.');
+    try {
+      const res = await fetch(`${API_BASE}/public/client-intakes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          restrictions: splitList(form.restrictions),
+          underlyingDiseases: form.underlyingDiseases,
+          operations: splitList(form.operations),
+          medications: splitList(form.medications),
+          weight: Number(form.weight),
+          height: Number(form.height),
+        }),
+      });
+      if (res.ok) setSent(true);
+      else setError('No pudimos enviar tu solicitud. Intenta nuevamente.');
+    } catch {
+      setError('No pudimos enviar tu solicitud. Intenta nuevamente.');
+    }
   };
   if (sent)
     return (
