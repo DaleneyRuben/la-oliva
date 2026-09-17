@@ -176,7 +176,7 @@ export function DatePickerInput({
         type="button"
         tabIndex={-1}
         onClick={() => setOpen((o) => !o)}
-        className="absolute right-2.5 flex items-center text-muted hover:text-ink transition-colors"
+        className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center text-muted transition-colors hover:text-ink"
       >
         <Icon name="calendar" size={14} />
       </button>
