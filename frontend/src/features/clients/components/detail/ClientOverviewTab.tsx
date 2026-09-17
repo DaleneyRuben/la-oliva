@@ -17,6 +17,11 @@ export function ClientOverviewTab({ client, sub, remaining }: Props) {
   const { status } = client;
   const delivered = sub ? Math.max(0, sub.duration - remaining) : 0;
   const progressPct = sub && sub.duration > 0 ? Math.min(100, (delivered / sub.duration) * 100) : 0;
+  const hasHealthInformation =
+    client.weight != null ||
+    client.height != null ||
+    Boolean(client.operations?.length) ||
+    Boolean(client.medications?.length);
   return (
     <div className="grid grid-cols-12 gap-[20px]">
       <div className="col-span-12 lg:col-span-7 flex flex-col gap-[20px]">
@@ -96,30 +101,6 @@ export function ClientOverviewTab({ client, sub, remaining }: Props) {
           ) : (
             <p className="text-[13px] text-muted">Sin suscripción activa.</p>
           )}
-        </Card>
-
-        <Card>
-          <Label variant="section" className="mb-4">
-            Información de salud
-          </Label>
-          <div className="grid grid-cols-2 gap-4 text-[13.5px] text-ink">
-            <div>
-              <Label variant="field">Peso</Label>
-              <p>{client.weight ? `${client.weight} kg` : 'Sin registrar'}</p>
-            </div>
-            <div>
-              <Label variant="field">Talla</Label>
-              <p>{client.height ? `${client.height} cm` : 'Sin registrar'}</p>
-            </div>
-            <div className="col-span-2">
-              <Label variant="field">Operaciones</Label>
-              <p>{client.operations?.length ? client.operations.join(', ') : 'Sin registrar'}</p>
-            </div>
-            <div className="col-span-2">
-              <Label variant="field">Medicamentos</Label>
-              <p>{client.medications?.length ? client.medications.join(', ') : 'Sin registrar'}</p>
-            </div>
-          </div>
         </Card>
 
         <Card>
@@ -210,6 +191,33 @@ export function ClientOverviewTab({ client, sub, remaining }: Props) {
             </div>
           )}
         </Card>
+        {hasHealthInformation && (
+          <Card>
+            <Label variant="section" className="mb-4">
+              Información de salud
+            </Label>
+            <div className="grid grid-cols-2 gap-4 text-[13.5px] text-ink">
+              <div>
+                <Label variant="field">Peso</Label>
+                <p>{client.weight ? `${client.weight} kg` : 'Sin registrar'}</p>
+              </div>
+              <div>
+                <Label variant="field">Talla</Label>
+                <p>{client.height ? `${client.height} cm` : 'Sin registrar'}</p>
+              </div>
+              <div className="col-span-2">
+                <Label variant="field">Operaciones</Label>
+                <p>{client.operations?.length ? client.operations.join(', ') : 'Sin registrar'}</p>
+              </div>
+              <div className="col-span-2">
+                <Label variant="field">Medicamentos</Label>
+                <p>
+                  {client.medications?.length ? client.medications.join(', ') : 'Sin registrar'}
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
       </div>
     </div>
   );
