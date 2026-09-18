@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+
+import { checkLoginRateLimit } from '../domains/auth';
 import logger from '../utils/logger';
 
 type CheckLoginRateLimit = (input: {
@@ -26,3 +28,5 @@ export const createLoginRateLimitMiddleware =
       res.status(503).json({ error: 'Inicio de sesión temporalmente no disponible.' });
     }
   };
+
+export const loginRateLimit = createLoginRateLimitMiddleware(checkLoginRateLimit);
