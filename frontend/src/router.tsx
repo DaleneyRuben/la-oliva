@@ -18,7 +18,6 @@ import { HealthPage } from '@/pages/HealthPage';
 import { UsersPage } from '@/pages/UsersPage';
 import { DeliveryPage } from '@/pages/DeliveryPage';
 import { ADMIN_ROLES, ROLES } from '@/constants/roles';
-import { PublicSiteRedirect } from '@/app/PublicSiteRedirect';
 
 const STAFF_ROLES = [...ADMIN_ROLES, ROLES.KITCHEN] as const;
 const DELIVERY_ROLES = [...ADMIN_ROLES, ROLES.DELIVERY] as const;
@@ -32,7 +31,7 @@ type StaffRouterProps = {
 };
 
 export function StaffRouter({
-  publicRegistrationElement = <PublicSiteRedirect />,
+  publicRegistrationElement = <Navigate to="/login" replace />,
 }: StaffRouterProps) {
   return (
     <Routes>

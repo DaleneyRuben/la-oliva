@@ -24,8 +24,6 @@ Run `yarn dev` at the repository root. This remains one combined frontend at
 Configure the staff frontend with:
 
 - `VITE_API_URL`: the production backend URL including `/api`.
-- `VITE_PUBLIC_SITE_URL`: the public frontend origin, without a route suffix. The staff
-  `/registro` route appends `/registro` and redirects there.
 
 Configure the public frontend with only:
 
@@ -60,16 +58,15 @@ authentication and role authorization remain mandatory and are the security auth
    promote it yet.
 2. Add `CORS_STAFF_ORIGIN` and `CORS_PUBLIC_ORIGIN` to the existing backend project before the code
    deployment. The old backend ignores them, so this is backward compatible.
-3. Add `VITE_PUBLIC_SITE_URL` to the staff project, retain `VITE_API_URL`, and change its build
-   command to `yarn build:staff`.
+3. Retain `VITE_API_URL` in the staff project and change its build command to
+   `yarn build:staff`.
 4. Connect both frontend projects to `la-oliva-backend` as a Vercel Related Project. Confirm a PR
    creates paired Preview deployments and each frontend Preview calls the related backend Preview.
 5. Merge only after CI and both frontend Preview smoke tests pass. Vercel then deploys the shared
    backend and both production frontend artifacts from `main`.
-6. Verify the staff canonical URL serves `/login`, staff `/registro` redirects to the public
-   canonical URL, and the public canonical URL serves `/registro` while `/login` resolves to
-   `/registro`.
+6. Verify the staff canonical URL serves `/login` and redirects `/registro` to `/login`. Verify
+   the public canonical URL serves `/registro` while `/login` resolves to `/registro`.
 7. Remove the obsolete backend `CORS_ORIGIN` variable after the new backend deployment is healthy.
 
-If custom domains are used, set the two backend CORS variables and `VITE_PUBLIC_SITE_URL` to those
-canonical origins instead of the generated `vercel.app` origins.
+If custom domains are used, set the two backend CORS variables to those canonical origins instead
+of the generated `vercel.app` origins.

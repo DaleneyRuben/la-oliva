@@ -1,6 +1,6 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { CombinedApp } from '@/app/CombinedApp';
 import { PublicApp } from '@/app/PublicApp';
@@ -18,6 +18,12 @@ jest.mock('@/services/api', () => ({
 }));
 
 const mockUseAuth = useAuth as jest.Mock;
+
+function LocationDisplay() {
+  const location = useLocation();
+
+  return <output data-testid="location">{location.pathname}</output>;
+}
 
 function renderAt(element: React.ReactElement, path: string) {
   mockUseAuth.mockReturnValue({
@@ -59,17 +65,17 @@ describe('frontend application compositions', () => {
     expect(await screen.findByRole('heading', { name: 'Clientes' })).toBeInTheDocument();
   });
 
-  it('redirects staff /registro visits to the configured public site', async () => {
-    const redirect = jest.fn();
-
+  it('redirects staff /registro visits to login', async () => {
     renderAt(
-      <StaffApp publicSiteUrl="https://registro.laoliva.example" redirect={redirect} />,
+      <>
+        <StaffApp />
+        <LocationDisplay />
+      </>,
       '/registro',
     );
 
-    await waitFor(() => {
-      expect(redirect).toHaveBeenCalledWith('https://registro.laoliva.example/registro');
-    });
+    expect(await screen.findByRole('heading', { name: 'Ingresar' })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/login');
     expect(screen.queryByText('Datos personales')).not.toBeInTheDocument();
   });
 
