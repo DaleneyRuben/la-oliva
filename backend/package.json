@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@sentry/node": "^10.65.0",
+    "@upstash/ratelimit": "^2.1.0",
+    "@upstash/redis": "^1.38.4",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "date-fns": "^4.3.0",

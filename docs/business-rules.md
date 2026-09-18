@@ -597,7 +597,7 @@ The dashboard's connections widget shows online/offline status for `kitchen` and
 
 ### Login tracking
 
-Each successful login records a **login event** (device type, OS, browser — parsed server-side from the User-Agent — plus the raw UA string) and overwrites a last-device snapshot on the user (`lastDeviceType`, `lastOs`, `lastBrowser`, alongside `lastLoginAt`). Failed logins are never recorded.
+Each successful login records a **login event** (device type, OS, browser — parsed server-side from the User-Agent — plus the raw UA string) and overwrites a last-device snapshot on the user (`lastDeviceType`, `lastOs`, `lastBrowser`, alongside `lastLoginAt`). Failed logins are never recorded as login events. A blocked login rate limit emits a PII-free Sentry security warning.
 
 - Events are append-only and **never pruned**; deleting a user cascades to their events.
 - The snapshot is still recorded on every login but is **not displayed** — device details appear only inside the two history views (which read from login events). The connections widget and the Usuarios table show login times only; the Usuarios "Último acceso" column uses a relative stamp (`Hace X min` / `Hace X horas` / `Hoy · HH:mm` / `Ayer · HH:mm` / `Hace X días`).

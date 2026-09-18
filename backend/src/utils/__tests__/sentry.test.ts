@@ -1,9 +1,15 @@
-import { captureException, flush, init } from '@sentry/node';
-import { isSentryEnabled, initSentry, captureError } from '../sentry';
+import { captureException, captureMessage, flush, init } from '@sentry/node';
+import {
+  captureError,
+  captureLoginRateLimitExceeded,
+  initSentry,
+  isSentryEnabled,
+} from '../sentry';
 
 jest.mock('@sentry/node', () => ({
   init: jest.fn(),
   captureException: jest.fn(),
+  captureMessage: jest.fn(),
   flush: jest.fn().mockResolvedValue(true),
 }));
 
@@ -88,5 +94,30 @@ describe('captureError', () => {
     (flush as jest.Mock).mockRejectedValueOnce(new Error('network down'));
 
     await expect(captureError(new Error('db exploded'))).resolves.toBeUndefined();
+  });
+});
+
+describe('captureLoginRateLimitExceeded', () => {
+  it('captures a PII-free warning and flushes it when enabled', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.SENTRY_DSN = 'https://key@sentry.example/1';
+
+    await captureLoginRateLimitExceeded(90);
+
+    expect(captureMessage).toHaveBeenCalledWith('login rate limit exceeded', {
+      level: 'warning',
+      tags: { event: 'login_rate_limit_exceeded' },
+      extra: { retryAfterSeconds: 90 },
+    });
+    expect(flush).toHaveBeenCalled();
+  });
+
+  it('does nothing when disabled', async () => {
+    process.env.NODE_ENV = 'development';
+
+    await captureLoginRateLimitExceeded(90);
+
+    expect(captureMessage).not.toHaveBeenCalled();
+    expect(flush).not.toHaveBeenCalled();
   });
 });
