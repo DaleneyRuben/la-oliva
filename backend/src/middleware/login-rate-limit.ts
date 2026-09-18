@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 
 import { checkLoginRateLimit } from '../domains/auth';
 import logger from '../utils/logger';
+import { captureLoginRateLimitExceeded } from '../utils/sentry';
 
 type CheckLoginRateLimit = (input: {
   username: string;
@@ -21,6 +22,7 @@ export const createLoginRateLimitMiddleware =
         return;
       }
 
+      await captureLoginRateLimitExceeded(result.retryAfterSeconds);
       res.set('Retry-After', String(result.retryAfterSeconds));
       res.status(429).json({ error: 'Demasiados intentos. Intenta nuevamente más tarde.' });
     } catch (err) {

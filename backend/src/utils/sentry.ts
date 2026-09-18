@@ -1,4 +1,4 @@
-import { captureException, flush, init } from '@sentry/node';
+import { captureException, captureMessage, flush, init } from '@sentry/node';
 
 const FLUSH_TIMEOUT_MS = 2000;
 
@@ -17,6 +17,20 @@ export async function captureError(err: Error): Promise<void> {
     captureException(err);
     // Vercel freezes the function as soon as the response is sent, so the
     // event must be flushed before the error handler responds
+    await flush(FLUSH_TIMEOUT_MS);
+  } catch {
+    // sentry being unreachable must never block the error response
+  }
+}
+
+export async function captureLoginRateLimitExceeded(retryAfterSeconds: number): Promise<void> {
+  if (!isSentryEnabled()) return;
+  try {
+    captureMessage('login rate limit exceeded', {
+      level: 'warning',
+      tags: { event: 'login_rate_limit_exceeded' },
+      extra: { retryAfterSeconds },
+    });
     await flush(FLUSH_TIMEOUT_MS);
   } catch {
     // sentry being unreachable must never block the error response

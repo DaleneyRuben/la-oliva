@@ -1,5 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
+
+import { captureLoginRateLimitExceeded } from '../../utils/sentry';
 import { createLoginRateLimitMiddleware } from '../login-rate-limit';
+
+jest.mock('../../utils/sentry', () => ({
+  captureLoginRateLimitExceeded: jest.fn(),
+}));
+
+const mockCaptureLoginRateLimitExceeded = captureLoginRateLimitExceeded as jest.Mock;
 
 const makeRequest = ({
   username = 'ada',
@@ -27,6 +35,8 @@ const makeResponse = (): Response => {
 };
 
 describe('login rate limit middleware', () => {
+  beforeEach(() => jest.clearAllMocks());
+
   it('continues when both limits allow the request', async () => {
     const check = jest.fn().mockResolvedValue({ allowed: true, retryAfterSeconds: 0 });
     const middleware = createLoginRateLimitMiddleware(check);
@@ -67,6 +77,7 @@ describe('login rate limit middleware', () => {
     expect(response.json).toHaveBeenCalledWith({
       error: 'Demasiados intentos. Intenta nuevamente más tarde.',
     });
+    expect(mockCaptureLoginRateLimitExceeded).toHaveBeenCalledWith(90);
     expect(next).not.toHaveBeenCalled();
   });
 
