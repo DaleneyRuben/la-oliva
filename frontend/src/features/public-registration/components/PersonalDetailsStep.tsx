@@ -49,7 +49,6 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
             <option value="">Seleccionar...</option>
             <option value="female">Femenino</option>
             <option value="male">Masculino</option>
-            <option value="other">Otro</option>
           </select>
         </label>
         <div>
