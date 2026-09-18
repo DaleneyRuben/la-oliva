@@ -1,12 +1,7 @@
-import { AppRouter } from '@/router';
-import { ThemeProvider } from '@/features/theme/theme';
+import { CombinedApp } from '@/app/CombinedApp';
 
 function App() {
-  return (
-    <ThemeProvider>
-      <AppRouter />
-    </ThemeProvider>
-  );
+  return <CombinedApp />;
 }
 
 export default App;

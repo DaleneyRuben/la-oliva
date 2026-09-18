@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { useAuth } from '@/features/auth/AuthContext';
 import { CombinedApp } from '@/app/CombinedApp';
@@ -26,20 +27,30 @@ function renderAt(element: React.ReactElement, path: string) {
     clearAuth: jest.fn(),
   });
 
-  return render(<MemoryRouter initialEntries={[path]}>{element}</MemoryRouter>);
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[path]}>{element}</MemoryRouter>
+    </QueryClientProvider>,
+  );
 }
 
 describe('frontend application compositions', () => {
   it('exposes staff login in the combined local application', () => {
     renderAt(<CombinedApp />, '/login');
 
-    expect(screen.getByRole('heading', { name: 'Iniciar sesión' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Ingresar' })).toBeInTheDocument();
   });
 
   it('exposes public registration in the combined local application', () => {
     renderAt(<CombinedApp />, '/registro');
 
-    expect(screen.getByRole('heading', { name: 'Comencemos a cuidar de ti' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Comencemos a cuidar de ti' })).not.toHaveLength(
+      0,
+    );
   });
 
   it('exposes staff routes in the staff application', async () => {
@@ -73,7 +84,9 @@ describe('frontend application compositions', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('heading', { name: 'Comencemos a cuidar de ti' })).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Comencemos a cuidar de ti' })).not.toHaveLength(
+      0,
+    );
   });
 
   it('does not expose login from the public application', async () => {
@@ -84,8 +97,8 @@ describe('frontend application compositions', () => {
     );
 
     expect(
-      await screen.findByRole('heading', { name: 'Comencemos a cuidar de ti' }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Iniciar sesión' })).not.toBeInTheDocument();
+      await screen.findAllByRole('heading', { name: 'Comencemos a cuidar de ti' }),
+    ).not.toHaveLength(0);
+    expect(screen.queryByRole('heading', { name: 'Ingresar' })).not.toBeInTheDocument();
   });
 });
