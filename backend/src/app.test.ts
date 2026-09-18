@@ -60,7 +60,7 @@ describe('CORS', () => {
 
   it('allows requests from public vercel preview deployments', async () => {
     const previewOrigin =
-      'https://la-oliva-registro-9pfvrvpti-fernando-daleney-s-projects.vercel.app';
+      'https://catering-la-oliva-9pfvrvpti-fernando-daleney-s-projects.vercel.app';
 
     const res = await request(app)
       .options('/api/health')
@@ -84,7 +84,7 @@ describe('CORS', () => {
 
   it('allows requests from public vercel git branch alias deployments', async () => {
     const branchOrigin =
-      'https://la-oliva-registro-git-fix-ve-badeeb-fernando-daleney-s-projects.vercel.app';
+      'https://catering-la-oliva-git-fix-ve-badeeb-fernando-daleney-s-projects.vercel.app';
 
     const res = await request(app)
       .options('/api/health')
