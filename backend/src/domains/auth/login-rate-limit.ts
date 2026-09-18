@@ -10,13 +10,13 @@ interface LoginRateLimitDependencies {
   secret: string;
 }
 
-interface LoginRateLimitInput {
+export interface LoginRateLimitInput {
   username: string;
   ip: string;
   now?: number;
 }
 
-interface LoginRateLimitResult {
+export interface LoginRateLimitResult {
   allowed: boolean;
   retryAfterSeconds: number;
 }
