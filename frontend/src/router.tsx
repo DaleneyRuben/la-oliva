@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
@@ -16,8 +17,8 @@ import { FinancePage } from '@/pages/FinancePage';
 import { HealthPage } from '@/pages/HealthPage';
 import { UsersPage } from '@/pages/UsersPage';
 import { DeliveryPage } from '@/pages/DeliveryPage';
-import { PublicRegistrationPage } from '@/pages/PublicRegistrationPage';
 import { ADMIN_ROLES, ROLES } from '@/constants/roles';
+import { PublicSiteRedirect } from '@/app/PublicSiteRedirect';
 
 const STAFF_ROLES = [...ADMIN_ROLES, ROLES.KITCHEN] as const;
 const DELIVERY_ROLES = [...ADMIN_ROLES, ROLES.DELIVERY] as const;
@@ -26,11 +27,17 @@ const PRODUCTION_ROLES = [...STAFF_ROLES, ROLES.AUDIT] as const;
 const DELIVERY_ROLES_WITH_AUDIT = [...DELIVERY_ROLES, ROLES.AUDIT] as const;
 const SHELL_ROLES = [...STAFF_ROLES, ROLES.DELIVERY, ROLES.NUTRITIONIST, ROLES.AUDIT] as const;
 
-export function AppRouter() {
+type StaffRouterProps = {
+  publicRegistrationElement?: ReactNode;
+};
+
+export function StaffRouter({
+  publicRegistrationElement = <PublicSiteRedirect />,
+}: StaffRouterProps) {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/registro" element={<PublicRegistrationPage />} />
+      <Route path="/registro" element={publicRegistrationElement} />
 
       <Route
         path="/*"

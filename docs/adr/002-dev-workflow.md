@@ -1,6 +1,6 @@
 # Dev Workflow: GitHub Flow, No Staging, Manual Migrations
 
-We use GitHub Flow (feature branches → `main` directly) with no staging environment. `main` is always production. Every PR runs CI (lint, typecheck, frontend tests, backend tests) before it can be merged. Vercel deploys both frontend and backend automatically on merge to `main`.
+We use GitHub Flow (feature branches → `main` directly) with no staging environment. `main` is always production. Every PR runs CI (lint, typecheck, frontend tests, backend tests) before it can be merged. Vercel deploys the staff frontend, public-registration frontend, and shared backend automatically on merge to `main`.
 
 We deliberately skipped a staging environment. The test suite (615 tests at the time of this decision) provides enough confidence for direct-to-production merges, and the operational cost of a second environment (second backend deployment, second database, migration coordination) outweighs the safety benefit at current team size.
 

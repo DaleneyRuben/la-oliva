@@ -7,16 +7,28 @@ import errorHandler from './middleware/error-handler';
 
 const app = express();
 
-const allowedOrigins: (string | RegExp)[] = [
-  process.env.CORS_ORIGIN || 'http://localhost:3000',
-  // [a-z0-9-] covers both random-hash and git-branch alias preview URLs
+const LOCAL_FRONTEND_ORIGIN = 'http://localhost:3000';
+const previewOriginPatterns = [
   /^https:\/\/la-oliva-frontend-[a-z0-9-]+-fernando-daleney-s-projects\.vercel\.app$/,
+  /^https:\/\/catering-la-oliva-[a-z0-9-]+-fernando-daleney-s-projects\.vercel\.app$/,
 ];
+
+export function isAllowedOrigin(origin: string) {
+  const productionOrigins = [process.env.CORS_STAFF_ORIGIN, process.env.CORS_PUBLIC_ORIGIN].filter(
+    (configuredOrigin): configuredOrigin is string => Boolean(configuredOrigin),
+  );
+
+  return (
+    origin === LOCAL_FRONTEND_ORIGIN ||
+    productionOrigins.includes(origin) ||
+    previewOriginPatterns.some((pattern) => pattern.test(origin))
+  );
+}
 
 app.use(helmet());
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => callback(null, !origin || isAllowedOrigin(origin)),
     exposedHeaders: ['Content-Disposition'],
   }),
 );
