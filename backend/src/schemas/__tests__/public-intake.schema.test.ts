@@ -32,6 +32,15 @@ describe('publicClientIntakeSchema', () => {
     expect(publicClientIntakeSchema.safeParse(validIntake).success).toBe(true);
   });
 
+  it('rejects a sex other than female or male', () => {
+    expect(
+      publicClientIntakeSchema.safeParse({
+        ...validIntake,
+        sex: 'other',
+      }).success,
+    ).toBe(false);
+  });
+
   it('rejects a future date of birth', () => {
     const result = publicClientIntakeSchema.safeParse({
       ...validIntake,

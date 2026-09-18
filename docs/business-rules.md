@@ -67,8 +67,8 @@ height; operations; and medications. Delivery is not collected publicly and must
 Admin or Super Admin in Review.
 
 Given name, surname, sex, date of birth, phone number, detailed address, delivery zone, preferred
-start date, weight, and height are required. Restrictions, underlying diseases, operations, and
-medications are optional.
+start date, weight, and height are required. Sex choices are Femenino and Masculino. Restrictions,
+underlying diseases, operations, and medications are optional.
 
 Date of birth cannot be in the future. Preferred start date must be after today and fall on a
 Monday through Friday; when the next calendar day is a weekend, the earliest eligible date is the

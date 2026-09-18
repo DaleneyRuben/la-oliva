@@ -23,6 +23,20 @@ it('shows the public registration heading', () => {
   expect(screen.queryByText('Empecemos por conocerte mejor.')).not.toBeInTheDocument();
 });
 
+it('offers only female and male sex options', () => {
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+    'Seleccionar...',
+    'Femenino',
+    'Masculino',
+  ]);
+});
+
 it('shows a retry message when submitting the form fails due to a network error', async () => {
   const user = userEvent.setup();
   global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
