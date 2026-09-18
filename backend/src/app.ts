@@ -10,7 +10,7 @@ const app = express();
 const LOCAL_FRONTEND_ORIGIN = 'http://localhost:3000';
 const previewOriginPatterns = [
   /^https:\/\/la-oliva-frontend-[a-z0-9-]+-fernando-daleney-s-projects\.vercel\.app$/,
-  /^https:\/\/la-oliva-registro-[a-z0-9-]+-fernando-daleney-s-projects\.vercel\.app$/,
+  /^https:\/\/catering-la-oliva-[a-z0-9-]+-fernando-daleney-s-projects\.vercel\.app$/,
 ];
 
 export function isAllowedOrigin(origin: string) {

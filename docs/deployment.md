@@ -5,7 +5,7 @@ The repository deploys three Vercel projects from one GitHub repository:
 | Project             | Vercel project name | Root directory                           | Build command                  | Output directory               |
 | ------------------- | ------------------- | ---------------------------------------- | ------------------------------ | ------------------------------ |
 | Staff frontend      | `la-oliva-frontend` | `frontend`                               | `yarn build:staff`             | `dist`                         |
-| Public registration | `la-oliva-registro` | `frontend`                               | `yarn build:public`            | `dist`                         |
+| Public registration | `catering-la-oliva` | `frontend`                               | `yarn build:public`            | `dist`                         |
 | Shared backend      | `la-oliva-backend`  | repository root (existing configuration) | existing backend configuration | existing backend configuration |
 
 The frontend projects intentionally share `frontend/vercel.json`. Its SPA rewrite sends route
@@ -40,7 +40,7 @@ Configure the backend with:
 - `CORS_PUBLIC_ORIGIN`: the exact canonical production origin of the public frontend.
 
 The backend always accepts `http://localhost:3000`. Preview access is restricted to the exact
-Vercel hostname families for `la-oliva-frontend` and `la-oliva-registro` in the
+Vercel hostname families for `la-oliva-frontend` and `catering-la-oliva` in the
 `fernando-daleney-s-projects` team. Renaming either Vercel project or moving it to another team
 requires updating the anchored patterns in `backend/src/app.ts`; arbitrary `*.vercel.app` origins
 must not be allowed.
@@ -56,7 +56,7 @@ authentication and role authorization remain mandatory and are the security auth
 
 ## Rollout order
 
-1. Create `la-oliva-registro` from the same repository with the public settings above, but do not
+1. Create `catering-la-oliva` from the same repository with the public settings above, but do not
    promote it yet.
 2. Add `CORS_STAFF_ORIGIN` and `CORS_PUBLIC_ORIGIN` to the existing backend project before the code
    deployment. The old backend ignores them, so this is backward compatible.
