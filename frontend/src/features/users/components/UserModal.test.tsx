@@ -157,4 +157,16 @@ describe('UserModal — edit mode', () => {
     expect(onDelete).toHaveBeenCalled();
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
+
+  it('saves once and shows Crear as loading when double-clicked', async () => {
+    const onSave = jest.fn(() => new Promise<void>(() => {}));
+    render(<UserModal mode="create" isSaving={false} onSave={onSave} onClose={jest.fn()} />);
+
+    await userEvent.type(screen.getByLabelText(/^usuario/i, { selector: 'input' }), 'nuevo');
+    await userEvent.type(screen.getByLabelText(/^contraseña/i, { selector: 'input' }), 'pass123');
+    await userEvent.dblClick(screen.getByRole('button', { name: /crear/i }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /crear/i })).toBeDisabled();
+  });
 });

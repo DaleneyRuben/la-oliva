@@ -97,4 +97,15 @@ describe('PlanModal — edit mode', () => {
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ name: 'Reductor' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });
+
+  it('saves once and shows Crear plan as loading when double-clicked', async () => {
+    const onSave = jest.fn(() => new Promise<void>(() => {}));
+    render(<PlanModal mode="create" isSaving={false} onSave={onSave} onClose={jest.fn()} />);
+
+    await userEvent.type(screen.getByLabelText(/nombre del plan/i), 'Ligero');
+    await userEvent.dblClick(screen.getByRole('button', { name: /crear plan/i }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /crear plan/i })).toBeDisabled();
+  });
 });

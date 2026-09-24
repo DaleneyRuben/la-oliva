@@ -244,4 +244,17 @@ describe('AppointmentModal — edit mode', () => {
 
     expect(onSave).toHaveBeenCalledWith({ date: '2026-08-03', time: '09:00' });
   });
+
+  it('saves once and shows Crear cita as loading when double-clicked', async () => {
+    const onSave = jest.fn(() => new Promise<void>(() => {}));
+    render(<AppointmentModal mode="create" isSaving={false} onSave={onSave} onClose={jest.fn()} />);
+
+    await userEvent.type(screen.getByLabelText(/nombre/i), 'Ana Pérez');
+    await userEvent.type(screen.getByLabelText(/tel[eé]fono/i), '71234567');
+    await userEvent.type(screen.getByLabelText(/hora/i), '0900AM');
+    await userEvent.dblClick(screen.getByRole('button', { name: /crear cita/i }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /crear cita/i })).toBeDisabled();
+  });
 });
