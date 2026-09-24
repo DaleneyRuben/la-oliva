@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AssignStartDateModal } from './AssignStartDateModal';
 
@@ -85,4 +85,23 @@ it('assigns once and shows the button as loading when double-clicked', async () 
 
   expect(onAssign).toHaveBeenCalledTimes(1);
   expect(screen.getByRole('button', { name: /asignar fecha/i })).toBeDisabled();
+});
+
+it('stays open while assigning', async () => {
+  const onClose = jest.fn();
+  render(
+    <AssignStartDateModal
+      {...baseProps}
+      onClose={onClose}
+      onAssign={() => new Promise<void>(() => {})}
+    />,
+  );
+  await userEvent.type(screen.getByLabelText(/fecha de inicio/i), '2026-08-03');
+  await userEvent.click(screen.getByRole('button', { name: /asignar fecha/i }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
 });

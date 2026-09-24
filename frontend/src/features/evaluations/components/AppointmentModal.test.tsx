@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AppointmentModal } from '@/features/evaluations/components/AppointmentModal';
 import { useClientSearch } from '@/features/evaluations/hooks/useClientSearch';
@@ -257,4 +257,27 @@ describe('AppointmentModal — edit mode', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /crear cita/i })).toBeDisabled();
   });
+});
+
+it('stays open while saving', async () => {
+  const onClose = jest.fn();
+  render(
+    <AppointmentModal
+      mode="create"
+      isSaving={false}
+      onSave={() => new Promise<void>(() => {})}
+      onClose={onClose}
+    />,
+  );
+  await userEvent.type(screen.getByLabelText(/nombre/i), 'Ana Pérez');
+  await userEvent.type(screen.getByLabelText(/tel[eé]fono/i), '71234567');
+  await userEvent.type(screen.getByLabelText(/hora/i), '0900AM');
+  await userEvent.click(screen.getByRole('button', { name: /crear cita/i }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
 });

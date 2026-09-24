@@ -84,4 +84,19 @@ describe('MenuFormModal', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: 'Guardar' })).toBeDisabled();
   });
+
+  it('stays open while saving', () => {
+    const onClose = jest.fn();
+    render(
+      <MenuFormModal {...baseProps} onClose={onClose} onSave={() => new Promise<void>(() => {})} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    screen.getByTestId('modal-backdrop').click();
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
+  });
 });

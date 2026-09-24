@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { UserModal } from '@/features/users/components/UserModal';
 import type { AppUser } from '@/features/users/hooks/useUsers';
@@ -169,4 +169,26 @@ describe('UserModal — edit mode', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /crear/i })).toBeDisabled();
   });
+});
+
+it('stays open while saving', async () => {
+  const onClose = jest.fn();
+  render(
+    <UserModal
+      mode="create"
+      isSaving={false}
+      onSave={() => new Promise<void>(() => {})}
+      onClose={onClose}
+    />,
+  );
+  await userEvent.type(screen.getByLabelText(/^usuario/i, { selector: 'input' }), 'nuevo');
+  await userEvent.type(screen.getByLabelText(/^contraseña/i, { selector: 'input' }), 'pass123');
+  await userEvent.click(screen.getByRole('button', { name: /crear/i }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
 });

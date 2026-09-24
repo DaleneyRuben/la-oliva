@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Subscription } from '@/features/clients/types';
 import { SuspendModal } from './SuspendModal';
@@ -107,4 +107,24 @@ it('saves once and shows Guardar as loading when double-clicked', async () => {
 
   expect(onSave).toHaveBeenCalledTimes(1);
   expect(screen.getByRole('button', { name: 'Guardar' })).toBeDisabled();
+});
+
+it('stays open while saving', async () => {
+  const onClose = jest.fn();
+  render(
+    <SuspendModal
+      sub={sub}
+      clientName="Ana Torres"
+      onClose={onClose}
+      onSave={() => new Promise<void>(() => {})}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
 });

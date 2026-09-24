@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Client } from '@/features/clients/types';
 import { ClientEditModal } from './ClientEditModal';
@@ -110,4 +110,24 @@ it('saves once and shows Guardar cambios as loading when double-clicked', async 
 
   expect(onSave).toHaveBeenCalledTimes(1);
   expect(screen.getByRole('button', { name: /guardar cambios/i })).toBeDisabled();
+});
+
+it('stays open while saving', async () => {
+  const onClose = jest.fn();
+  render(
+    <ClientEditModal
+      client={client}
+      onSave={() => new Promise<void>(() => {})}
+      onClose={onClose}
+      isSaving={false}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
 });

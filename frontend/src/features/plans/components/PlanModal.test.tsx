@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PlanModal } from '@/features/plans/components/PlanModal';
 import type { Plan } from '@/features/plans/types';
@@ -108,4 +108,25 @@ describe('PlanModal — edit mode', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /crear plan/i })).toBeDisabled();
   });
+});
+
+it('stays open while saving', async () => {
+  const onClose = jest.fn();
+  render(
+    <PlanModal
+      mode="create"
+      isSaving={false}
+      onSave={() => new Promise<void>(() => {})}
+      onClose={onClose}
+    />,
+  );
+  await userEvent.type(screen.getByLabelText(/nombre del plan/i), 'Ligero');
+  await userEvent.click(screen.getByRole('button', { name: /crear plan/i }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
 });
