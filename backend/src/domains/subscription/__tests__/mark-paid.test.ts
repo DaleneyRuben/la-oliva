@@ -20,7 +20,7 @@ jest.mock('../../../database/sequelize', () => ({
 }));
 
 const actor = { userId: 9, username: 'ada' };
-const transaction = { id: 'own' };
+const transaction = { id: 'own', LOCK: { UPDATE: 'UPDATE' } };
 const callerTransaction = { id: 'caller' } as never;
 
 describe('markPaid', () => {
@@ -36,7 +36,7 @@ describe('markPaid', () => {
 
     expect(result).toBeNull();
     expect(record).not.toHaveBeenCalled();
-    expect(sequelize.transaction).not.toHaveBeenCalled();
+    expect(recordPayment).not.toHaveBeenCalled();
   });
 
   it('marks the subscription paid and logs a plan_assigned history event', async () => {
@@ -58,6 +58,8 @@ describe('markPaid', () => {
     expect(Subscription.findOne).toHaveBeenCalledWith({
       where: { clientId: 1, paid: false },
       order: [['id', 'ASC']],
+      transaction,
+      lock: 'UPDATE',
     });
     expect(subscription.update).toHaveBeenCalledWith({ paid: true }, { transaction });
     expect(record).toHaveBeenCalledWith(
@@ -421,5 +423,35 @@ describe('markPaid', () => {
 
     await expect(markPaid(1, actor)).rejects.toThrow('db error');
     expect(record).not.toHaveBeenCalled();
+  });
+
+  it('records one payment and one history event when two confirmations race', async () => {
+    const subscription = {
+      id: 3,
+      clientId: 1,
+      planId: 2,
+      startDate: null,
+      duration: 20,
+      contractEndDate: null,
+      price: 1200,
+      paid: false,
+      renewalType: null,
+      update: jest.fn().mockImplementation(async ({ paid }) => {
+        subscription.paid = paid;
+      }),
+    };
+    // the second request's locked read waits for the first to commit, then no longer matches
+    (Subscription.findOne as jest.Mock).mockImplementation(async () =>
+      subscription.paid ? null : subscription,
+    );
+    (Plan.findByPk as jest.Mock).mockResolvedValue({ id: 2, name: 'Completo', price: 5000 });
+
+    const first = await markPaid(1, actor);
+    const second = await markPaid(1, actor);
+
+    expect(first).toBe(subscription);
+    expect(second).toBeNull();
+    expect(recordPayment).toHaveBeenCalledTimes(1);
+    expect(record).toHaveBeenCalledTimes(1);
   });
 });
