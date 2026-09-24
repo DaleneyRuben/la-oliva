@@ -17,10 +17,7 @@ export function useCreateClient() {
     }: {
       client: ClientCreateDraft;
       subscription: SubscriptionCreateDraft;
-    }) => {
-      const created = await api.post<{ id: string }>('/clients', client);
-      await api.post(`/clients/${created.id}/subscriptions`, subscription);
-    },
+    }) => api.post('/clients', { client, subscription }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['clients'] });
       toast.success('Cliente registrado correctamente');
