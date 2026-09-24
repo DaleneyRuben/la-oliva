@@ -19,7 +19,18 @@ const payload = {
 };
 
 describe('POST /api/public/client-intakes', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // The payload's preferredStartDate must stay after "today" for validation to pass, so the
+    // clock is pinned rather than letting a fixed date go stale. supertest still needs real
+    // nextTick and setImmediate to drive the request.
+    jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
+    jest.setSystemTime(new Date('2026-09-16T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
   it('creates a public draft without requiring authentication', async () => {
     (submitPublicIntake as jest.Mock).mockResolvedValue({ id: 1 });
