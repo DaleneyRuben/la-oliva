@@ -4,7 +4,7 @@ import historyController from '../controllers/history.controller';
 import { requireRole } from '../middleware/auth';
 import validate from '../middleware/validate';
 import {
-  createClientSchema,
+  createClientWithSubscriptionSchema,
   reviewDraftSchema,
   updateClientSchema,
   setGroupSchema,
@@ -25,7 +25,7 @@ router.get(
   clientController.getById,
 );
 router.get('/:id/history', clientReadOnly, historyController.getByClient);
-router.post('/', adminOnly, validate(createClientSchema), clientController.create);
+router.post('/', adminOnly, validate(createClientWithSubscriptionSchema), clientController.create);
 router.post('/:id/review', adminOnly, validate(reviewDraftSchema), clientController.review);
 router.patch('/:id', adminOnly, validate(updateClientSchema), clientController.update);
 router.post('/:id/finalize', adminOnly, clientController.finalize);
