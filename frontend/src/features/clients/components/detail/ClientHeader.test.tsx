@@ -205,3 +205,13 @@ it('keeps Renovar available when there is no queued renewal', () => {
 
   expect(screen.getByRole('button', { name: /renovar/i })).toBeEnabled();
 });
+
+it('pauses once and shows the button as loading when double-clicked', async () => {
+  const onToggleActive = jest.fn(() => new Promise<void>(() => {}));
+  render(<ClientHeader {...baseProps} status="active" onToggleActive={onToggleActive} />);
+
+  await userEvent.dblClick(screen.getByRole('button', { name: /pausar/i }));
+
+  expect(onToggleActive).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: /pausar/i })).toBeDisabled();
+});

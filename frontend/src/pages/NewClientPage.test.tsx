@@ -316,6 +316,21 @@ describe('NewClientPage', () => {
     resolve();
   });
 
+  it('sends one create request when Crear cliente is double-clicked', async () => {
+    mockPost.mockReset();
+    mockPost.mockImplementation(() => new Promise(() => {}));
+    await navigateToStep3();
+    await userEvent.click(screen.getByRole('button', { name: /completo/i }));
+    fireEvent.change(screen.getByLabelText(/fecha de inicio/i), {
+      target: { value: '2026-06-01' },
+    });
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.dblClick(screen.getByRole('button', { name: /crear/i }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear/i })).toBeDisabled());
+    expect(mockPost).toHaveBeenCalledTimes(1);
+  });
+
   it('navigates to /clientes after successful submit', async () => {
     await navigateToStep3();
     await userEvent.click(screen.getByRole('button', { name: /completo/i }));

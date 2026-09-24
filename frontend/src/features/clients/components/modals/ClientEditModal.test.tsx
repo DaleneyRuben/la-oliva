@@ -101,3 +101,13 @@ it('pre-fills a custom underlying disease through the Otro field', () => {
   expect(otherDisease).toHaveAttribute('aria-pressed', 'true');
   expect(screen.getByLabelText(/especificar enfermedad/i)).toHaveValue('test');
 });
+
+it('saves once and shows Guardar cambios as loading when double-clicked', async () => {
+  const onSave = jest.fn(() => new Promise<void>(() => {}));
+  render(<ClientEditModal client={client} onSave={onSave} onClose={jest.fn()} isSaving={false} />);
+
+  await userEvent.dblClick(screen.getByRole('button', { name: /guardar cambios/i }));
+
+  expect(onSave).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: /guardar cambios/i })).toBeDisabled();
+});
