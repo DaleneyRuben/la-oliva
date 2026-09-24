@@ -3,6 +3,7 @@ import { Icon } from '@ui/Icon';
 import { Button } from '@ui/Button';
 import { OverflowMenu } from '@ui/OverflowMenu';
 import { Tooltip } from '@ui/Tooltip';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import {
   STATUS_LABELS,
   STATUS_CLASSES,
@@ -30,7 +31,7 @@ interface Props {
   client: Client;
   status: ClientStatus;
   isUpdating: boolean;
-  onToggleActive: () => void;
+  onToggleActive: () => Promise<unknown>;
   onEdit: () => void;
   onDelete: () => void;
   onFinalize: () => void;
@@ -63,6 +64,7 @@ export function ClientHeader({
   onReview,
   readOnly = false,
 }: Props) {
+  const { pending: toggling, run } = usePendingAction();
   const age = differenceInYears(startOfToday(), parseISO(client.dateOfBirth));
   const sub = client.subscriptions[0];
   const queuedRenewal = findQueuedRenewal(client.subscriptions);
@@ -136,9 +138,9 @@ export function ClientHeader({
                 {toggleConfig && (
                   <Button
                     variant={status === CLIENT_STATUS.PAUSED ? 'primary' : 'secondary'}
-                    onClick={onToggleActive}
+                    onClick={() => run(onToggleActive)}
                     disabled={isUpdating}
-                    loading={isUpdating}
+                    loading={toggling}
                     leftIcon={toggleConfig.icon}
                     className={toggleConfig.className}
                     style={status === CLIENT_STATUS.PAUSED ? RESUME_BTN_STYLE : PAUSE_BTN_STYLE}

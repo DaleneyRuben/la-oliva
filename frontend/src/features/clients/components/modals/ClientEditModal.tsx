@@ -11,6 +11,7 @@ import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
 import { TagInput } from '@ui/TagInput';
 import { ToggleGroup } from '@ui/ToggleGroup';
 import { TogglePill } from '@ui/TogglePill';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { DISEASES } from '@/features/clients/constants/diseases';
 import { ZONES, DELIVERIES, SEX_OPTIONS } from '@/features/clients/constants/clientOptions';
 import type { Client } from '@/features/clients/types';
@@ -62,11 +63,13 @@ export function ClientEditModal({
   isSaving,
 }: {
   client: Client;
-  onSave: (draft: EditDraft) => void;
+  onSave: (draft: EditDraft) => Promise<unknown>;
   onClose: () => void;
   isSaving: boolean;
 }) {
   const [draft, setDraft] = useState<EditDraft>(() => draftFromClient(client));
+  const { pending, run } = usePendingAction();
+  const saving = pending || isSaving;
   const [restrictionInput, setRestrictionInput] = useState('');
 
   const set = (updates: Partial<EditDraft>) => setDraft((prev) => ({ ...prev, ...updates }));
@@ -352,12 +355,17 @@ export function ClientEditModal({
         </div>
 
         <div className="sticky bottom-0 bg-cream border-t border-hairline px-[28px] py-[16px] flex items-center justify-end gap-[10px]">
-          <Button variant="secondary" onClick={onClose} style={MODAL_CANCEL_STYLE}>
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            disabled={saving}
+            style={MODAL_CANCEL_STYLE}
+          >
             Cancelar
           </Button>
           <Button
-            onClick={() => onSave(draft)}
-            loading={isSaving}
+            onClick={() => run(() => onSave(draft))}
+            loading={saving}
             leftIcon="check"
             style={MODAL_CONFIRM_STYLE}
           >
