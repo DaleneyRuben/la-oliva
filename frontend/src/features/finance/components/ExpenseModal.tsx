@@ -94,7 +94,7 @@ export function ExpenseModal({
   };
 
   return (
-    <Modal onClose={onClose} className="w-full max-w-[460px] overflow-hidden">
+    <Modal onClose={onClose} busy={saving} className="w-full max-w-[460px] overflow-hidden">
       <div className="px-[26px] pt-[22px] pb-[18px] border-b border-cream-2 flex items-start gap-3.5">
         <span className="w-9 h-9 rounded-[9px] bg-expense-icon-bg text-danger flex items-center justify-center shrink-0">
           <Icon name="arrow-down" size={18} stroke={1.6} />
@@ -114,6 +114,7 @@ export function ExpenseModal({
           label="Cerrar"
           size={18}
           onClick={onClose}
+          disabled={saving}
           className="p-1 rounded-md text-faint hover:text-ink hover:bg-cream-2 cursor-pointer"
         />
       </div>

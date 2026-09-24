@@ -46,7 +46,7 @@ export function ConfirmModal({
     });
 
   return (
-    <Modal onClose={onClose} className="w-[min(420px,92vw)]">
+    <Modal onClose={onClose} busy={isLoading} className="w-[min(420px,92vw)]">
       <div className="px-[28px] py-[26px]">
         {icon ? (
           <div className="flex items-center gap-3 mb-3.5">

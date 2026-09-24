@@ -40,7 +40,11 @@ export function RenewalModal({
     vigenciaSummary = `${formatDate(form.newStart)} → ${formatDate(form.newEnd)}`;
 
   return (
-    <Modal onClose={onClose} className="w-[min(560px,92vw)] max-h-[92vh] overflow-auto">
+    <Modal
+      onClose={onClose}
+      busy={form.isSaving}
+      className="w-[min(560px,92vw)] max-h-[92vh] overflow-auto"
+    >
       {/* Header */}
       <div className="flex items-center gap-[13px] px-[28px] py-[22px] border-b border-hairline">
         <div className="w-10 h-10 rounded-full bg-olive-800 text-olive-50 flex items-center justify-center font-serif text-[16px] font-semibold shrink-0">
@@ -56,6 +60,7 @@ export function RenewalModal({
           icon="x"
           label="Cerrar"
           onClick={onClose}
+          disabled={form.isSaving}
           size={20}
           stroke={1.8}
           className="p-1 text-faint hover:text-ink-2"
@@ -300,7 +305,12 @@ export function RenewalModal({
 
       {/* Footer */}
       <div className="flex justify-end gap-[10px] py-[16px] px-[28px] border-t border-hairline">
-        <Button variant="secondary" onClick={onClose} style={MODAL_CANCEL_STYLE}>
+        <Button
+          variant="secondary"
+          onClick={onClose}
+          disabled={form.isSaving}
+          style={MODAL_CANCEL_STYLE}
+        >
           Cancelar
         </Button>
         <Button

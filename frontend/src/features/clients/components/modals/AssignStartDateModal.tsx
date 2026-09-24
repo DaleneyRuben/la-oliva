@@ -30,7 +30,7 @@ export function AssignStartDateModal({ clientName, planName, duration, onClose, 
   };
 
   return (
-    <Modal onClose={onClose} className="w-[min(440px,92vw)]">
+    <Modal onClose={onClose} busy={isSaving} className="w-[min(440px,92vw)]">
       <div className="px-[28px] py-[26px]">
         <h3 className="font-serif text-[24px] font-semibold text-ink mb-2.5">
           Asignar fecha de inicio
@@ -59,7 +59,7 @@ export function AssignStartDateModal({ clientName, planName, duration, onClose, 
         </Field>
 
         <div className="flex justify-end gap-2.5 mt-[22px]">
-          <Button variant="ghost" onClick={onClose} style={MODAL_CANCEL_STYLE}>
+          <Button variant="ghost" onClick={onClose} disabled={isSaving} style={MODAL_CANCEL_STYLE}>
             Cancelar
           </Button>
           <Button
