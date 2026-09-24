@@ -60,4 +60,46 @@ describe('Modal', () => {
     fireEvent.keyDown(document, { key: 'Enter' });
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  // A request in flight would otherwise finish behind a closed modal, and reopening it would start
+  // from a fresh, idle form that can submit the same write again.
+  describe('while busy', () => {
+    it('ignores Escape', () => {
+      const onClose = jest.fn();
+      render(
+        <Modal onClose={onClose} busy>
+          <p>contenido</p>
+        </Modal>,
+      );
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('ignores a backdrop click', () => {
+      const onClose = jest.fn();
+      render(
+        <Modal onClose={onClose} busy>
+          <p>contenido</p>
+        </Modal>,
+      );
+      screen.getByTestId('modal-backdrop').click();
+      expect(onClose).not.toHaveBeenCalled();
+    });
+
+    it('closes again once it is no longer busy', () => {
+      const onClose = jest.fn();
+      const { rerender } = render(
+        <Modal onClose={onClose} busy>
+          <p>contenido</p>
+        </Modal>,
+      );
+      rerender(
+        <Modal onClose={onClose} busy={false}>
+          <p>contenido</p>
+        </Modal>,
+      );
+      fireEvent.keyDown(document, { key: 'Escape' });
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
 });
