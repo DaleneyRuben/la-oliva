@@ -18,3 +18,15 @@ export const Default: Story = {
     </Modal>
   ),
 };
+
+// While a write is in flight, Escape and a backdrop click leave the modal open.
+export const Busy: Story = {
+  render: () => (
+    <Modal onClose={() => {}} busy>
+      <div className="p-6 w-80">
+        <p className="font-semibold text-lg mb-2">Guardando…</p>
+        <p className="text-sm text-muted">Escape y el fondo no cierran el modal.</p>
+      </div>
+    </Modal>
+  ),
+};
