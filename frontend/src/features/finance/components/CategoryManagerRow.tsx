@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@ui/Button';
 import { inputCls } from '@ui/Field';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import type { ExpenseCategoryWithUsage } from '@/features/finance/types';
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
   // The row reports the intent and the modal owns the confirm: stating what archiving leaves
   // untouched needs the month's arithmetic, which lives a level up.
   onArchive: (category: ExpenseCategoryWithUsage) => void;
-  onRestore: (id: string) => void;
+  onRestore: (id: string) => Promise<unknown>;
 }
 
 // Inline styles rather than size classes, so the design's exact padding wins over Button's
@@ -32,6 +33,7 @@ const usageLabel = ({ usageThisMonth, usageAllTime }: ExpenseCategoryWithUsage):
 
 export function CategoryManagerRow({ category, onRename, onArchive, onRestore }: Props) {
   const [draft, setDraft] = useState<string | null>(null);
+  const { pending, run } = usePendingAction();
   const inputRef = useRef<HTMLInputElement>(null);
   const isEditing = draft !== null;
 
@@ -46,7 +48,7 @@ export function CategoryManagerRow({ category, onRename, onArchive, onRestore }:
 
   const trimmed = draft?.trim() ?? '';
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (trimmed === '') return;
 
@@ -57,13 +59,15 @@ export function CategoryManagerRow({ category, onRename, onArchive, onRestore }:
       return;
     }
 
-    try {
-      await onRename(category.id, trimmed);
-      setDraft(null);
-    } catch {
-      // A taken name comes back as a 409 the user has to act on (the message is toasted globally),
-      // so the input stays open with what they typed still in it.
-    }
+    run(async () => {
+      try {
+        await onRename(category.id, trimmed);
+        setDraft(null);
+      } catch {
+        // A taken name comes back as a 409 the user has to act on (the message is toasted
+        // globally), so the input stays open with what they typed still in it.
+      }
+    });
   };
 
   const usage = (
@@ -88,6 +92,7 @@ export function CategoryManagerRow({ category, onRename, onArchive, onRestore }:
         <Button
           type="submit"
           disabled={trimmed === ''}
+          loading={pending}
           style={SAVE_STYLE}
           className="rounded-[7px]"
         >
@@ -136,7 +141,8 @@ export function CategoryManagerRow({ category, onRename, onArchive, onRestore }:
         <Button
           variant="bare"
           aria-label={`Restaurar ${category.name}`}
-          onClick={() => onRestore(category.id)}
+          onClick={() => run(() => onRestore(category.id))}
+          loading={pending}
           className="border border-rule text-ink-2 rounded-[7px] hover:bg-olive-50 hover:border-olive-300 cursor-pointer"
           style={RESTORE_STYLE}
         >

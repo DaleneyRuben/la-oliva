@@ -6,6 +6,7 @@ import { IconButton } from '@ui/IconButton';
 import { ConfirmModal } from '@ui/ConfirmModal';
 import { inputCls } from '@ui/Field';
 import { MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useCategoryCatalog, useCategoryMutations } from '@/features/finance/hooks/useCategories';
 import { CategoryManagerRow } from '@/features/finance/components/CategoryManagerRow';
 import { categoryAddedMessage } from '@/features/finance/utils/categories';
@@ -48,6 +49,7 @@ const archiveMessage = (
 export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
   const { categories, isLoading } = useCategoryCatalog(month);
   const { create, rename, archive, restore } = useCategoryMutations();
+  const { pending: adding, run } = usePendingAction();
 
   const [newName, setNewName] = useState('');
   const [pendingArchive, setPendingArchive] = useState<ExpenseCategoryWithUsage | null>(null);
@@ -55,14 +57,16 @@ export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
   const active = categories.filter((category) => category.active);
   const archived = categories.filter((category) => !category.active);
 
-  const handleAdd = async (event: React.FormEvent) => {
+  const handleAdd = (event: React.FormEvent) => {
     event.preventDefault();
     const name = newName.trim();
     if (name === '') return;
 
-    const created = await create(name);
-    toast.success(categoryAddedMessage(created, categories));
-    setNewName('');
+    run(async () => {
+      const created = await create(name);
+      toast.success(categoryAddedMessage(created, categories));
+      setNewName('');
+    });
   };
 
   // Not caught: the row keeps its input open on a rejection so a name already taken can be
@@ -125,7 +129,12 @@ export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
             aria-label="Nueva categoría"
             className={`${inputCls()} flex-1`}
           />
-          <Button type="submit" disabled={newName.trim() === ''} style={MODAL_CONFIRM_STYLE}>
+          <Button
+            type="submit"
+            disabled={newName.trim() === ''}
+            loading={adding}
+            style={MODAL_CONFIRM_STYLE}
+          >
             Agregar
           </Button>
         </form>
