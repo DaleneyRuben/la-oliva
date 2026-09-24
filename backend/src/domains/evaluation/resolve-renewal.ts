@@ -15,20 +15,28 @@ export const resolveRenewal = async (
   subscriptionData: CreateSubscriptionDto,
   actor: Actor,
 ): Promise<ResolveRenewalResult | null> => {
-  const appointment = await Appointment.findByPk(appointmentId);
-  if (!appointment || !appointment.clientId || appointment.subscriptionId) return null;
-
-  const clientId = appointment.clientId as number;
-
   // Fast path: avoids a wasted transaction in the common case. Not sufficient on its own —
   // two near-simultaneous requests could both pass this check before either commits, so the
   // db-level unique index (see migration add-unique-unpaid-subscription-per-client) is the
   // real guarantee; a violation of it is caught below and reported the same way.
+  const unlocked = await Appointment.findByPk(appointmentId);
+  if (!unlocked || !unlocked.clientId || unlocked.subscriptionId) return null;
+
+  const clientId = unlocked.clientId as number;
+
   const pendingUnpaid = await Subscription.findOne({ where: { clientId, paid: false } });
   if (pendingUnpaid) return { subscription: null, reason: 'already_pending' };
 
   try {
     return await sequelize.transaction(async (transaction) => {
+      // Re-read under a row lock: a concurrent request resolving the same appointment waits here
+      // and then sees it resolved, instead of creating a second renewal.
+      const appointment = await Appointment.findByPk(appointmentId, {
+        transaction,
+        lock: transaction.LOCK.UPDATE,
+      });
+      if (!appointment || appointment.subscriptionId) return null;
+
       const subscription = await createSubscription(
         clientId,
         { ...subscriptionData, appointmentId },
