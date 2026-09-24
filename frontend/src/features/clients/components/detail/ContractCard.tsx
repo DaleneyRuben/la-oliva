@@ -8,6 +8,7 @@ import { Label } from '@ui/Label';
 import { projectedEndDate } from '@/utils/businessDays';
 import { formatDate } from '@/utils/format';
 import type { Subscription } from '@/features/clients/types';
+import { usePendingAction } from '@/hooks/usePendingAction';
 
 export interface ContractDraft {
   contractDate: string;
@@ -24,7 +25,7 @@ interface Props {
 
 export function ContractCard({ sub, remaining, onUpdateContract, readOnly = false }: Props) {
   const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const { pending: saving, run } = usePendingAction();
   const [contractDate, setContractDate] = useState(sub.contractDate);
   const [startDate, setStartDate] = useState(sub.startDate ?? '');
   const [durationStr, setDurationStr] = useState(String(sub.duration));
@@ -38,13 +39,10 @@ export function ContractCard({ sub, remaining, onUpdateContract, readOnly = fals
 
   const handleSave = async () => {
     if (!validDuration) return;
-    setSaving(true);
-    try {
+    await run(async () => {
       await onUpdateContract({ contractDate, startDate, duration: validDuration });
       setEditing(false);
-    } finally {
-      setSaving(false);
-    }
+    });
   };
 
   // Seeded when the editor opens, not at mount: this card is never remounted when the subscription

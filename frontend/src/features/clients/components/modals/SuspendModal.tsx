@@ -26,6 +26,7 @@ import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
 import { addBusinessDays, subtractBusinessDays } from '@/utils/businessDays';
 import { formatDate } from '@/utils/format';
 import type { Subscription } from '@/features/clients/types';
+import { usePendingAction } from '@/hooks/usePendingAction';
 
 const WEEKDAY_LABELS = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE'];
 
@@ -60,7 +61,7 @@ export function SuspendModal({
   const [selected, setSelected] = useState<Date[]>(
     (sub.suspendedDates ?? []).map((d) => parseISO(`${d}T12:00:00`)),
   );
-  const [isSaving, setIsSaving] = useState(false);
+  const { pending: isSaving, run } = usePendingAction();
 
   const minDate = subDays(today, 7);
   const contractStart = sub.startDate ? parseISO(sub.startDate) : null;
@@ -92,15 +93,11 @@ export function SuspendModal({
 
   const weeks = getCalendarWeeks(anchor);
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
+  const handleSave = () =>
+    run(async () => {
       await onSave(selected.map((d) => format(d, 'yyyy-MM-dd')));
       onClose();
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    });
 
   return (
     <Modal onClose={onClose} className="w-[min(580px,92vw)] max-h-[92vh] overflow-auto">

@@ -6,6 +6,7 @@ import { Field } from '@ui/Field';
 import { DatePickerInput } from '@ui/DatePickerInput';
 import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
 import { isWeekendStartDate } from '@/features/clients/utils/startDate';
+import { usePendingAction } from '@/hooks/usePendingAction';
 
 interface Props {
   clientName: string;
@@ -18,19 +19,14 @@ interface Props {
 export function AssignStartDateModal({ clientName, planName, duration, onClose, onAssign }: Props) {
   const [startDate, setStartDate] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
+  const { pending: isSaving, run } = usePendingAction();
 
   const handleAssign = async () => {
     if (isWeekendStartDate(startDate)) {
       setError('El inicio debe ser un día hábil (lunes a viernes)');
       return;
     }
-    setIsSaving(true);
-    try {
-      await onAssign(startDate);
-    } finally {
-      setIsSaving(false);
-    }
+    await run(() => onAssign(startDate));
   };
 
   return (

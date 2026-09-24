@@ -3,6 +3,7 @@ import { Icon } from '@ui/Icon';
 import { Modal } from '@ui/Modal';
 import { Button } from '@ui/Button';
 import { MODAL_CANCEL_STYLE, CONFIRM_DIALOG_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 
 interface Props {
   title: string;
@@ -30,21 +31,19 @@ export function ConfirmModal({
   onClose,
   onConfirm,
 }: Props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const { pending: isLoading, run } = usePendingAction();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleConfirm = async () => {
-    setIsLoading(true);
-    setErrorMessage(null);
-    try {
-      await onConfirm();
-      onClose();
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'No se pudo completar la acción.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleConfirm = () =>
+    run(async () => {
+      setErrorMessage(null);
+      try {
+        await onConfirm();
+        onClose();
+      } catch (error) {
+        setErrorMessage(error instanceof Error ? error.message : 'No se pudo completar la acción.');
+      }
+    });
 
   return (
     <Modal onClose={onClose} className="w-[min(420px,92vw)]">
