@@ -7,9 +7,19 @@ interface Props {
   checked: boolean;
   onChange: (checked: boolean) => void;
   icon?: string;
+  disabled?: boolean;
 }
 
-export function CheckboxRow({ id, label, description, checked, onChange, icon }: Props) {
+export function CheckboxRow({
+  id,
+  label,
+  description,
+  checked,
+  onChange,
+  icon,
+  disabled = false,
+}: Props) {
+  const cursor = disabled ? 'cursor-wait opacity-60' : 'cursor-pointer';
   const trackOffColor = icon ? 'bg-toggle-off' : 'bg-rule';
   const trackSize = icon ? 'top-[3px] left-[3px] w-[21px] h-[21px]' : 'top-[2px] w-[18px] h-[18px]';
   const thumbOffset = icon ? 'translate-x-0' : 'translate-x-[2px]';
@@ -20,8 +30,8 @@ export function CheckboxRow({ id, label, description, checked, onChange, icon }:
       htmlFor={id}
       className={
         icon
-          ? 'flex items-center justify-between gap-4 cursor-pointer bg-empty-bg border border-hairline rounded-xl px-4 py-[13px]'
-          : 'flex items-center gap-3 cursor-pointer py-[6px]'
+          ? `flex items-center justify-between gap-4 ${cursor} bg-empty-bg border border-hairline rounded-xl px-4 py-[13px]`
+          : `flex items-center gap-3 ${cursor} py-[6px]`
       }
     >
       <div className={icon ? 'flex items-center gap-[13px]' : undefined}>
@@ -55,6 +65,7 @@ export function CheckboxRow({ id, label, description, checked, onChange, icon }:
         id={id}
         type="checkbox"
         checked={checked}
+        disabled={disabled}
         onChange={(e) => onChange(e.target.checked)}
         className="sr-only"
       />
