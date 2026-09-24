@@ -88,7 +88,7 @@ describe('NewClientPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGet.mockResolvedValue([makePlan()]);
-    mockPost.mockResolvedValueOnce({ id: 1 }).mockResolvedValueOnce({});
+    mockPost.mockResolvedValueOnce({ id: 1 });
   });
 
   it('renders the Agregar cliente heading and Identidad form on load', () => {
@@ -195,11 +195,12 @@ describe('NewClientPage', () => {
     });
     await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await userEvent.click(screen.getByRole('button', { name: /crear/i }));
-    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
-    expect(mockPost).toHaveBeenNthCalledWith(
-      1,
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    expect(mockPost).toHaveBeenCalledWith(
       '/clients',
-      expect.objectContaining({ underlyingDiseases: ['Diabetes', 'Anemia'] }),
+      expect.objectContaining({
+        client: expect.objectContaining({ underlyingDiseases: ['Diabetes', 'Anemia'] }),
+      }),
     );
   });
 
@@ -251,17 +252,11 @@ describe('NewClientPage', () => {
     });
     await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await userEvent.click(screen.getByRole('button', { name: /crear/i }));
-    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
-    expect(mockPost).toHaveBeenNthCalledWith(
-      1,
-      '/clients',
-      expect.objectContaining({ name: 'María García', sex: 'female' }),
-    );
-    expect(mockPost).toHaveBeenNthCalledWith(
-      2,
-      '/clients/1/subscriptions',
-      expect.objectContaining({ planId: 1, startDate: '2026-06-01' }),
-    );
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    expect(mockPost).toHaveBeenCalledWith('/clients', {
+      client: expect.objectContaining({ name: 'María García', sex: 'female' }),
+      subscription: expect.objectContaining({ planId: 1, startDate: '2026-06-01' }),
+    });
   });
 
   it('subscription POST defaults the price to the selected plan price', async () => {
@@ -272,12 +267,8 @@ describe('NewClientPage', () => {
     });
     await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await userEvent.click(screen.getByRole('button', { name: /crear/i }));
-    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
-    expect(mockPost).toHaveBeenNthCalledWith(
-      2,
-      '/clients/1/subscriptions',
-      expect.objectContaining({ price: 480 }),
-    );
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    expect(mockPost.mock.calls[0][1].subscription).toEqual(expect.objectContaining({ price: 480 }));
   });
 
   it('subscription POST sends the agreed price when precio is entered', async () => {
@@ -289,12 +280,8 @@ describe('NewClientPage', () => {
     fireEvent.change(screen.getByLabelText(/precio final/i), { target: { value: '380' } });
     await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await userEvent.click(screen.getByRole('button', { name: /crear/i }));
-    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
-    expect(mockPost).toHaveBeenNthCalledWith(
-      2,
-      '/clients/1/subscriptions',
-      expect.objectContaining({ price: 380 }),
-    );
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    expect(mockPost.mock.calls[0][1].subscription).toEqual(expect.objectContaining({ price: 380 }));
   });
 
   it('subscription POST does not include contractEndDate', async () => {
@@ -305,14 +292,14 @@ describe('NewClientPage', () => {
     });
     await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await userEvent.click(screen.getByRole('button', { name: /crear/i }));
-    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2));
-    expect(mockPost.mock.calls[1][1]).not.toHaveProperty('contractEndDate');
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    expect(mockPost.mock.calls[0][1].subscription).not.toHaveProperty('contractEndDate');
   });
 
   it('disables guardar button while submitting', async () => {
     mockPost.mockReset();
     let resolve!: () => void;
-    mockPost.mockResolvedValueOnce({ id: 1 }).mockImplementationOnce(
+    mockPost.mockImplementationOnce(
       () =>
         new Promise<void>((res) => {
           resolve = res;

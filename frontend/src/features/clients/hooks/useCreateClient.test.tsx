@@ -37,20 +37,19 @@ const subscriptionDraft = {
 beforeEach(() => jest.clearAllMocks());
 
 describe('useCreateClient', () => {
-  it('posts to /clients then /clients/:id/subscriptions', async () => {
-    mockPost.mockResolvedValueOnce({ id: 'client-42' }).mockResolvedValueOnce(undefined);
+  it('creates the client and its subscription in a single request', async () => {
+    mockPost.mockResolvedValueOnce({ id: 'client-42' });
     const { result } = renderHook(() => useCreateClient(), { wrapper: makeWrapper() });
 
     await act(async () => {
       await result.current.create(clientDraft, subscriptionDraft);
     });
 
-    expect(mockPost).toHaveBeenNthCalledWith(1, '/clients', clientDraft);
-    expect(mockPost).toHaveBeenNthCalledWith(
-      2,
-      '/clients/client-42/subscriptions',
-      subscriptionDraft,
-    );
+    expect(mockPost).toHaveBeenCalledTimes(1);
+    expect(mockPost).toHaveBeenCalledWith('/clients', {
+      client: clientDraft,
+      subscription: subscriptionDraft,
+    });
   });
 
   it('isCreating starts as false', () => {
@@ -59,7 +58,7 @@ describe('useCreateClient', () => {
   });
 
   it('isCreating is false after successful create', async () => {
-    mockPost.mockResolvedValueOnce({ id: 'client-1' }).mockResolvedValueOnce(undefined);
+    mockPost.mockResolvedValueOnce({ id: 'client-1' });
     const { result } = renderHook(() => useCreateClient(), { wrapper: makeWrapper() });
 
     await act(async () => {
@@ -69,7 +68,7 @@ describe('useCreateClient', () => {
     expect(result.current.isCreating).toBe(false);
   });
 
-  it('throws when the first post fails', async () => {
+  it('throws when the request fails', async () => {
     mockPost.mockRejectedValueOnce(new Error('server error'));
     const { result } = renderHook(() => useCreateClient(), { wrapper: makeWrapper() });
 
@@ -84,7 +83,7 @@ describe('useCreateClient', () => {
   it('invalidates clients query on success', async () => {
     const qc = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
     const invalidate = jest.spyOn(qc, 'invalidateQueries');
-    mockPost.mockResolvedValueOnce({ id: 'client-1' }).mockResolvedValueOnce(undefined);
+    mockPost.mockResolvedValueOnce({ id: 'client-1' });
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <QueryClientProvider client={qc}>{children}</QueryClientProvider>
