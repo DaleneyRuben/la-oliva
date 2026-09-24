@@ -8,14 +8,18 @@ import { recordPayment } from '../finance';
 import { finalizeOverlappingSubscriptions } from './finalize-overlapping';
 import { applyRenewalPauseState, historyEventTypeFor } from './_helpers';
 
-export const markPaid = async (clientId: number, actor: Actor, transaction?: Transaction) => {
-  const subscription = await Subscription.findOne({
-    where: { clientId, paid: false },
-    order: [['id', 'ASC']],
-  });
-  if (!subscription) return null;
+export const markPaid = (clientId: number, actor: Actor, transaction?: Transaction) =>
+  withTransaction(transaction, async (t) => {
+    // The row lock makes a concurrent confirmation wait for this one to commit; its re-read then no
+    // longer matches paid: false, so the payment and history event are written once.
+    const subscription = await Subscription.findOne({
+      where: { clientId, paid: false },
+      order: [['id', 'ASC']],
+      transaction: t,
+      lock: Transaction.LOCK.UPDATE,
+    });
+    if (!subscription) return null;
 
-  await withTransaction(transaction, async (t) => {
     await subscription.update({ paid: true }, { transaction: t });
 
     // These were deferred at creation time while the subscription was unpaid (see
@@ -61,7 +65,6 @@ export const markPaid = async (clientId: number, actor: Actor, transaction?: Tra
       actor,
       t,
     );
-  });
 
-  return subscription;
-};
+    return subscription;
+  });

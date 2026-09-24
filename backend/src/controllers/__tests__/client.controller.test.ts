@@ -2,7 +2,7 @@ import type { Request } from 'express';
 import request from 'supertest';
 import app from '../../app';
 import {
-  create,
+  createWithSubscription,
   finalize,
   findAll,
   findById,
@@ -57,6 +57,14 @@ const validPayload = {
   height: 170,
   operations: [],
   medications: [],
+};
+
+const validSubscription = {
+  planId: encodeId(4),
+  contractDate: '2026-09-23',
+  startDate: '2026-09-24',
+  duration: 20,
+  price: 500,
 };
 
 describe('GET /api/clients', () => {
@@ -274,59 +282,66 @@ describe('PATCH /api/clients/:id', () => {
 });
 
 describe('POST /api/clients', () => {
-  it('returns 201 with created client', async () => {
-    (create as jest.Mock).mockResolvedValue(mockClient);
+  beforeEach(() => jest.clearAllMocks());
 
-    const res = await request(app).post('/api/clients').send(validPayload);
+  const send = (client: Record<string, unknown>, subscription = validSubscription) =>
+    request(app).post('/api/clients').send({ client, subscription });
+
+  it('creates the client and its first subscription in one request', async () => {
+    (createWithSubscription as jest.Mock).mockResolvedValue(mockClient);
+
+    const res = await send(validPayload);
 
     expect(res.status).toBe(201);
     expect(res.body.data).toMatchObject({ name: 'John Doe', sex: 'male' });
+    expect(createWithSubscription).toHaveBeenCalledWith(
+      expect.objectContaining(validPayload),
+      expect.objectContaining({ ...validSubscription, planId: 4 }),
+      { userId: 9, username: 'ada' },
+    );
+  });
+
+  it('returns 400 when the subscription is missing', async () => {
+    const res = await request(app).post('/api/clients').send({ client: validPayload });
+
+    expect(res.status).toBe(400);
+    expect(createWithSubscription).not.toHaveBeenCalled();
   });
 
   it('returns 400 when required field is missing', async () => {
-    const res = await request(app)
-      .post('/api/clients')
-      .send({ ...validPayload, name: undefined });
+    const res = await send({ ...validPayload, name: undefined });
 
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when sex is invalid', async () => {
-    const res = await request(app)
-      .post('/api/clients')
-      .send({ ...validPayload, sex: 'alien' });
+    const res = await send({ ...validPayload, sex: 'alien' });
 
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when dateOfBirth format is invalid', async () => {
-    const res = await request(app)
-      .post('/api/clients')
-      .send({ ...validPayload, dateOfBirth: '15-05-1990' });
+    const res = await send({ ...validPayload, dateOfBirth: '15-05-1990' });
 
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when deliveryZone is invalid', async () => {
-    const res = await request(app)
-      .post('/api/clients')
-      .send({ ...validPayload, deliveryZone: 'Norte' });
+    const res = await send({ ...validPayload, deliveryZone: 'Norte' });
 
     expect(res.status).toBe(400);
   });
 
   it('returns 400 when delivery is invalid', async () => {
-    const res = await request(app)
-      .post('/api/clients')
-      .send({ ...validPayload, delivery: 'Unknown' });
+    const res = await send({ ...validPayload, delivery: 'Unknown' });
 
     expect(res.status).toBe(400);
   });
 
   it('returns 500 when service throws', async () => {
-    (create as jest.Mock).mockRejectedValue(new Error('db error'));
+    (createWithSubscription as jest.Mock).mockRejectedValue(new Error('db error'));
 
-    const res = await request(app).post('/api/clients').send(validPayload);
+    const res = await send(validPayload);
 
     expect(res.status).toBe(500);
   });

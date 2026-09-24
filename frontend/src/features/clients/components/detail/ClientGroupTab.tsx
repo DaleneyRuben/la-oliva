@@ -4,6 +4,7 @@ import { Card } from '@ui/Card';
 import { Icon } from '@ui/Icon';
 import { Label } from '@ui/Label';
 import { inputCls } from '@ui/Field';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useClientList } from '@/features/clients/hooks/useClientList';
 import { useClientGroup } from '@/features/clients/hooks/useClientGroup';
@@ -20,6 +21,7 @@ export function ClientGroupTab({ clientId, initialMembers, readOnly = false }: P
     clientId,
     initialMembers,
   );
+  const { pending, run } = usePendingAction();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search);
 
@@ -105,7 +107,13 @@ export function ClientGroupTab({ clientId, initialMembers, readOnly = false }: P
       )}
 
       {!readOnly && (
-        <Button onClick={save} disabled={!isDirty || isSaving} leftIcon="check" className="w-full">
+        <Button
+          onClick={() => run(save)}
+          disabled={!isDirty}
+          loading={pending || isSaving}
+          leftIcon="check"
+          className="w-full"
+        >
           Guardar grupo
         </Button>
       )}

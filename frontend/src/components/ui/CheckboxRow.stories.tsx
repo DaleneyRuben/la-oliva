@@ -81,3 +81,14 @@ function InteractiveDemo() {
 export const Interactive: Story = {
   render: () => <InteractiveDemo />,
 };
+
+export const Disabled: Story = {
+  args: {
+    id: 'salad-grande-disabled',
+    label: 'Ensalada grande',
+    icon: 'salad',
+    checked: true,
+    disabled: true,
+    onChange: () => {},
+  },
+};

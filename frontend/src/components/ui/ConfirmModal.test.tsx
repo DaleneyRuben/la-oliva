@@ -165,4 +165,22 @@ describe('ConfirmModal', () => {
     await userEvent.click(screen.getByRole('button', { name: /confirmar/i }));
     expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
   });
+
+  it('confirms once when the confirm button is double-clicked', async () => {
+    const onConfirm = jest.fn(() => new Promise<void>(() => {}));
+    render(
+      <ConfirmModal
+        title="Test"
+        message="Test message"
+        confirmLabel="Confirmar"
+        onClose={noop}
+        onConfirm={onConfirm}
+      />,
+    );
+
+    await userEvent.dblClick(screen.getByRole('button', { name: /confirmar/i }));
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /confirmar/i })).toBeDisabled();
+  });
 });

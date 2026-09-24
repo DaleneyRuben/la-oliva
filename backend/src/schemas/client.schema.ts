@@ -51,10 +51,12 @@ export const updateClientSchema = z.object({
 
 export type UpdateClientDto = z.infer<typeof updateClientSchema>;
 
-export const reviewDraftSchema = z.object({
+export const createClientWithSubscriptionSchema = z.object({
   client: createClientSchema,
   subscription: createSubscriptionSchema,
 });
+
+export const reviewDraftSchema = createClientWithSubscriptionSchema;
 
 export type ReviewDraftDto = z.infer<typeof reviewDraftSchema>;
 

@@ -9,6 +9,7 @@ import { ToggleGroup } from '@ui/ToggleGroup';
 import { DatePickerInput } from '@ui/DatePickerInput';
 import { TimePickerInput } from '@ui/TimePickerInput';
 import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useClientSearch } from '@/features/evaluations/hooks/useClientSearch';
 import type {
@@ -41,6 +42,8 @@ type Props = CreateProps | EditProps;
 
 export function AppointmentModal(props: Props) {
   const { mode, onClose, isSaving, onSave } = props;
+  const { pending, run } = usePendingAction();
+  const saving = pending || isSaving;
   const appointment = mode === 'edit' ? (props as EditProps).appointment : null;
 
   const [draft, setDraft] = useState<AppointmentDraft>(
@@ -85,16 +88,17 @@ export function AppointmentModal(props: Props) {
     setSearch('');
   };
 
-  const handleSubmit = async () => {
-    if (isExistingClientMode && selectedClient) {
-      await onSave({ clientId: selectedClient.id, date: draft.date, time: draft.time });
-    } else if (isEditingExistingClient) {
-      await onSave({ date: draft.date, time: draft.time });
-    } else {
-      await onSave({ name: draft.name, phone: draft.phone, date: draft.date, time: draft.time });
-    }
-    onClose();
-  };
+  const handleSubmit = () =>
+    run(async () => {
+      if (isExistingClientMode && selectedClient) {
+        await onSave({ clientId: selectedClient.id, date: draft.date, time: draft.time });
+      } else if (isEditingExistingClient) {
+        await onSave({ date: draft.date, time: draft.time });
+      } else {
+        await onSave({ name: draft.name, phone: draft.phone, date: draft.date, time: draft.time });
+      }
+      onClose();
+    });
 
   let clientFieldsSection: React.ReactNode;
   if (isEditingExistingClient) {
@@ -240,14 +244,14 @@ export function AppointmentModal(props: Props) {
           <Button
             variant="secondary"
             onClick={onClose}
-            disabled={isSaving}
+            disabled={saving}
             style={MODAL_CANCEL_STYLE}
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
-            loading={isSaving}
+            loading={saving}
             disabled={isExistingClientMode && !selectedClient}
             leftIcon="check"
             style={MODAL_CONFIRM_STYLE}

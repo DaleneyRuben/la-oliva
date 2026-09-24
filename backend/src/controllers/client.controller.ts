@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import {
   findAll as findAllClients,
   findById as findClientById,
-  create as createClient,
+  createWithSubscription,
   update as updateClient,
   finalize as finalizeClient,
   softDelete as softDeleteClient,
@@ -17,7 +17,10 @@ import { decodeId } from '../utils/sqids';
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const client = await createClient(req.body);
+    const client = await createWithSubscription(req.body.client, req.body.subscription, {
+      userId: req.user!.userId,
+      username: req.user!.username,
+    });
     sendSuccess(res, client, 201);
   } catch (err) {
     next(err);

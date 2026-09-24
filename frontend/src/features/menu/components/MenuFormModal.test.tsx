@@ -73,4 +73,15 @@ describe('MenuFormModal', () => {
     fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('saves once and shows Guardar as loading when clicked twice', () => {
+    const onSave = jest.fn(() => new Promise<void>(() => {}));
+    render(<MenuFormModal {...baseProps} onSave={onSave} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+
+    expect(onSave).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Guardar' })).toBeDisabled();
+  });
 });

@@ -1,11 +1,20 @@
+import { Button } from '@ui/Button';
 import { RegistrationStep } from '@/features/public-registration/types';
+
+// Inline so the design's size wins over Button's default size classes deterministically.
+const SUBMIT_STYLE = { padding: '10.5px 17.5px', fontSize: '12px', lineHeight: 1.45 };
 
 interface RegistrationActionsProps {
   step: RegistrationStep;
   onPrevious: () => void;
+  loading?: boolean;
 }
 
-export function RegistrationActions({ step, onPrevious }: RegistrationActionsProps) {
+export function RegistrationActions({
+  step,
+  onPrevious,
+  loading = false,
+}: RegistrationActionsProps) {
   return (
     <div className="mt-auto flex items-center justify-between pt-8">
       {step > 1 ? (
@@ -20,12 +29,15 @@ export function RegistrationActions({ step, onPrevious }: RegistrationActionsPro
         <span />
       )}
       <span className="text-[11px] text-faint">Paso {step} de 3</span>
-      <button
+      <Button
         type="submit"
-        className="rounded-[9px] bg-brand-primary px-5 py-3 text-[12px] font-semibold text-brand-on-primary shadow-card-elevated transition hover:bg-brand-primary-hover"
+        variant="bare"
+        loading={loading}
+        style={SUBMIT_STYLE}
+        className="bg-brand-primary font-semibold text-brand-on-primary shadow-card-elevated hover:bg-brand-primary-hover"
       >
         {step === 3 ? 'Enviar solicitud' : 'Continuar'}
-      </button>
+      </Button>
     </div>
   );
 }

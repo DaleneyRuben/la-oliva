@@ -5,6 +5,7 @@ import { isWeekendStartDate } from '@/features/clients/utils/startDate';
 import { formatDate } from '@/utils/format';
 import type { Subscription, RenewalPayload } from '@/features/clients/types';
 import type { Plan } from '@/features/plans/types';
+import { usePendingAction } from '@/hooks/usePendingAction';
 
 export type StartMode = 'atEnd' | 'pick' | 'undefined';
 
@@ -31,7 +32,7 @@ export function useRenewalForm({
   const [precioStr, setPrecioStr] = useState('');
   const [startMode, setStartMode] = useState<StartMode>(isReactivation ? 'pick' : 'atEnd');
   const [pickedDate, setPickedDate] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const { pending: isSaving, run } = usePendingAction();
   // no default selection: the Evaluaciones renewal flow requires an explicit choice
   const [paid, setPaid] = useState<boolean | undefined>(undefined);
 
@@ -93,8 +94,7 @@ export function useRenewalForm({
 
   const handleConfirm = async () => {
     if (!canConfirm) return;
-    setIsSaving(true);
-    try {
+    await run(async () => {
       await onRenew({
         planId: newPlanId,
         contractDate: format(new Date(), 'yyyy-MM-dd'),
@@ -105,9 +105,7 @@ export function useRenewalForm({
         ...(showPaidToggle ? { paid } : {}),
       });
       onClose();
-    } finally {
-      setIsSaving(false);
-    }
+    });
   };
 
   let confirmLabel = 'Renovar';

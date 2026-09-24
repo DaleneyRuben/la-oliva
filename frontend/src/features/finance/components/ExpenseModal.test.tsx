@@ -320,4 +320,18 @@ describe('ExpenseModal', () => {
     expect(onClose).toHaveBeenCalled();
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it('registers once and shows Registrar as loading for a double click and Enter', async () => {
+    const onSubmit = jest.fn(() => new Promise<void>(() => {}));
+    setup({ onSubmit });
+
+    const amount = screen.getByLabelText(/monto/i);
+    await userEvent.type(amount, '180');
+    await pickCategory('Transporte');
+    await userEvent.dblClick(screen.getByRole('button', { name: 'Registrar' }));
+    await userEvent.type(amount, '{Enter}');
+
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Registrar' })).toBeDisabled();
+  });
 });

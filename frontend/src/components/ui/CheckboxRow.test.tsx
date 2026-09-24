@@ -105,4 +105,24 @@ describe('CheckboxRow', () => {
       expect(thumb.className).toContain('translate-x-0');
     });
   });
+
+  describe('disabled', () => {
+    it('disables the input and ignores clicks', async () => {
+      const onChange = jest.fn();
+      render(<CheckboxRow {...baseProps} onChange={onChange} disabled />);
+
+      const input = screen.getByLabelText(baseProps.label);
+      expect(input).toBeDisabled();
+      await userEvent.click(input);
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('marks the row as busy with a wait cursor', () => {
+      render(<CheckboxRow {...baseProps} disabled />);
+
+      expect(screen.getByLabelText(baseProps.label).closest('label')!.className).toContain(
+        'cursor-wait',
+      );
+    });
+  });
 });

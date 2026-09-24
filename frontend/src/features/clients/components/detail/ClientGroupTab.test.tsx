@@ -72,6 +72,14 @@ describe('ClientGroupTab', () => {
     expect(screen.getByRole('button', { name: /guardar grupo/i })).not.toBeDisabled();
   });
 
+  it('shows a loading spinner on guardar while the group is being saved', () => {
+    mockUseClientGroup.mockReturnValue(mockHook({ isDirty: true, isSaving: true }));
+    render(<ClientGroupTab clientId="1" initialMembers={[]} />);
+    const button = screen.getByRole('button', { name: /guardar grupo/i });
+    expect(button).toBeDisabled();
+    expect(button.querySelector('.animate-spin')).toBeInTheDocument();
+  });
+
   it('calls save when guardar button is clicked', () => {
     const save = jest.fn();
     mockUseClientGroup.mockReturnValue(mockHook({ isDirty: true, save }));
@@ -117,5 +125,17 @@ describe('ClientGroupTab', () => {
     render(<ClientGroupTab clientId="1" initialMembers={[]} />);
     fireEvent.change(screen.getByPlaceholderText(/agregar miembro/i), { target: { value: 'Car' } });
     expect(screen.queryByRole('button', { name: /agregar carlos/i })).not.toBeInTheDocument();
+  });
+
+  it('saves once when guardar is clicked twice before the request finishes', () => {
+    const save = jest.fn(() => new Promise<void>(() => {}));
+    mockUseClientGroup.mockReturnValue(mockHook({ isDirty: true, save }));
+    render(<ClientGroupTab clientId="1" initialMembers={[]} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /guardar grupo/i }));
+    fireEvent.click(screen.getByRole('button', { name: /guardar grupo/i }));
+
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /guardar grupo/i })).toBeDisabled();
   });
 });

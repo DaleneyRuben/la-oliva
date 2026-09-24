@@ -75,3 +75,14 @@ it('closes without assigning', async () => {
 
   expect(onClose).toHaveBeenCalled();
 });
+
+it('assigns once and shows the button as loading when double-clicked', async () => {
+  const onAssign = jest.fn(() => new Promise<void>(() => {}));
+  render(<AssignStartDateModal {...baseProps} onAssign={onAssign} />);
+
+  await userEvent.type(screen.getByLabelText(/fecha de inicio/i), '2026-08-03');
+  await userEvent.dblClick(screen.getByRole('button', { name: /asignar fecha/i }));
+
+  expect(onAssign).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: /asignar fecha/i })).toBeDisabled();
+});

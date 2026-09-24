@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { Button } from '@ui/Button';
 import { StepIndicator } from '@ui/StepIndicator';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useCreateClient } from '@/features/clients/hooks/useCreateClient';
 import { useClient } from '@/features/clients/hooks/useClient';
 import { useReviewDraft } from '@/features/clients/hooks/useReviewDraft';
@@ -44,6 +45,7 @@ export function NewClientPage() {
   });
   const [paid, setPaid] = useState<boolean | null>(null);
   const [submitError, setSubmitError] = useState('');
+  const { pending: submitting, run } = usePendingAction();
 
   const {
     register,
@@ -245,8 +247,8 @@ export function NewClientPage() {
               </Button>
             ) : (
               <Button
-                onClick={submit}
-                loading={isCreating || isConverting || isReviewing}
+                onClick={() => run(submit)}
+                loading={submitting || isCreating || isConverting || isReviewing}
                 disabled={origen === 'Cita' && paid === null}
                 rightIcon="check"
               >

@@ -32,7 +32,7 @@ const subscriptionData = {
 } as never;
 
 const actor = { userId: 9, username: 'ada' };
-const transaction = { id: 'txn-1' };
+const transaction = { id: 'txn-1', LOCK: { UPDATE: 'UPDATE' } };
 
 describe('convertAppointment', () => {
   beforeEach(() => {
@@ -98,5 +98,43 @@ describe('convertAppointment', () => {
 
     expect(appointment.update).not.toHaveBeenCalled();
     expect(result).toBeNull();
+  });
+
+  it('reads the appointment with a row lock inside the transaction', async () => {
+    const appointment = {
+      id: 1,
+      clientId: 7,
+      subscriptionId: null,
+      update: jest.fn().mockResolvedValue({}),
+    };
+    (Appointment.findByPk as jest.Mock).mockResolvedValue(appointment);
+    (createClient as jest.Mock).mockResolvedValue({ id: 7 });
+    (createSubscription as jest.Mock).mockResolvedValue({ id: 3, clientId: 7 });
+
+    await convertAppointment(1, clientData, subscriptionData, actor);
+
+    expect(Appointment.findByPk).toHaveBeenCalledWith(1, { transaction, lock: 'UPDATE' });
+  });
+
+  it('resolves only once when two requests race for the same appointment', async () => {
+    const appointment = {
+      id: 1,
+      clientId: 7,
+      subscriptionId: null as number | null,
+      update: jest.fn().mockImplementation(async ({ subscriptionId }) => {
+        appointment.subscriptionId = subscriptionId;
+      }),
+    };
+    // the second request's locked read waits for the first to commit, then sees it resolved
+    (Appointment.findByPk as jest.Mock).mockImplementation(async () => ({ ...appointment }));
+    (createClient as jest.Mock).mockResolvedValue({ id: 7 });
+    (createSubscription as jest.Mock).mockResolvedValue({ id: 3, clientId: 7 });
+
+    const first = await convertAppointment(1, clientData, subscriptionData, actor);
+    const second = await convertAppointment(1, clientData, subscriptionData, actor);
+
+    expect(first).not.toBeNull();
+    expect(second).toBeNull();
+    expect(createClient).toHaveBeenCalledTimes(1);
   });
 });

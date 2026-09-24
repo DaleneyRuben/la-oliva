@@ -4,6 +4,7 @@ import { IconButton } from '@ui/IconButton';
 import { Modal } from '@ui/Modal';
 import { Button } from '@ui/Button';
 import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { PlanEditorForm } from '@/features/plans/components/PlanEditorForm';
 import type { MealKey, Plan, PlanDraft } from '@/features/plans/types';
 
@@ -29,6 +30,8 @@ type Props = CreateProps | EditProps;
 
 export function PlanModal(props: Props) {
   const { mode, onClose, isSaving, onSave } = props;
+  const { pending, run } = usePendingAction();
+  const saving = pending || isSaving;
   const plan = mode === 'edit' ? (props as EditProps).plan : null;
   const clientCount = mode === 'edit' ? (props as EditProps).clientCount : 0;
 
@@ -40,10 +43,11 @@ export function PlanModal(props: Props) {
 
   const clientsLabel = clientCount === 1 ? '1 cliente activo' : `${clientCount} clientes activos`;
 
-  const handleSubmit = async () => {
-    await onSave(draft);
-    onClose();
-  };
+  const handleSubmit = () =>
+    run(async () => {
+      await onSave(draft);
+      onClose();
+    });
 
   return (
     <Modal onClose={onClose} className="w-[min(520px,92vw)] max-h-[92vh] overflow-auto">
@@ -77,14 +81,14 @@ export function PlanModal(props: Props) {
           <Button
             variant="secondary"
             onClick={onClose}
-            disabled={isSaving}
+            disabled={saving}
             style={MODAL_CANCEL_STYLE}
           >
             Cancelar
           </Button>
           <Button
             onClick={handleSubmit}
-            loading={isSaving}
+            loading={saving}
             leftIcon="check"
             style={MODAL_CONFIRM_STYLE}
           >

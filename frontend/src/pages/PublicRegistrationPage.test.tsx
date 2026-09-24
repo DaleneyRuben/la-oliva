@@ -12,7 +12,10 @@ it('shows the public registration heading', () => {
 
   expect(screen.getByRole('heading', { name: 'Datos personales' })).toBeInTheDocument();
   expect(screen.getByText('Paso 1 de 3')).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Continuar' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Continuar' })).toHaveStyle({
+    fontSize: '12px',
+    padding: '10.5px 17.5px',
+  });
   expect(screen.getAllByRole('listitem')[0]).toHaveAttribute('aria-current', 'step');
   expect(screen.getByRole('main')).toHaveClass('md:items-center');
   expect(screen.getByRole('main').firstElementChild).toHaveClass('md:h-[calc(100vh-48px)]');
@@ -37,16 +40,7 @@ it('offers only female and male sex options', () => {
   ]);
 });
 
-it('shows a retry message when submitting the form fails due to a network error', async () => {
-  const user = userEvent.setup();
-  global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
-
-  render(
-    <MemoryRouter>
-      <PublicRegistrationPage />
-    </MemoryRouter>,
-  );
-
+async function fillFormToReview(user: ReturnType<typeof userEvent.setup>) {
   const field = (id: string) => document.getElementById(id) as HTMLInputElement;
   await user.type(field('firstName'), 'María');
   await user.type(field('lastName'), 'Prueba');
@@ -64,7 +58,19 @@ it('shows a retry message when submitting the form fails due to a network error'
   await user.click(screen.getByRole('button', { name: 'Continuar' }));
 
   await screen.findByRole('heading', { name: 'Revisa tus datos' });
+}
 
+it('shows a retry message when submitting the form fails due to a network error', async () => {
+  const user = userEvent.setup();
+  global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
+
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  await fillFormToReview(user);
   await user.click(screen.getByRole('button', { name: 'Enviar solicitud' }));
 
   await waitFor(() =>
@@ -72,4 +78,32 @@ it('shows a retry message when submitting the form fails due to a network error'
       screen.getByText('No pudimos enviar tu solicitud. Intenta nuevamente.'),
     ).toBeInTheDocument(),
   );
+  expect(screen.getByRole('button', { name: 'Enviar solicitud' })).toBeEnabled();
+});
+
+it('shows a loading state and sends one request when the submit button is clicked twice', async () => {
+  const user = userEvent.setup();
+  let resolveRequest: (response: Response) => void = () => {};
+  global.fetch = jest.fn().mockReturnValue(
+    new Promise<Response>((resolve) => {
+      resolveRequest = resolve;
+    }),
+  );
+
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  await fillFormToReview(user);
+  const submit = screen.getByRole('button', { name: 'Enviar solicitud' });
+  await user.click(submit);
+  await user.click(submit);
+
+  expect(submit).toBeDisabled();
+  expect(global.fetch).toHaveBeenCalledTimes(1);
+
+  resolveRequest({ ok: true } as Response);
+  await screen.findByRole('heading', { name: 'Recibimos tu solicitud' });
 });

@@ -6,6 +6,7 @@ import { Modal } from '@ui/Modal';
 import { Button } from '@ui/Button';
 import { ConfirmModal } from '@ui/ConfirmModal';
 import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { ROLES, type UserRole } from '@/constants/roles';
 import type { AppUser, UserDraft, UserUpdateDraft } from '@/features/users/hooks/useUsers';
 
@@ -39,6 +40,8 @@ type Props = CreateProps | EditProps;
 
 export function UserModal(props: Props) {
   const { mode, onClose, isSaving } = props;
+  const { pending, run } = usePendingAction();
+  const saving = pending || isSaving;
   const isSelf = mode === 'edit' ? ((props as EditProps).isSelf ?? false) : false;
   const initial = mode === 'edit' ? (props as EditProps).user : null;
 
@@ -50,16 +53,17 @@ export function UserModal(props: Props) {
 
   const canSave = mode === 'create' ? !!username && !!password : !!username;
 
-  const handleSave = async () => {
-    if (mode === 'create') {
-      await (props as CreateProps).onSave({ username, password, role });
-    } else {
-      const draft: UserUpdateDraft = { username, role };
-      if (password) draft.password = password;
-      await (props as EditProps).onSave(draft);
-    }
-    onClose();
-  };
+  const handleSave = () =>
+    run(async () => {
+      if (mode === 'create') {
+        await (props as CreateProps).onSave({ username, password, role });
+      } else {
+        const draft: UserUpdateDraft = { username, role };
+        if (password) draft.password = password;
+        await (props as EditProps).onSave(draft);
+      }
+      onClose();
+    });
 
   const handleDelete = async () => {
     if (mode === 'edit') {
@@ -172,18 +176,18 @@ export function UserModal(props: Props) {
 
       <div className="flex items-center gap-[10px] px-[28px] py-4 border-t border-hairline">
         {mode === 'edit' && !isSelf && (
-          <Button variant="danger" onClick={() => setShowDeleteConfirm(true)} disabled={isSaving}>
+          <Button variant="danger" onClick={() => setShowDeleteConfirm(true)} disabled={saving}>
             Eliminar
           </Button>
         )}
         <div className="flex-1" />
-        <Button variant="secondary" onClick={onClose} style={MODAL_CANCEL_STYLE}>
+        <Button variant="secondary" onClick={onClose} disabled={saving} style={MODAL_CANCEL_STYLE}>
           Cancelar
         </Button>
         <Button
           onClick={handleSave}
-          disabled={isSaving || !canSave}
-          loading={isSaving}
+          disabled={!canSave}
+          loading={saving}
           leftIcon="check"
           style={MODAL_CONFIRM_STYLE}
         >

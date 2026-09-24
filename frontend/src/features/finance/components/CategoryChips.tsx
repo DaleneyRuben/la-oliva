@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@ui/Button';
 import { inputCls } from '@ui/Field';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { useCategoryMutations } from '@/features/finance/hooks/useCategories';
 import { categoryAddedMessage } from '@/features/finance/utils/categories';
 import type { ExpenseCategory } from '@/features/finance/types';
@@ -25,6 +26,7 @@ const UNSELECTED_CLS = 'border-rule bg-white text-ink-2 font-medium hover:border
 
 export function CategoryChips({ categories, selectedId, onPick }: Props) {
   const { create } = useCategoryMutations();
+  const { pending: adding, run } = usePendingAction();
   const [draft, setDraft] = useState<string | null>(null);
   const draftRef = useRef<HTMLInputElement>(null);
 
@@ -40,18 +42,19 @@ export function CategoryChips({ categories, selectedId, onPick }: Props) {
 
   const name = (draft ?? '').trim();
 
-  const handleAdd = async () => {
-    if (name === '') return;
+  const handleAdd = () =>
+    run(async () => {
+      if (name === '') return;
 
-    try {
-      const added = await create(name);
-      toast.success(categoryAddedMessage(added, categories));
-      onPick(added.id);
-      setDraft(null);
-    } catch {
-      // The field stays open so the name can be retried; the failure is toasted globally.
-    }
-  };
+      try {
+        const added = await create(name);
+        toast.success(categoryAddedMessage(added, categories));
+        onPick(added.id);
+        setDraft(null);
+      } catch {
+        // The field stays open so the name can be retried; the failure is toasted globally.
+      }
+    });
 
   // The field sits inside the expense form: Enter would file the expense and Escape would reach the
   // modal's own document listener and close the whole form, so both stop here.
@@ -106,7 +109,7 @@ export function CategoryChips({ categories, selectedId, onPick }: Props) {
             aria-label="Nombre de la nueva categoría"
             className={`${inputCls()} flex-1`}
           />
-          <Button onClick={handleAdd} disabled={name === ''} style={ADD_STYLE}>
+          <Button onClick={handleAdd} disabled={name === ''} loading={adding} style={ADD_STYLE}>
             Agregar
           </Button>
           <Button variant="secondary" onClick={() => setDraft(null)} style={CANCEL_STYLE}>

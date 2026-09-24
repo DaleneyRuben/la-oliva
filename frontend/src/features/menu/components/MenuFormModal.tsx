@@ -4,6 +4,7 @@ import { Button } from '@ui/Button';
 import { IconButton } from '@ui/IconButton';
 import { Field, inputCls } from '@ui/Field';
 import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import type { MenuDraft } from '@/features/menu/types';
 import {
   MEAL_FIELDS,
@@ -41,10 +42,14 @@ export function MenuFormModal({
     setDraft((prev) => ({ ...prev, [field]: value || null }));
   };
 
-  const handleSave = async () => {
-    await onSave({ ...draft, date });
-    onClose();
-  };
+  const { pending, run } = usePendingAction();
+  const saving = pending || isSaving;
+
+  const handleSave = () =>
+    run(async () => {
+      await onSave({ ...draft, date });
+      onClose();
+    });
 
   if (!open) return null;
 
@@ -85,20 +90,10 @@ export function MenuFormModal({
       </div>
 
       <div className="flex justify-end gap-[10px] px-[28px] py-4 border-t border-hairline">
-        <Button
-          variant="secondary"
-          onClick={onClose}
-          disabled={isSaving}
-          style={MODAL_CANCEL_STYLE}
-        >
+        <Button variant="secondary" onClick={onClose} disabled={saving} style={MODAL_CANCEL_STYLE}>
           Cancelar
         </Button>
-        <Button
-          onClick={handleSave}
-          loading={isSaving}
-          leftIcon="check"
-          style={MODAL_CONFIRM_STYLE}
-        >
+        <Button onClick={handleSave} loading={saving} leftIcon="check" style={MODAL_CONFIRM_STYLE}>
           Guardar
         </Button>
       </div>

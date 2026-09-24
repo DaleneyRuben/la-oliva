@@ -98,3 +98,13 @@ describe('today marker', () => {
     });
   });
 });
+
+it('saves once and shows Guardar as loading when double-clicked', async () => {
+  const onSave = jest.fn(() => new Promise<void>(() => {}));
+  render(<SuspendModal sub={sub} clientName="Ana Torres" onClose={jest.fn()} onSave={onSave} />);
+
+  await userEvent.dblClick(screen.getByRole('button', { name: 'Guardar' }));
+
+  expect(onSave).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: 'Guardar' })).toBeDisabled();
+});

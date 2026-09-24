@@ -21,6 +21,7 @@ export function PublicRegistrationPage() {
     form,
     error,
     sent,
+    submitting,
     update,
     addListItem,
     removeListItem,
@@ -92,7 +93,7 @@ export function PublicRegistrationPage() {
               onChange={(event) => update('website', event.target.value)}
             />
             {error && <p className="mt-4 text-[12px] text-alert">{error}</p>}
-            <RegistrationActions step={step} onPrevious={previous} />
+            <RegistrationActions step={step} onPrevious={previous} loading={submitting} />
           </form>
         </div>
       )}

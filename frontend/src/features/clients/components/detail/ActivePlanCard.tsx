@@ -12,6 +12,7 @@ import { projectedEndDate, remainingDeliveryDays } from '@/utils/businessDays';
 import { formatDate } from '@/utils/format';
 import { usePlans } from '@/features/plans/hooks/usePlans';
 import type { Subscription, SubscriptionTermsDraft } from '@/features/clients/types';
+import { usePendingAction } from '@/hooks/usePendingAction';
 
 interface Props {
   sub: Subscription;
@@ -30,7 +31,8 @@ export function ActivePlanCard({
   const assignedPlanPrice = Number(sub.plan.price);
   const storedGap = assignedPlanPrice - Number(sub.price);
   const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const { pending: saving, run: runSave } = usePendingAction();
+  const { pending: savingInstructions, run: runInstructions } = usePendingAction();
   const [planId, setPlanId] = useState(sub.planId);
   const [durationStr, setDurationStr] = useState(String(sub.duration));
   const [priceStr, setPriceStr] = useState(String(Number(sub.price)));
@@ -61,8 +63,7 @@ export function ActivePlanCard({
   // by changing the duration instead.
   const handleSave = async () => {
     if (Number.isNaN(enteredPrice) || validDuration === 0) return;
-    setSaving(true);
-    try {
+    await runSave(async () => {
       await onUpdateTerms({
         price: enteredPrice,
         // sent only when they moved, so an untouched plan writes no terms_changed
@@ -70,9 +71,7 @@ export function ActivePlanCard({
         ...(validDuration !== sub.duration && { duration: validDuration }),
       });
       setEditing(false);
-    } finally {
-      setSaving(false);
-    }
+    });
   };
 
   // Seeded when the editor opens, not at mount: this card is never remounted when the subscription
@@ -138,6 +137,7 @@ export function ActivePlanCard({
               label="Ensalada grande"
               icon="salad"
               checked={!!sub.specialInstructions?.salad}
+              disabled={savingInstructions}
               onChange={(checked) => {
                 const updated = { ...sub.specialInstructions };
                 if (checked) {
@@ -145,7 +145,7 @@ export function ActivePlanCard({
                 } else {
                   delete updated.salad;
                 }
-                onUpdateInstructions(updated);
+                runInstructions(() => onUpdateInstructions(updated));
               }}
             />
           )}
