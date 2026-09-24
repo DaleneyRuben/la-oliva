@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { CategoryManagerModal } from '@/features/finance/components/CategoryManagerModal';
@@ -263,5 +263,17 @@ describe('CategoryManagerModal', () => {
       expect(screen.getByRole('button', { name: 'Restaurar Eventos' })).toBeDisabled();
       expect(screen.getByRole('button', { name: 'Restaurar Viajes' })).toBeEnabled();
     });
+  });
+
+  it('stays open while a category is being saved', () => {
+    mockMutations.mockReturnValue({ create, rename, archive, restore, isSaving: true });
+    setup();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    screen.getByTestId('modal-backdrop').click();
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Listo' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
   });
 });

@@ -91,7 +91,7 @@ export function UserModal(props: Props) {
   }
 
   return (
-    <Modal onClose={onClose} className="w-[min(480px,92vw)]">
+    <Modal onClose={onClose} busy={saving} className="w-[min(480px,92vw)]">
       <div className="flex items-center gap-3 px-[28px] py-[22px] border-b border-hairline">
         <span className="w-[34px] h-[34px] rounded-[9px] bg-olive-100 text-olive-700 flex items-center justify-center shrink-0">
           <Icon name="users" size={17} stroke={1.6} />
@@ -103,6 +103,7 @@ export function UserModal(props: Props) {
           icon="x"
           label="Cerrar"
           onClick={onClose}
+          disabled={saving}
           size={20}
           stroke={1.8}
           className="p-1 text-faint hover:text-ink-2"

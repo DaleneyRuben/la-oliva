@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ConfirmModal } from '@ui/ConfirmModal';
 
@@ -182,5 +182,25 @@ describe('ConfirmModal', () => {
 
     expect(onConfirm).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: /confirmar/i })).toBeDisabled();
+  });
+
+  it('stays open while confirming', async () => {
+    const onClose = jest.fn();
+    render(
+      <ConfirmModal
+        title="Test"
+        message="Test message"
+        confirmLabel="Confirmar"
+        onClose={onClose}
+        onConfirm={() => new Promise<void>(() => {})}
+      />,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /confirmar/i }));
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    screen.getByTestId('modal-backdrop').click();
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
   });
 });

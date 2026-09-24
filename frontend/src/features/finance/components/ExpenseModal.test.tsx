@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ExpenseModal } from '@/features/finance/components/ExpenseModal';
 import { useCategoryMutations } from '@/features/finance/hooks/useCategories';
@@ -333,5 +333,19 @@ describe('ExpenseModal', () => {
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: 'Registrar' })).toBeDisabled();
+  });
+
+  it('stays open while registering', async () => {
+    const { onClose } = setup({ onSubmit: () => new Promise<void>(() => {}) });
+    await userEvent.type(screen.getByLabelText(/monto/i), '180');
+    await pickCategory('Transporte');
+    await userEvent.click(screen.getByRole('button', { name: 'Registrar' }));
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    screen.getByTestId('modal-backdrop').click();
+
+    expect(onClose).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
   });
 });

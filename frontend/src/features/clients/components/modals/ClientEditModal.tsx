@@ -95,7 +95,11 @@ export function ClientEditModal({
   };
 
   return (
-    <Modal onClose={onClose} className="max-w-[560px] w-full max-h-[90vh] overflow-auto">
+    <Modal
+      onClose={onClose}
+      busy={saving}
+      className="max-w-[560px] w-full max-h-[90vh] overflow-auto"
+    >
       <div aria-labelledby="edit-modal-title">
         <div className="sticky top-0 bg-cream z-10 flex items-center gap-[12px] px-[28px] py-[22px] border-b border-hairline">
           <Icon name="settings" size={20} stroke={1.7} className="text-olive-700" />
@@ -109,6 +113,7 @@ export function ClientEditModal({
             icon="x"
             label="Cerrar"
             onClick={onClose}
+            disabled={saving}
             size={20}
             stroke={1.8}
             className="p-1 text-faint hover:text-ink-2"

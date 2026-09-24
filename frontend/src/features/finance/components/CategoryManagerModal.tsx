@@ -48,8 +48,11 @@ const archiveMessage = (
 
 export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
   const { categories, isLoading } = useCategoryCatalog(month);
-  const { create, rename, archive, restore } = useCategoryMutations();
+  const { create, rename, archive, restore, isSaving } = useCategoryMutations();
   const { pending: adding, run } = usePendingAction();
+  // The rows guard their own rename and restore; the mutation flag is enough to keep the modal
+  // open while one is in flight, since closing is never as fast as a double click.
+  const busy = adding || isSaving;
 
   const [newName, setNewName] = useState('');
   const [pendingArchive, setPendingArchive] = useState<ExpenseCategoryWithUsage | null>(null);
@@ -100,7 +103,7 @@ export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
 
   return (
     <>
-      <Modal onClose={onClose} className="w-full max-w-[520px] overflow-hidden">
+      <Modal onClose={onClose} busy={busy} className="w-full max-w-[520px] overflow-hidden">
         <div className="px-[26px] pt-[22px] pb-[18px] border-b border-cream-2 flex items-start gap-3.5">
           <div className="flex-1 min-w-0">
             <h3 className="font-serif font-semibold text-2xl leading-[1.1] text-ink">
@@ -118,6 +121,7 @@ export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
             label="Cerrar"
             size={18}
             onClick={onClose}
+            disabled={busy}
             className="p-1 rounded-md text-faint hover:text-ink hover:bg-cream-2 cursor-pointer"
           />
         </div>
@@ -159,7 +163,7 @@ export function CategoryManagerModal({ month, byCategory, onClose }: Props) {
         </div>
 
         <div className="px-[26px] pt-4 pb-5 flex justify-end">
-          <Button onClick={onClose} style={MODAL_CONFIRM_STYLE}>
+          <Button onClick={onClose} disabled={busy} style={MODAL_CONFIRM_STYLE}>
             Listo
           </Button>
         </div>

@@ -100,7 +100,11 @@ export function SuspendModal({
     });
 
   return (
-    <Modal onClose={onClose} className="w-[min(580px,92vw)] max-h-[92vh] overflow-auto">
+    <Modal
+      onClose={onClose}
+      busy={isSaving}
+      className="w-[min(580px,92vw)] max-h-[92vh] overflow-auto"
+    >
       <div className="flex items-center gap-2.5 px-[22px] py-[18px] border-b border-rule">
         <Icon name="calendar" size={16} />
         <div className="flex-1">
@@ -111,6 +115,7 @@ export function SuspendModal({
           icon="x"
           label="Cerrar"
           onClick={onClose}
+          disabled={isSaving}
           size={14}
           className="w-[34px] h-[34px] border border-rule rounded-md bg-paper hover:bg-cream-2"
         />

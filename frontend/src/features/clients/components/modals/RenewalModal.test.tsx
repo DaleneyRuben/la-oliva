@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { Client, Subscription } from '@/features/clients/types';
 import { RenewalModal } from './RenewalModal';
@@ -148,4 +148,28 @@ it('disables confirm until a paid selection is made, then enables it', async () 
   await userEvent.click(screen.getByRole('button', { name: /^sí$/i }));
 
   expect(screen.getByRole('button', { name: /^renovar$/i })).not.toBeDisabled();
+});
+
+it('stays open while renewing', async () => {
+  const onClose = jest.fn();
+  render(
+    <RenewalModal
+      client={client}
+      sub={sub}
+      isReactivation={false}
+      onClose={onClose}
+      onRenew={() => new Promise<Subscription>(() => {})}
+    />,
+  );
+  const precio = screen.getByLabelText(/precio/i);
+  await userEvent.clear(precio);
+  await userEvent.type(precio, '1200');
+  await userEvent.click(screen.getByRole('button', { name: /^renovar$/i }));
+
+  fireEvent.keyDown(document, { key: 'Escape' });
+  screen.getByTestId('modal-backdrop').click();
+
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
 });
