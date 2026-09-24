@@ -218,4 +218,22 @@ describe('CategoryChips', () => {
       expect(screen.getByLabelText('Nombre de la nueva categoría')).toHaveValue('');
     });
   });
+
+  describe('while the new category is being saved', () => {
+    it('shows Agregar as loading and sends one request for a double click and Enter', async () => {
+      create.mockReturnValueOnce(new Promise(() => {}));
+      setup();
+      await userEvent.click(screen.getByRole('button', { name: 'Nueva' }));
+      const field = screen.getByLabelText('Nombre de la nueva categoría');
+      await userEvent.type(field, 'Gas');
+
+      await userEvent.dblClick(screen.getByRole('button', { name: 'Agregar' }));
+      await userEvent.type(field, '{Enter}{Enter}');
+
+      const add = screen.getByRole('button', { name: 'Agregar' });
+      expect(add).toBeDisabled();
+      expect(add.querySelector('.animate-spin')).toBeInTheDocument();
+      expect(create).toHaveBeenCalledTimes(1);
+    });
+  });
 });

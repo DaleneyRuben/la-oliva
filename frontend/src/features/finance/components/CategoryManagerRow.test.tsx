@@ -156,4 +156,32 @@ describe('CategoryManagerRow', () => {
 
     expect(screen.queryByLabelText('Nuevo nombre')).not.toBeInTheDocument();
   });
+
+  describe('while a write is in flight', () => {
+    it('sends one rename for repeated Enter and shows Guardar as loading', async () => {
+      onRename.mockReturnValueOnce(new Promise(() => {}));
+      setup();
+      await userEvent.click(screen.getByRole('button', { name: 'Renombrar Insumos' }));
+      const field = screen.getByLabelText('Nuevo nombre');
+      await userEvent.type(field, ' secos{Enter}{Enter}');
+      await userEvent.dblClick(screen.getByRole('button', { name: 'Guardar' }));
+
+      const save = screen.getByRole('button', { name: 'Guardar' });
+      expect(save).toBeDisabled();
+      expect(save.querySelector('.animate-spin')).toBeInTheDocument();
+      expect(onRename).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends one restore for a double click and shows Restaurar as loading', async () => {
+      onRestore.mockReturnValueOnce(new Promise(() => {}));
+      setup({ active: false });
+
+      await userEvent.dblClick(screen.getByRole('button', { name: 'Restaurar Insumos' }));
+
+      const restoreButton = screen.getByRole('button', { name: 'Restaurar Insumos' });
+      expect(restoreButton).toBeDisabled();
+      expect(restoreButton.querySelector('.animate-spin')).toBeInTheDocument();
+      expect(onRestore).toHaveBeenCalledTimes(1);
+    });
+  });
 });

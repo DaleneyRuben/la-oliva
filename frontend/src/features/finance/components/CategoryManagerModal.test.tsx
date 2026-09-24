@@ -236,4 +236,32 @@ describe('CategoryManagerModal', () => {
       expect(screen.getByText('Categorías de gasto')).toBeInTheDocument();
     });
   });
+
+  describe('while a write is in flight', () => {
+    it('sends one create for a double click and Enter, and shows Agregar as loading', async () => {
+      create.mockReturnValueOnce(new Promise(() => {}));
+      setup();
+      const field = screen.getByLabelText('Nueva categoría');
+      await userEvent.type(field, 'Gas');
+
+      await userEvent.dblClick(screen.getByRole('button', { name: 'Agregar' }));
+      await userEvent.type(field, '{Enter}{Enter}');
+
+      const add = screen.getByRole('button', { name: 'Agregar' });
+      expect(add).toBeDisabled();
+      expect(add.querySelector('.animate-spin')).toBeInTheDocument();
+      expect(create).toHaveBeenCalledTimes(1);
+    });
+
+    it('sends one restore for a double click and marks only that row as loading', async () => {
+      restore.mockReturnValueOnce(new Promise(() => {}));
+      setup([...catalog, category({ id: 'QR90ST', name: 'Viajes', active: false })]);
+
+      await userEvent.dblClick(screen.getByRole('button', { name: 'Restaurar Eventos' }));
+
+      expect(restore).toHaveBeenCalledTimes(1);
+      expect(screen.getByRole('button', { name: 'Restaurar Eventos' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Restaurar Viajes' })).toBeEnabled();
+    });
+  });
 });
