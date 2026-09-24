@@ -121,6 +121,34 @@ it('renders the salad toggle with an icon tile when the plan includes salad', ()
   expect(toggleLabel.querySelector('svg')).toBeInTheDocument();
 });
 
+it('ignores another salad toggle while the previous change is being saved', async () => {
+  const subWithSalad: Subscription = { ...sub, plan: { ...sub.plan, meals: ['salad'] } };
+  let resolve!: () => void;
+  const onUpdateInstructions = jest.fn(
+    () =>
+      new Promise<void>((res) => {
+        resolve = res;
+      }),
+  );
+  render(
+    <ActivePlanCard
+      sub={subWithSalad}
+      onUpdateTerms={onUpdateTerms}
+      onUpdateInstructions={onUpdateInstructions}
+    />,
+  );
+
+  const toggle = screen.getByLabelText('Ensalada grande');
+  fireEvent.click(toggle);
+  fireEvent.click(toggle);
+
+  expect(onUpdateInstructions).toHaveBeenCalledTimes(1);
+  expect(toggle).toBeDisabled();
+
+  resolve();
+  await waitFor(() => expect(toggle).toBeEnabled());
+});
+
 describe('cambio de plan', () => {
   // startDate is a Monday; 20 delivery days from it lands on Fri 28/08, 18 of them still ahead
   const running: Subscription = {
@@ -321,4 +349,18 @@ it('does not write the previous price onto a subscription that has changed', asy
 
   await waitFor(() => expect(onUpdateTerms).toHaveBeenCalled());
   expect(onUpdateTerms).not.toHaveBeenCalledWith(expect.objectContaining({ price: 140 }));
+});
+
+it('saves the terms once and shows Guardar as loading when clicked twice', () => {
+  const pendingTerms = jest.fn(() => new Promise<void>(() => {}));
+  render(
+    <ActivePlanCard sub={sub} onUpdateTerms={pendingTerms} onUpdateInstructions={jest.fn()} />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+
+  fireEvent.click(screen.getByRole('button', { name: /guardar/i }));
+  fireEvent.click(screen.getByRole('button', { name: /guardar/i }));
+
+  expect(pendingTerms).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: /guardar/i })).toBeDisabled();
 });

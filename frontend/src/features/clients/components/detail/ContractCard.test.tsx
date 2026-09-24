@@ -149,3 +149,15 @@ it('saves the values the editor was seeded with after the subscription changed',
     expect(onUpdateContract).toHaveBeenCalledWith(expect.objectContaining({ duration: 21 })),
   );
 });
+
+it('saves once and shows Guardar as loading when clicked twice', () => {
+  const pendingUpdate = jest.fn(() => new Promise<void>(() => {}));
+  render(<ContractCard sub={sub} remaining={25} onUpdateContract={pendingUpdate} />);
+  fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+
+  fireEvent.click(screen.getByRole('button', { name: /guardar/i }));
+  fireEvent.click(screen.getByRole('button', { name: /guardar/i }));
+
+  expect(pendingUpdate).toHaveBeenCalledTimes(1);
+  expect(screen.getByRole('button', { name: /guardar/i })).toBeDisabled();
+});

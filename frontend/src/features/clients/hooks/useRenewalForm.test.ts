@@ -170,6 +170,20 @@ describe('useRenewalForm', () => {
   });
 
   describe('handleConfirm', () => {
+    it('renews once when confirmed twice before a re-render', async () => {
+      const onRenew = jest.fn(() => new Promise<void>(() => {}));
+      const { result } = renderHook(() => useRenewalForm(makeOptions({ onRenew })));
+      act(() => result.current.setPrecioStr('1200'));
+
+      act(() => {
+        result.current.handleConfirm();
+        result.current.handleConfirm();
+      });
+
+      expect(onRenew).toHaveBeenCalledTimes(1);
+      expect(result.current.isSaving).toBe(true);
+    });
+
     it('calls onRenew with the correct payload for atEnd mode', async () => {
       const onRenew = jest.fn().mockResolvedValue(undefined);
       const onClose = jest.fn();
