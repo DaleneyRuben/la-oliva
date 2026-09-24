@@ -5,6 +5,7 @@ import { Icon } from '@ui/Icon';
 import { IconButton } from '@ui/IconButton';
 import { Field, inputCls } from '@ui/Field';
 import { MODAL_CANCEL_STYLE, MODAL_CONFIRM_STYLE } from '@ui/modalButtonStyles';
+import { usePendingAction } from '@/hooks/usePendingAction';
 import { CategoryChips } from '@/features/finance/components/CategoryChips';
 import type { ExpenseCategory, ExpenseInput } from '@/features/finance/types';
 
@@ -73,18 +74,23 @@ export function ExpenseModal({
   }, []);
 
   const parsedAmount = parseFloat(amount);
+  const { pending, run } = usePendingAction();
+  const saving = pending || isSaving;
+
   const isValid = parsedAmount > 0 && spentAt !== '' && spentAt <= today && categoryId !== '';
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!isValid || isSaving) return;
+    if (!isValid) return;
 
-    await onSubmit({
-      amount: parsedAmount,
-      categoryId,
-      spentAt,
-      description: description.trim() === '' ? null : description.trim(),
-    });
+    run(() =>
+      onSubmit({
+        amount: parsedAmount,
+        categoryId,
+        spentAt,
+        description: description.trim() === '' ? null : description.trim(),
+      }),
+    );
   };
 
   return (
@@ -159,10 +165,16 @@ export function ExpenseModal({
         </div>
 
         <div className="flex items-center justify-end gap-2.5 pt-0.5">
-          <Button type="button" variant="secondary" onClick={onClose} style={MODAL_CANCEL_STYLE}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            disabled={saving}
+            style={MODAL_CANCEL_STYLE}
+          >
             Cancelar
           </Button>
-          <Button type="submit" disabled={!isValid} loading={isSaving} style={MODAL_CONFIRM_STYLE}>
+          <Button type="submit" disabled={!isValid} loading={saving} style={MODAL_CONFIRM_STYLE}>
             {isEdit ? 'Guardar' : 'Registrar'}
             {/* Enter still submits; the caption that used to say so was noise on a form filled
                 daily, so the affordance is this glyph. Decorative — out of the accessible name. */}
