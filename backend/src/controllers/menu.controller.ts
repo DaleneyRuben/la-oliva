@@ -1,9 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import {
-  findAll as findAllMenus,
-  findByDate as findMenuByDate,
-  upsert as upsertMenu,
-} from '../domains/menu';
+import { findAll as findAllMenus, findByDate as findMenuByDate, upsertWeek } from '../domains/menu';
 import { sendError, sendSuccess } from '../utils/response';
 
 const getAll = async (_req: Request, res: Response, next: NextFunction) => {
@@ -28,14 +24,13 @@ const getByDate = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const upsert = async (req: Request, res: Response, next: NextFunction) => {
+const saveWeek = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { date, ...data } = req.body;
-    const menu = await upsertMenu(date, data);
-    sendSuccess(res, menu);
+    const menus = await upsertWeek(req.body.menus);
+    sendSuccess(res, menus);
   } catch (err) {
     next(err);
   }
 };
 
-export default { getAll, getByDate, upsert };
+export default { getAll, getByDate, saveWeek };
