@@ -1,5 +1,6 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import api from '@/services/api';
 import { useMenu } from '@/features/menu/hooks/useMenu';
 
@@ -35,19 +36,22 @@ describe('useMenu', () => {
     expect(result.current.menus).toEqual([menu]);
   });
 
-  it('save calls PUT /menus with the draft', async () => {
+  it('saveWeek sends every changed day in one PUT /menus/week', async () => {
     mockGet.mockResolvedValue([]);
-    const saved = { id: '1', date: '2026-06-15', breakfast: 'Queque' };
-    mockPut.mockResolvedValue(saved);
+    mockPut.mockResolvedValue([]);
     const { result } = renderHook(() => useMenu(), { wrapper: makeWrapper() });
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    const draft = { date: '2026-06-15', breakfast: 'Queque' };
+    const drafts = [
+      { date: '2026-06-15', breakfast: 'Queque' },
+      { date: '2026-06-16', lunch: 'Pollo' },
+    ];
     await act(async () => {
-      await result.current.save(draft as never);
+      await result.current.saveWeek(drafts as never);
     });
 
-    expect(mockPut).toHaveBeenCalledWith('/menus', draft);
+    expect(mockPut).toHaveBeenCalledWith('/menus/week', { menus: drafts });
+    expect(toast.success).toHaveBeenCalledWith('Semana guardada');
   });
 
   it('isSaving is false after the mutation completes', async () => {
@@ -57,7 +61,7 @@ describe('useMenu', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     await act(async () => {
-      await result.current.save({} as never);
+      await result.current.saveWeek([] as never);
     });
     expect(result.current.isSaving).toBe(false);
   });

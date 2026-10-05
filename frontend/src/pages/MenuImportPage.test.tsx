@@ -1,138 +1,85 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { addDays, format, getDay, startOfISOWeek } from 'date-fns';
-import { checkIsWeekend } from '@/utils/devFlags';
 import { useMenu } from '@/features/menu/hooks/useMenu';
+import { emptyDraft } from '@/features/menu/menuFields';
 import { MenuImportPage } from '@/pages/MenuImportPage';
 
-jest.mock('@/features/menu/hooks/useMenu', () => ({
-  useMenu: jest.fn(),
-}));
+jest.mock('@/features/menu/hooks/useMenu', () => ({ useMenu: jest.fn() }));
 
-jest.mock('@/utils/devFlags', () => ({
-  checkIsWeekend: jest.fn(),
-}));
-
-const mockSave = jest.fn();
-const TODAY = format(new Date(), 'yyyy-MM-dd');
-const TOMORROW = format(addDays(new Date(), 1), 'yyyy-MM-dd');
-
-function getWeekMonday(): string {
-  const today = new Date();
-  const dow = getDay(today);
-  const monday = dow === 0 ? addDays(today, 1) : startOfISOWeek(today);
-  return format(monday, 'yyyy-MM-dd');
-}
-const MONDAY = getWeekMonday();
-
-function makeMenu(date: string, breakfast = 'Avena'): object {
-  return {
-    id: date,
-    date,
-    breakfast,
-    morningSnack: null,
-    salad: null,
-    lunch: null,
-    afternoonSnack: null,
-    dinner: null,
-    juice: null,
-  };
-}
+const mockSaveWeek = jest.fn();
 
 function setupMenu(overrides: object = {}) {
   (useMenu as jest.Mock).mockReturnValue({
-    menus: [],
+    menus: [{ id: '1', ...emptyDraft('2026-10-05'), breakfast: 'Pancakes' }],
     isLoading: false,
     isSaving: false,
-    save: mockSave,
+    saveWeek: mockSaveWeek,
     ...overrides,
   });
 }
 
+const user = () => userEvent.setup({ delay: null });
+
 describe('MenuImportPage', () => {
   beforeEach(() => {
+    // Wednesday 7 Oct 2026
+    jest.useFakeTimers().setSystemTime(new Date('2026-10-07T12:00:00'));
     jest.clearAllMocks();
-    mockSave.mockResolvedValue(undefined);
-    (checkIsWeekend as jest.Mock).mockReturnValue(false);
+    mockSaveWeek.mockResolvedValue(undefined);
     setupMenu();
   });
 
+  afterEach(() => jest.useRealTimers());
+
   it('renders the heading', () => {
     render(<MenuImportPage />);
-    expect(screen.getByRole('heading', { name: 'Menú del día' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Menú semanal' })).toBeInTheDocument();
   });
 
-  it('shows Hoy and Mañana section labels', () => {
+  it('shows a status card for each day of this week, tagging today and tomorrow', () => {
     render(<MenuImportPage />);
+    expect(screen.getByText('5 – 9 oct')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Editar menú del lunes 5 oct' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Editar menú del miércoles 7 oct' })).toBeEnabled();
     expect(screen.getByText('Hoy')).toBeInTheDocument();
     expect(screen.getByText('Mañana')).toBeInTheDocument();
   });
 
-  it('shows Esta semana section label', () => {
+  it('shows the saved menu in the week grid', () => {
     render(<MenuImportPage />);
-    expect(screen.getByText('Esta semana')).toBeInTheDocument();
+    expect(within(screen.getByTestId('week-grid')).getByText('Pancakes')).toBeInTheDocument();
   });
 
-  it('shows two Cargar menú buttons when no menus exist', () => {
+  it('switches to next week', async () => {
     render(<MenuImportPage />);
-    expect(screen.getAllByRole('button', { name: /cargar menú/i })).toHaveLength(2);
+    await user().click(screen.getByRole('tab', { name: 'Próxima semana' }));
+    expect(screen.getByText('12 – 16 oct')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Editar menú del lunes 12 oct' })).toBeEnabled();
   });
 
-  it('shows weekend status for today when today is a weekend', () => {
-    (checkIsWeekend as jest.Mock).mockReturnValueOnce(true).mockReturnValue(false);
+  it('edits the whole week and saves it', async () => {
     render(<MenuImportPage />);
-    expect(screen.getByText('Fin de semana · sin entregas')).toBeInTheDocument();
-    expect(screen.getByText('No disponible')).toBeInTheDocument();
+    const u = user();
+    await u.click(screen.getByRole('button', { name: 'Editar semana' }));
+
+    const grid = within(screen.getByTestId('week-edit-grid'));
+    await u.type(grid.getByRole('textbox', { name: 'Almuerzo del viernes 9 oct' }), 'Pollo');
+    await u.click(screen.getByRole('button', { name: 'Guardar semana' }));
+
+    expect(mockSaveWeek).toHaveBeenCalledWith([{ ...emptyDraft('2026-10-09'), lunch: 'Pollo' }]);
+    expect(screen.queryByTestId('week-edit-grid')).not.toBeInTheDocument();
   });
 
-  it('opens the form modal when Cargar menú is clicked', async () => {
+  it('opens the editor from a day card', async () => {
     render(<MenuImportPage />);
-    await userEvent.click(screen.getAllByRole('button', { name: /cargar menú/i })[0]);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.getByLabelText(/desayuno/i)).toBeInTheDocument();
+    await user().click(screen.getByRole('button', { name: 'Editar menú del jueves 8 oct' }));
+    expect(screen.getByTestId('week-edit-grid')).toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Próxima semana' })).not.toBeInTheDocument();
   });
 
-  it('calls save when save button is clicked inside modal', async () => {
+  it('shows the skeleton while loading', () => {
+    setupMenu({ isLoading: true, menus: [] });
     render(<MenuImportPage />);
-    await userEvent.click(screen.getAllByRole('button', { name: /cargar menú/i })[0]);
-    await userEvent.click(screen.getByRole('button', { name: 'Guardar' }));
-    expect(mockSave).toHaveBeenCalledWith(expect.objectContaining({ date: expect.any(String) }));
-  });
-
-  it('shows the date range next to Esta semana', () => {
-    render(<MenuImportPage />);
-    expect(screen.getByText(/\d{1,2}\s*–\s*\d{1,2}\s*\w+/)).toBeInTheDocument();
-  });
-
-  it('shows edit button when today menu exists', () => {
-    setupMenu({ menus: [makeMenu(TODAY)] });
-    render(<MenuImportPage />);
-    expect(screen.getByRole('button', { name: /editar menú/i })).toBeInTheDocument();
-  });
-
-  it('shows edit button when tomorrow menu exists', () => {
-    setupMenu({ menus: [makeMenu(TOMORROW)] });
-    render(<MenuImportPage />);
-    expect(screen.getByRole('button', { name: /editar menú/i })).toBeInTheDocument();
-  });
-
-  it('shows meal row labels in week grid', () => {
-    render(<MenuImportPage />);
-    const grid = screen.getByTestId('week-grid');
-    expect(within(grid).getByText('Desayuno')).toBeInTheDocument();
-    expect(within(grid).getByText('Almuerzo')).toBeInTheDocument();
-  });
-
-  it('shows dashes in week grid for empty cells', () => {
-    render(<MenuImportPage />);
-    const grid = screen.getByTestId('week-grid');
-    expect(within(grid).getAllByText('—').length).toBeGreaterThan(0);
-  });
-
-  it('shows meal value in week grid for a day that has a menu', () => {
-    setupMenu({ menus: [makeMenu(MONDAY, 'Pancakes')] });
-    render(<MenuImportPage />);
-    const grid = screen.getByTestId('week-grid');
-    expect(within(grid).getByText('Pancakes')).toBeInTheDocument();
+    expect(screen.queryByTestId('week-grid')).not.toBeInTheDocument();
   });
 });

@@ -1,4 +1,9 @@
-import { MEAL_FIELDS, MEAL_FIELD_LABELS, emptyDraft } from '@/features/menu/menuFields';
+import {
+  MEAL_FIELDS,
+  MEAL_FIELD_LABELS,
+  countFilledMeals,
+  emptyDraft,
+} from '@/features/menu/menuFields';
 
 describe('MEAL_FIELDS', () => {
   it('lists every meal field key', () => {
@@ -34,5 +39,15 @@ describe('emptyDraft', () => {
       dinner: null,
       juice: null,
     });
+  });
+});
+
+describe('countFilledMeals', () => {
+  it('counts the meals that have a dish', () => {
+    expect(countFilledMeals({ ...emptyDraft('2026-10-05'), breakfast: 'Avena', lunch: 'Pollo' })).toBe(2);
+  });
+
+  it('is zero for a day without a menu', () => {
+    expect(countFilledMeals(null)).toBe(0);
   });
 });
