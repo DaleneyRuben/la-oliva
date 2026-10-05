@@ -9,7 +9,9 @@ const menus: Menu[] = [{ id: '1', ...emptyDraft('2026-10-07'), lunch: 'Pollo' }]
 
 const renderEditor = () => {
   const props = { onSave: jest.fn().mockResolvedValue(undefined), onClose: jest.fn() };
-  render(<WeekEditor weekDays={WEEK} menus={menus} today="2026-10-07" isSaving={false} {...props} />);
+  render(
+    <WeekEditor weekDays={WEEK} menus={menus} today="2026-10-07" isSaving={false} {...props} />,
+  );
   return props;
 };
 

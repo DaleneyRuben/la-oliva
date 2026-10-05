@@ -44,7 +44,9 @@ describe('emptyDraft', () => {
 
 describe('countFilledMeals', () => {
   it('counts the meals that have a dish', () => {
-    expect(countFilledMeals({ ...emptyDraft('2026-10-05'), breakfast: 'Avena', lunch: 'Pollo' })).toBe(2);
+    expect(
+      countFilledMeals({ ...emptyDraft('2026-10-05'), breakfast: 'Avena', lunch: 'Pollo' }),
+    ).toBe(2);
   });
 
   it('is zero for a day without a menu', () => {

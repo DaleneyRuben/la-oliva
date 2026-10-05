@@ -16,7 +16,13 @@ const full: Menu = {
   dinner: 'f',
   juice: 'g',
 };
-const partial: Menu = { id: '2', ...emptyDraft(DATE), breakfast: 'Avena', lunch: 'Pollo', dinner: 'Sopa' };
+const partial: Menu = {
+  id: '2',
+  ...emptyDraft(DATE),
+  breakfast: 'Avena',
+  lunch: 'Pollo',
+  dinner: 'Sopa',
+};
 
 const renderCard = (props: Partial<React.ComponentProps<typeof DayStatusCard>> = {}) =>
   render(<DayStatusCard date={DATE} menu={null} isPast={false} onEdit={jest.fn()} {...props} />);

@@ -34,7 +34,9 @@ it('renders an editable box for every meal of today and later', () => {
 
 it('locks the days before today', () => {
   renderGrid();
-  expect(screen.queryByRole('textbox', { name: 'Desayuno del lunes 5 oct' })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('textbox', { name: 'Desayuno del lunes 5 oct' }),
+  ).not.toBeInTheDocument();
   expect(screen.getByText('Avena')).toBeInTheDocument();
   expect(screen.getAllByText('Día pasado')).toHaveLength(2);
 });
@@ -53,7 +55,9 @@ it('copies the previous day into an editable day', async () => {
 
 it('offers no copy into a locked day', () => {
   renderGrid();
-  expect(screen.queryByRole('button', { name: 'Copiar el lunes en el martes' })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole('button', { name: 'Copiar el lunes en el martes' }),
+  ).not.toBeInTheDocument();
 });
 
 it('marks the cells that changed', () => {
