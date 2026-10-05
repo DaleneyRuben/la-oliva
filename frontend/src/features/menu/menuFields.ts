@@ -1,5 +1,5 @@
 import { MEAL_LABELS } from '@/constants/meals';
-import type { MenuDraft } from '@/features/menu/types';
+import type { Menu, MenuDraft } from '@/features/menu/types';
 
 export const MEAL_FIELDS = [
   'breakfast',
@@ -33,3 +33,6 @@ export const emptyDraft = (date: string): MenuDraft => ({
   dinner: null,
   juice: null,
 });
+
+export const countFilledMeals = (menu: Pick<Menu, MealField> | null): number =>
+  menu ? MEAL_FIELDS.filter((field) => menu[field]).length : 0;
