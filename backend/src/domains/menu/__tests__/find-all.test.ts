@@ -4,6 +4,7 @@ import { findAll } from '../find-all';
 
 jest.mock('../../../models/Menu');
 jest.mock('../../../utils/date', () => ({
+  ...jest.requireActual('../../../utils/date'),
   getCurrentMenuWeek: jest.fn(() => ({ start: '2026-06-15', end: '2026-06-19' })),
 }));
 
@@ -16,7 +17,7 @@ const makeMenu = (overrides = {}) => ({
 beforeEach(() => jest.clearAllMocks());
 
 describe('findAll', () => {
-  it('returns menus for the current week ordered by date ascending', async () => {
+  it('returns menus for the current and next week ordered by date ascending', async () => {
     const menus = [
       makeMenu({ id: 1, date: '2026-06-15' }),
       makeMenu({ id: 2, date: '2026-06-16' }),
@@ -26,7 +27,7 @@ describe('findAll', () => {
     const result = await findAll();
 
     expect(Menu.findAll).toHaveBeenCalledWith({
-      where: { date: { [Op.between]: ['2026-06-15', '2026-06-19'] } },
+      where: { date: { [Op.between]: ['2026-06-15', '2026-06-26'] } },
       order: [['date', 'ASC']],
     });
     expect(result).toHaveLength(2);
