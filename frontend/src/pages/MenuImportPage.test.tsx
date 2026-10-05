@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useMenu } from '@/features/menu/hooks/useMenu';
 import { emptyDraft } from '@/features/menu/menuFields';
@@ -67,7 +67,7 @@ describe('MenuImportPage', () => {
     await u.click(screen.getByRole('button', { name: 'Guardar semana' }));
 
     expect(mockSaveWeek).toHaveBeenCalledWith([{ ...emptyDraft('2026-10-09'), lunch: 'Pollo' }]);
-    expect(screen.queryByTestId('week-edit-grid')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByTestId('week-edit-grid')).not.toBeInTheDocument());
   });
 
   it('opens the editor from a day card', async () => {

@@ -6,28 +6,22 @@ const MEAL_KEYS = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 export function MenuImportSkeleton() {
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-[18px] mb-[30px]">
-        <div className="bg-gradient-to-br from-today-gradient-start to-today-gradient-end rounded-[14px] px-[26px] py-6 flex items-center justify-between gap-5">
-          <div className="flex flex-col gap-3">
-            <Skeleton className="w-10 h-2.5 bg-white/20" />
-            <Skeleton className="w-48 h-7 rounded-[5px] bg-white/20" />
-            <Skeleton className="w-36 h-2.5 bg-white/20" />
-          </div>
-          <Skeleton className="w-[120px] h-[44px] rounded-[9px] bg-white/20 shrink-0" />
-        </div>
-        <div className="bg-paper border border-rule rounded-[14px] px-[26px] py-6 flex items-center justify-between gap-5">
-          <div className="flex flex-col gap-3">
-            <Skeleton className="w-14 h-2.5" />
-            <Skeleton className="w-48 h-7 rounded-[5px]" />
-            <Skeleton className="w-36 h-2.5" />
-          </div>
-          <Skeleton className="w-[120px] h-[44px] rounded-[9px] shrink-0" />
-        </div>
+      <div className="flex items-center justify-between gap-4 mb-[18px]">
+        <Skeleton className="w-56 h-9 rounded-[9px]" />
+        <Skeleton className="w-24 h-3" />
       </div>
 
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <Skeleton className="w-32 h-7 rounded-[5px]" />
-        <Skeleton className="w-24 h-3" />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-[22px]">
+        {DAY_KEYS.map((k) => (
+          <div
+            key={k}
+            className="bg-paper border border-rule rounded-[12px] px-4 py-[14px] flex flex-col gap-3"
+          >
+            <Skeleton className="w-16 h-3.5" />
+            <Skeleton className="w-full h-[5px]" />
+            <Skeleton className="w-20 h-2.5" />
+          </div>
+        ))}
       </div>
 
       <div className="border border-rule rounded-[14px] overflow-hidden">
