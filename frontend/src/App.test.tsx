@@ -64,7 +64,7 @@ describe('App', () => {
 
   it('lets kitchen role reach the menu page', async () => {
     renderAt('/menu', 'kitchen');
-    expect(await screen.findByRole('heading', { name: 'Menú del día' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Menú semanal' })).toBeInTheDocument();
   });
 
   it('lets kitchen role reach the reports page', async () => {

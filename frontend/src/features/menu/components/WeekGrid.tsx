@@ -1,9 +1,6 @@
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
 import type { Menu } from '../types';
 import { MEAL_FIELDS, MEAL_FIELD_LABELS } from '../menuFields';
-
-const DAY_LABELS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+import { capitalizedWeekday, dayMonth } from '../menuWeeks';
 
 const CELL_BG = {
   today: { filled: 'bg-row-selected', empty: 'bg-menu-today-empty' },
@@ -36,12 +33,12 @@ export function WeekGrid({ weekDays, menus, today }: Props) {
                     className={`${isToday ? 'bg-olive-100' : 'bg-olive-50'} border-b border-l border-cream-2 px-4 py-[13px] text-center min-w-[130px]`}
                   >
                     <p className={`text-[13px] font-bold ${isToday ? 'text-ok' : 'text-ink-2'}`}>
-                      {DAY_LABELS[weekDays.indexOf(date)]}
+                      {capitalizedWeekday(date)}
                     </p>
                     <p
                       className={`font-mono text-[10.5px] mt-[3px] ${isToday ? 'text-olive-600' : 'text-faint'}`}
                     >
-                      {format(parseISO(date), 'd MMM', { locale: es })}
+                      {dayMonth(date)}
                     </p>
                   </th>
                 );
@@ -67,7 +64,7 @@ export function WeekGrid({ weekDays, menus, today }: Props) {
                       key={date}
                       className={`${bg} border-l border-cream-2 px-[11px] py-[9px] min-h-[54px] text-[12.5px] text-menu-dish-text align-top`}
                     >
-                      {value ?? <span className="text-empty-border text-[15px]">—</span>}
+                      {value ?? <span className="text-empty-text italic">Sin cargar</span>}
                     </td>
                   );
                 })}

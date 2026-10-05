@@ -41,8 +41,8 @@ it('shows menu content for a populated day', () => {
   expect(screen.getByText('Pollo a la plancha')).toBeInTheDocument();
 });
 
-it('shows em dash for empty meal slots', () => {
+it('marks empty meal slots as not loaded', () => {
   render(<WeekGrid weekDays={weekDays} menus={[]} today="2026-06-29" />);
   // 7 meal fields × 5 days = 35 empty slots
-  expect(screen.getAllByText('—').length).toBe(35);
+  expect(screen.getAllByText('Sin cargar').length).toBe(35);
 });

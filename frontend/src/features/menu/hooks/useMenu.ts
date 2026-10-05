@@ -12,10 +12,10 @@ export function useMenu() {
   });
 
   const saveMutation = useMutation({
-    mutationFn: (draft: MenuDraft) => api.put<Menu>('/menus', draft),
+    mutationFn: (drafts: MenuDraft[]) => api.put<Menu[]>('/menus/week', { menus: drafts }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['menus'] });
-      toast.success('Menú guardado');
+      toast.success('Semana guardada');
     },
   });
 
@@ -23,7 +23,7 @@ export function useMenu() {
     menus: menusQuery.data ?? [],
     isLoading: menusQuery.isLoading,
     isSaving: saveMutation.isPending,
-    save: (draft: MenuDraft): Promise<Menu> => saveMutation.mutateAsync(draft) as Promise<Menu>,
+    saveWeek: (drafts: MenuDraft[]): Promise<Menu[]> => saveMutation.mutateAsync(drafts),
     error: saveMutation.error,
   };
 }

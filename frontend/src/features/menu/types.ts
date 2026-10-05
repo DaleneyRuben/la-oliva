@@ -1,3 +1,5 @@
+import type { MealField } from '@/features/menu/menuFields';
+
 export interface Menu {
   id: string;
   date: string;
@@ -11,3 +13,13 @@ export interface Menu {
 }
 
 export type MenuDraft = Omit<Menu, 'id'>;
+
+// Shared by the desktop grid and the phone editor, which edit the same week draft.
+export interface WeekDraftEditorProps {
+  weekDays: string[];
+  drafts: MenuDraft[];
+  today: string;
+  isChanged: (date: string, field: MealField) => boolean;
+  onChange: (date: string, field: MealField, value: string) => void;
+  onCopyPrevious: (date: string) => void;
+}

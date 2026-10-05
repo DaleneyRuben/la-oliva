@@ -1,93 +1,104 @@
-import { addDays, format, getDay, parseISO, startOfISOWeek } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { addDays, format } from 'date-fns';
 import { useState } from 'react';
+import { Button } from '@ui/Button';
 import { PageHeader } from '@ui/PageHeader';
-import type { MenuDraft } from '@/features/menu/types';
+import { Tabs } from '@ui/Tabs';
 import { useMenu } from '@/features/menu/hooks/useMenu';
-import { checkIsWeekend } from '@/utils/devFlags';
-import { formatLongDate } from '@/utils/format';
-import { MenuFormModal } from '@/features/menu/components/MenuFormModal';
-import { DayCard } from '@/features/menu/components/DayCard';
+import { getMenuWeeks, isPastDay, weekRangeLabel } from '@/features/menu/menuWeeks';
+import { DayStatusCard } from '@/features/menu/components/DayStatusCard';
 import { MenuImportSkeleton } from '@/features/menu/components/MenuImportSkeleton';
+import { WeekEditor } from '@/features/menu/components/WeekEditor';
 import { WeekGrid } from '@/features/menu/components/WeekGrid';
+
+const WEEK_TABS = [
+  { id: '0', label: 'Esta semana' },
+  { id: '1', label: 'Próxima semana' },
+];
 
 const toIso = (d: Date) => format(d, 'yyyy-MM-dd');
 
-function getWeekDays(): string[] {
-  const today = new Date();
-  const dow = getDay(today); // 0=Sun
-  const monday = dow === 0 ? addDays(today, 1) : startOfISOWeek(today);
-  return [0, 1, 2, 3, 4].map((i) => toIso(addDays(monday, i)));
+function dayTag(date: string, today: string, tomorrow: string) {
+  if (date === today) return 'Hoy';
+  if (date === tomorrow) return 'Mañana';
+  return undefined;
 }
 
 export function MenuImportPage() {
-  const today = toIso(new Date());
-  const tomorrow = toIso(addDays(new Date(), 1));
-  const weekDays = getWeekDays();
+  const now = new Date();
+  const today = toIso(now);
+  const tomorrow = toIso(addDays(now, 1));
+  const weeks = getMenuWeeks(now);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editingDate, setEditingDate] = useState<string>(today);
+  const [weekIndex, setWeekIndex] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const { menus, isLoading, isSaving, saveWeek } = useMenu();
 
-  const { menus, isLoading, isSaving, save } = useMenu();
-
-  const todayMenu = menus.find((m) => m.date === today) ?? null;
-  const tomorrowMenu = menus.find((m) => m.date === tomorrow) ?? null;
-  const isTodayWeekend = checkIsWeekend(parseISO(today));
-  const isTomorrowWeekend = checkIsWeekend(parseISO(tomorrow));
-
-  const weekRangeLabel = `${format(parseISO(weekDays[0]), 'd')} – ${format(parseISO(weekDays[4]), 'd MMM', { locale: es })}`;
-
-  const openModal = (date: string) => {
-    setEditingDate(date);
-    setModalOpen(true);
-  };
+  const weekDays = weeks[weekIndex];
+  const allPast = weekDays.every((date) => isPastDay(date, today));
 
   return (
-    <div className="px-4 py-5 lg:px-[44px] lg:py-[34px]">
-      <PageHeader label="Operativa diaria" title="Menú del día" />
+    <div className="px-4 py-5 lg:px-[44px] lg:pt-[34px] lg:pb-0">
+      <PageHeader
+        label="Operativa diaria"
+        title={editing ? 'Editar semana' : 'Menú semanal'}
+        action={
+          !editing && !isLoading && !allPast ? (
+            <Button leftIcon="pencil" onClick={() => setEditing(true)}>
+              Editar semana
+            </Button>
+          ) : undefined
+        }
+      />
 
-      {isLoading ? (
-        <MenuImportSkeleton />
-      ) : (
-        <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-[18px] mb-[30px]">
-            <DayCard
-              isToday
-              date={today}
-              menu={todayMenu}
-              isWeekend={isTodayWeekend}
-              onOpen={() => openModal(today)}
-            />
-            <DayCard
-              isToday={false}
-              date={tomorrow}
-              menu={tomorrowMenu}
-              isWeekend={isTomorrowWeekend}
-              onOpen={() => openModal(tomorrow)}
-            />
-          </div>
+      {isLoading && <MenuImportSkeleton />}
 
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <h2 className="font-serif font-semibold text-[24px] text-ink">Esta semana</h2>
-            <span className="font-mono text-[11.5px] tracking-[.04em] text-muted">
-              {weekRangeLabel}
-            </span>
-          </div>
-          <WeekGrid weekDays={weekDays} menus={menus} today={today} />
-        </>
+      {!isLoading && (
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-[18px]">
+          {editing ? (
+            <p className="text-[13.5px] font-semibold text-ink-2">{WEEK_TABS[weekIndex].label}</p>
+          ) : (
+            <Tabs
+              tabs={WEEK_TABS}
+              activeId={String(weekIndex)}
+              onChange={(id) => setWeekIndex(Number(id))}
+            />
+          )}
+          <span className="font-mono text-[11.5px] tracking-[.04em] text-muted">
+            {weekRangeLabel(weekDays)}
+          </span>
+        </div>
       )}
 
-      <MenuFormModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        date={editingDate}
-        dateLabel={formatLongDate(editingDate)}
-        initial={menus.find((m) => m.date === editingDate) ?? null}
-        onSave={async (draft: MenuDraft) => {
-          await save(draft);
-        }}
-        isSaving={isSaving}
-      />
+      {!isLoading && editing && (
+        <WeekEditor
+          weekDays={weekDays}
+          menus={menus}
+          today={today}
+          isSaving={isSaving}
+          onSave={async (drafts) => {
+            await saveWeek(drafts);
+          }}
+          onClose={() => setEditing(false)}
+        />
+      )}
+
+      {!isLoading && !editing && (
+        <div className="pb-5 lg:pb-[34px]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-[22px]">
+            {weekDays.map((date) => (
+              <DayStatusCard
+                key={date}
+                date={date}
+                menu={menus.find((m) => m.date === date) ?? null}
+                tag={dayTag(date, today, tomorrow)}
+                isPast={isPastDay(date, today)}
+                onEdit={() => setEditing(true)}
+              />
+            ))}
+          </div>
+          <WeekGrid weekDays={weekDays} menus={menus} today={today} />
+        </div>
+      )}
     </div>
   );
 }
