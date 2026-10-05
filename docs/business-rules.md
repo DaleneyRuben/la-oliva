@@ -224,7 +224,9 @@ All UI-facing views (calendars, suspension picker, delivery history, client-faci
 
 ## Daily Menu Processing
 
-Menus are entered daily and persisted in the `menus` table with a rolling weekly window — records outside the current Mon–Fri display week are pruned automatically on each upsert. The display week is the same one used by the Menú view: it resets to the upcoming week on Sunday.
+Menus are persisted in the `menus` table with a rolling two-week window: the current Mon–Fri display week and the week after it. Records outside that window are pruned automatically on each save. The display week is the same one used by the Menú view: it resets to the upcoming week on Sunday.
+
+The Menú view loads a whole week at once: the manager picks **Esta semana** or **Próxima semana**, edits any of its days in one grid, and saves the week in a single request that commits or fails as a whole. A day before today is **locked** — it is shown but cannot be edited, and the API rejects any save that touches it, since the kitchen has already prepared it. Clearing a dish removes it from that day's menu.
 
 When a menu is saved the system generates a **chef preparation report** — a downloadable `.docx` file for the kitchen. The report includes:
 

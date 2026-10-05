@@ -126,7 +126,7 @@ Every table has exactly one owner. This table is the authority.
 | `clients`            | `client`         | Includes `groupToken` — see Known debt                                                                                                                            |
 | `subscriptions`      | `subscription`   | The largest domain; correct, as subscriptions are the heart of the business. Includes `pausedSince`, moved off `clients` so a pause describes the plan it stopped |
 | `plans`              | `plan`           |                                                                                                                                                                   |
-| `menus`              | `menu`           | Owns the rolling weekly-window pruning rule                                                                                                                       |
+| `menus`              | `menu`           | Owns the two-week planning window and the past-day lock                                                                                                           |
 | `appointments`       | `evaluation`     | Named for the workflow, not the entity — see `CONTEXT.md`                                                                                                         |
 | `users`              | `user`           |                                                                                                                                                                   |
 | `login_events`       | `login-event`    | Owns User-Agent parsing                                                                                                                                           |
