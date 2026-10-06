@@ -6,6 +6,8 @@ import { CombinedApp } from '@/app/CombinedApp';
 import { PublicApp } from '@/app/PublicApp';
 import { StaffApp } from '@/app/StaffApp';
 
+jest.mock('@/assets/public-info/hero.jpg', () => ({ __esModule: true, default: 'hero.jpg' }));
+
 jest.mock('@/features/auth/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
@@ -102,9 +104,58 @@ describe('frontend application compositions', () => {
       </MemoryRouter>,
     );
 
-    expect(
-      await screen.findAllByRole('heading', { name: 'Comencemos a cuidar de ti' }),
-    ).not.toHaveLength(0);
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      'Comer bien puede ser mucho más fácil',
+    );
     expect(screen.queryByRole('heading', { name: 'Ingresar' })).not.toBeInTheDocument();
+  });
+
+  it('serves the public information page at the public root', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <PublicApp />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Comer bien puede ser mucho más fácil',
+    );
+    expect(screen.queryByRole('heading', { name: 'Ingresar' })).not.toBeInTheDocument();
+  });
+
+  it('sends unknown public paths to the information page, not the form', async () => {
+    render(
+      <MemoryRouter initialEntries={['/algo-que-no-existe']}>
+        <PublicApp />
+        <LocationDisplay />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(
+      'Comer bien puede ser mucho más fácil',
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/');
+    expect(screen.queryByText('Datos personales')).not.toBeInTheDocument();
+  });
+
+  it('exposes the public information page in the combined local application', () => {
+    renderAt(<CombinedApp />, '/informacion');
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
+      'Comer bien puede ser mucho más fácil',
+    );
+  });
+
+  it('redirects staff /informacion visits to login', async () => {
+    renderAt(
+      <>
+        <StaffApp />
+        <LocationDisplay />
+      </>,
+      '/informacion',
+    );
+
+    expect(await screen.findByRole('heading', { name: 'Ingresar' })).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/login');
   });
 });
