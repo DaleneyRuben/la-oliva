@@ -28,15 +28,18 @@ const SHELL_ROLES = [...STAFF_ROLES, ROLES.DELIVERY, ROLES.NUTRITIONIST, ROLES.A
 
 type StaffRouterProps = {
   publicRegistrationElement?: ReactNode;
+  publicInfoElement?: ReactNode;
 };
 
 export function StaffRouter({
   publicRegistrationElement = <Navigate to="/login" replace />,
+  publicInfoElement = <Navigate to="/login" replace />,
 }: StaffRouterProps) {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/registro" element={publicRegistrationElement} />
+      <Route path="/informacion" element={publicInfoElement} />
 
       <Route
         path="/*"
