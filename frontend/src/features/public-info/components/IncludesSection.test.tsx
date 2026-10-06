@@ -32,4 +32,11 @@ it('lists what the plan includes and the steps before starting', () => {
   expect(screen.getByText('Pago antes de iniciar')).toBeInTheDocument();
   expect(screen.getByText('mediante transferencia, depósito o QR')).toBeInTheDocument();
   expect(document.getElementById('que-incluye')).not.toBeNull();
+
+  const cards = screen.getByText('Anamnesis virtual').closest('ul');
+  expect(cards).toHaveClass('reveal-stagger');
+  expect(screen.getByText('Anamnesis virtual').closest('li')).toHaveClass('hover:-translate-y-0.5');
+  expect(
+    screen.getByRole('heading', { name: 'Más que solo comida' }).closest('div')?.parentElement,
+  ).toHaveClass('reveal');
 });

@@ -16,7 +16,10 @@ it('renders the four numbered steps and the four notices', () => {
     '04Comenzamos con tus entregas',
   ]);
 
+  expect(steps).toHaveClass('reveal-stagger');
+
   const notices = screen.getByRole('list', { name: 'Importante antes de contratar' });
+  expect(notices).toHaveClass('reveal-stagger');
   expect(
     within(notices)
       .getAllByRole('listitem')

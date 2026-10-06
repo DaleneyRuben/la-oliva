@@ -13,4 +13,5 @@ it('renders the contact invitation and the closing script line', () => {
   );
   expect(screen.getByText('Comer bien también es cuidarte')).toBeInTheDocument();
   expect(screen.getAllByRole('link')).toHaveLength(1);
+  expect(document.getElementById('contacto')).toHaveClass('reveal');
 });

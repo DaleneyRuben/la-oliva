@@ -14,4 +14,5 @@ it('renders the five summary cards as anchors into the page', () => {
     ['Entregas', '#entregas'],
   ]);
   expect(screen.getByRole('navigation', { name: 'Secciones' })).toBeInTheDocument();
+  expect(screen.getByRole('list')).toHaveClass('reveal-stagger');
 });

@@ -29,5 +29,7 @@ it('renders both complete-plan prices and the delivery card', () => {
     WHATSAPP_URL,
   );
   expect(document.getElementById('precios')).not.toBeNull();
-  expect(document.getElementById('entregas')).not.toBeNull();
+  expect(document.getElementById('entregas')).toHaveClass('reveal');
+  expect(screen.getByText('Bs. 1.450').closest('li')).toHaveClass('hover:-translate-y-0.5');
+  expect(screen.getByText('Bs. 1.450').closest('ul')).toHaveClass('reveal-stagger');
 });

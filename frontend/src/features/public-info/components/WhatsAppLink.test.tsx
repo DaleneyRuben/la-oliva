@@ -9,7 +9,7 @@ it('renders a pill link to WhatsApp that opens in a new tab', () => {
   expect(link).toHaveAttribute('href', WHATSAPP_URL);
   expect(link).toHaveAttribute('target', '_blank');
   expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-  expect(link).toHaveClass('rounded-full');
+  expect(link).toHaveClass('rounded-full', 'active:scale-[0.98]');
   expect(link.querySelectorAll('svg')).toHaveLength(2);
 });
 
