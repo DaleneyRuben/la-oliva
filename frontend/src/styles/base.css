@@ -240,3 +240,84 @@ select {
   background: var(--color-olive-400);
   border-radius: 0 2px 2px 0;
 }
+
+/* Public information page. The document is what scrolls, so smooth anchor scrolling has to be
+   declared on <html>, scoped to the time the page is mounted. */
+html:has(.public-info-page) {
+  scroll-behavior: smooth;
+}
+
+/* Hero entrance and scroll reveals share the login page's keyframes and curve. Everything sits
+   behind the motion preference, so a visitor who asked for less motion gets the static page. */
+@media (prefers-reduced-motion: no-preference) {
+  .enter-up-1,
+  .enter-up-2,
+  .enter-up-3,
+  .enter-up-4,
+  .enter-up-5 {
+    animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .enter-up-2 {
+    animation-delay: 80ms;
+  }
+  .enter-up-3 {
+    animation-delay: 160ms;
+  }
+  .enter-up-4 {
+    animation-delay: 240ms;
+  }
+  .enter-up-5 {
+    animation-delay: 480ms;
+  }
+  .enter-from-right {
+    animation: slide-from-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.48s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .reveal-stagger.is-visible > * {
+    opacity: 1;
+    transform: none;
+  }
+  .reveal-stagger.is-visible > *:nth-child(2) {
+    transition-delay: 60ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(3) {
+    transition-delay: 120ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(4) {
+    transition-delay: 180ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(5) {
+    transition-delay: 240ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(6) {
+    transition-delay: 300ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(7) {
+    transition-delay: 360ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(8) {
+    transition-delay: 420ms;
+  }
+  .reveal-stagger.is-visible > *:nth-child(n + 9) {
+    transition-delay: 420ms;
+  }
+}
