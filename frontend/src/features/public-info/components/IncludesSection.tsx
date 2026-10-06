@@ -1,16 +1,25 @@
 import { Icon } from '@ui/Icon';
+import { useReveal } from '@/features/public-info/hooks/useReveal';
+
 import panelPhoto from '@/assets/public-info/panel.jpg';
 import { BEFORE_STARTING, PLAN_INCLUDES, TONE_BG } from '@/features/public-info/content';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 
 export function IncludesSection() {
+  const panel = useReveal<HTMLDivElement>();
+  const aside = useReveal<HTMLDivElement>();
+  const cards = useReveal<HTMLUListElement>({ stagger: true });
+
   return (
     <section
       id="que-incluye"
       className="mx-auto flex max-w-[1200px] flex-wrap items-stretch gap-8 px-6 py-[72px]"
     >
-      <div className="flex min-w-0 flex-[1.3_1_480px] flex-wrap overflow-hidden rounded-3xl bg-public-olive text-public-cream">
+      <div
+        ref={panel.ref}
+        className={`flex min-w-0 flex-[1.3_1_480px] flex-wrap overflow-hidden rounded-3xl bg-public-olive text-public-cream ${panel.className}`}
+      >
         <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-[18px] px-9 py-10">
           <h2 className="m-0 font-public-display text-[32px] font-medium leading-[1.05] md:text-[40px]">
             Más que solo comida
@@ -51,13 +60,19 @@ export function IncludesSection() {
         </div>
       </div>
 
-      <div className="flex min-w-0 flex-[1_1_320px] flex-col justify-center gap-5">
+      <div
+        ref={aside.ref}
+        className={`flex min-w-0 flex-[1_1_320px] flex-col justify-center gap-5 ${aside.className}`}
+      >
         <SectionHeading>Antes de comenzar</SectionHeading>
-        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3.5 p-0">
+        <ul
+          ref={cards.ref}
+          className={`m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3.5 p-0 ${cards.className}`}
+        >
           {BEFORE_STARTING.map((card) => (
             <li
               key={card.title}
-              className="flex flex-col items-center gap-3 rounded-[18px] border border-public-rule bg-public-paper px-4 py-[22px] text-center"
+              className="flex flex-col items-center gap-3 rounded-[18px] border border-public-rule bg-public-paper px-4 py-[22px] text-center transition hover:-translate-y-0.5 hover:shadow-public-badge"
             >
               <span
                 className={`flex h-14 w-14 items-center justify-center rounded-full text-public-paper ${TONE_BG[card.tone]}`}

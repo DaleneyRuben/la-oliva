@@ -18,7 +18,7 @@ export function WhatsAppLink({ children, icon = 'whatsapp', className = '' }: Pr
       href={WHATSAPP_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-3 rounded-full bg-public-olive px-[26px] py-4 text-[13px] font-semibold uppercase tracking-[0.14em] text-public-cream no-underline transition hover:bg-public-ink ${className}`}
+      className={`inline-flex items-center gap-3 rounded-full bg-public-olive px-[26px] py-4 text-[13px] font-semibold uppercase tracking-[0.14em] text-public-cream no-underline transition hover:bg-public-ink active:scale-[0.98] ${className}`}
     >
       <PublicInfoIcon name={icon} size={20} stroke={1.8} />
       {children}

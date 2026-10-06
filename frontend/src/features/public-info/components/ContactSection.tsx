@@ -1,12 +1,16 @@
+import { useReveal } from '@/features/public-info/hooks/useReveal';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 import { WhatsAppLink } from './WhatsAppLink';
 
 export function ContactSection() {
+  const section = useReveal<HTMLElement>();
+
   return (
     <section
       id="contacto"
-      className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-8 px-6 pb-10 pt-[72px]"
+      ref={section.ref}
+      className={`mx-auto flex max-w-[1200px] flex-wrap items-center gap-8 px-6 pb-10 pt-[72px] ${section.className}`}
     >
       <div className="flex min-w-0 flex-[1_1_360px] flex-col gap-3.5">
         <SectionHeading>¿Tienes alguna consulta?</SectionHeading>

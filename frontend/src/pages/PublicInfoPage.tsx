@@ -10,7 +10,7 @@ import { SectionNav } from '@/features/public-info/components/SectionNav';
 
 export function PublicInfoPage() {
   return (
-    <main className="min-h-screen scroll-smooth bg-public-cream font-public-body text-public-body">
+    <main className="public-info-page min-h-screen bg-public-cream font-public-body text-public-body">
       <PublicInfoHero />
       <SectionNav />
       <DailyPlanSection />
