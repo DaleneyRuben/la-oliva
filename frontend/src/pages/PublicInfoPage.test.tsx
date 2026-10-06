@@ -84,3 +84,10 @@ it('shows only copy that exists on the slides', () => {
   expect(screen.getByText('La Oliva Catering')).toBeInTheDocument();
   expect(screen.getByText('Comer bien también es cuidarte')).toBeInTheDocument();
 });
+
+it('marks the page root so the document scrolls smoothly to anchors', () => {
+  renderPage();
+
+  expect(screen.getByRole('main')).toHaveClass('public-info-page');
+  expect(screen.getByRole('main')).not.toHaveClass('scroll-smooth');
+});

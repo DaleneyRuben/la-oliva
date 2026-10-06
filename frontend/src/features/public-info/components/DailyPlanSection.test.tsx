@@ -23,4 +23,6 @@ it('renders the seven meals with their photos shown whole', () => {
   expect(screen.getByText('+ jugo vitamínico')).toBeInTheDocument();
   expect(screen.getByText('de lunes a viernes')).toBeInTheDocument();
   expect(document.getElementById('plan-completo')).not.toBeNull();
+  expect(screen.getAllByRole('figure')[0].parentElement).toHaveClass('reveal-stagger');
+  expect(screen.getByRole('heading', { level: 2 }).parentElement).toHaveClass('reveal');
 });

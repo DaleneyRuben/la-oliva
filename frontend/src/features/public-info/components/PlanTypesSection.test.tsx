@@ -15,4 +15,6 @@ it('renders the five plan types with their meal counts', () => {
   ]);
   expect(screen.getByText('Además contamos con plan de Almuerzos y/o Cena')).toBeInTheDocument();
   expect(document.getElementById('tipos-de-plan')).not.toBeNull();
+  expect(screen.getByRole('list')).toHaveClass('reveal-stagger');
+  expect(screen.getAllByRole('listitem')[0]).toHaveClass('hover:-translate-y-0.5');
 });

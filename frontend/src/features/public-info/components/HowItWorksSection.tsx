@@ -1,8 +1,12 @@
 import { NOTICES, STEPS } from '@/features/public-info/content';
+import { useReveal } from '@/features/public-info/hooks/useReveal';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 
 export function HowItWorksSection() {
+  const steps = useReveal<HTMLOListElement>({ stagger: true });
+  const notices = useReveal<HTMLUListElement>({ stagger: true });
+
   return (
     <section className="border-y border-public-rule bg-public-paper">
       <div className="mx-auto flex max-w-[1200px] flex-wrap gap-12 px-6 py-[72px]">
@@ -11,8 +15,9 @@ export function HowItWorksSection() {
             <span id="how-it-works-label">¿Cómo funciona?</span>
           </SectionHeading>
           <ol
+            ref={steps.ref}
             aria-labelledby="how-it-works-label"
-            className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(128px,1fr))] gap-3.5 p-0"
+            className={`m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(128px,1fr))] gap-3.5 p-0 ${steps.className}`}
           >
             {STEPS.map((step, index) => (
               <li
@@ -35,7 +40,11 @@ export function HowItWorksSection() {
           <SectionHeading>
             <span id="notices-label">Importante antes de contratar</span>
           </SectionHeading>
-          <ul aria-labelledby="notices-label" className="m-0 flex list-none flex-col gap-2.5 p-0">
+          <ul
+            ref={notices.ref}
+            aria-labelledby="notices-label"
+            className={`m-0 flex list-none flex-col gap-2.5 p-0 ${notices.className}`}
+          >
             {NOTICES.map((notice) => (
               <li
                 key={notice.text}

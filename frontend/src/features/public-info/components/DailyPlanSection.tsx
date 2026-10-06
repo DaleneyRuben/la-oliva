@@ -1,11 +1,18 @@
 import { MEALS } from '@/features/public-info/content';
+import { useReveal } from '@/features/public-info/hooks/useReveal';
 import { SectionHeading } from './SectionHeading';
 
 export function DailyPlanSection() {
+  const intro = useReveal<HTMLDivElement>();
+  const meals = useReveal<HTMLDivElement>({ stagger: true });
+
   return (
     <section id="plan-completo" className="border-y border-public-rule bg-public-paper">
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-12 px-6 py-[72px]">
-        <div className="flex min-w-0 flex-[1_1_360px] flex-col gap-5">
+        <div
+          ref={intro.ref}
+          className={`flex min-w-0 flex-[1_1_360px] flex-col gap-5 ${intro.className}`}
+        >
           <SectionHeading size="lg">
             Tu alimentación diaria,{' '}
             <em className="font-public-script text-[1.3em] font-normal not-italic text-public-terracotta">
@@ -29,7 +36,10 @@ export function DailyPlanSection() {
           </div>
         </div>
 
-        <div className="grid min-w-0 flex-[1.2_1_440px] grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4">
+        <div
+          ref={meals.ref}
+          className={`grid min-w-0 flex-[1.2_1_440px] grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 ${meals.className}`}
+        >
           {MEALS.map((meal) => (
             <figure
               key={meal.label}

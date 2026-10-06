@@ -23,3 +23,18 @@ it('renders the hero slide copy, photo and WhatsApp button', () => {
   expect(screen.getByText('Bs. 1.450')).toBeInTheDocument();
   expect(screen.getByText('por 20 días')).toBeInTheDocument();
 });
+
+it('staggers the hero entrance and slides the photo in from the right', () => {
+  render(<PublicInfoHero />);
+
+  expect(screen.getByText('Más que catering, experiencias que dejan huella.')).toHaveClass(
+    'enter-up-1',
+  );
+  expect(screen.getByRole('heading', { level: 1 })).toHaveClass('enter-up-2');
+  expect(screen.getByText(/Comidas caseras, deliciosas/)).toHaveClass('enter-up-3');
+  expect(screen.getByRole('link', { name: 'Quiero contratar' }).parentElement).toHaveClass(
+    'enter-up-4',
+  );
+  expect(screen.getByRole('img').parentElement).toHaveClass('enter-from-right');
+  expect(screen.getByText('Planes desde').parentElement).toHaveClass('enter-up-5');
+});

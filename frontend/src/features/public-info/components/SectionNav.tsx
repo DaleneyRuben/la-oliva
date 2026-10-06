@@ -1,10 +1,16 @@
 import { SECTION_LINKS, TONE_BG } from '@/features/public-info/content';
+import { useReveal } from '@/features/public-info/hooks/useReveal';
 import { PublicInfoIcon } from './PublicInfoIcon';
 
 export function SectionNav() {
+  const cards = useReveal<HTMLUListElement>({ stagger: true });
+
   return (
     <nav aria-label="Secciones" className="mx-auto max-w-[1200px] px-6 pb-14 pt-6">
-      <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4 p-0">
+      <ul
+        ref={cards.ref}
+        className={`m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-4 p-0 ${cards.className}`}
+      >
         {SECTION_LINKS.map((section) => (
           <li key={section.id}>
             <a
