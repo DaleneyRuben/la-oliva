@@ -113,6 +113,17 @@ client information, or internal status.
 
 The public form lives at `/registro`, outside the staff layout, and is designed mobile-first.
 
+### Public information page
+
+The public host also serves an unauthenticated **information page** at `/` (reachable as
+`/informacion` in the combined local build). It is the manager's four information slides rebuilt
+as one scrolling, mobile-first page: every visible string is copied from the slides verbatim, with
+no header, navigation bar or sign-up control added. Its four call-to-action buttons open the
+business WhatsApp chat; nothing on it links to `/registro` unless the manager asks for it. The
+plan names and prices on it are marketing copy kept in frontend constants, not the Plans catalog,
+so a price change on the page is a copy edit and never follows an admin's plan edit. Unknown paths
+on the public host redirect to this page.
+
 ### Restrictions field
 
 Allergies, intolerances, and preferences (_gustos_) are captured in one list. Each entry is a free-text item the user can add to or remove from. For allergy-detection logic, every entry in this list is treated as a potential conflict trigger — the system does not distinguish between an allergy and a preference at the data level. If a finer distinction is needed later, it can be added as a tag per entry without changing the field shape.
