@@ -24,6 +24,7 @@ const DELIVERY_ROLES = [...ADMIN_ROLES, ROLES.DELIVERY] as const;
 const CLIENT_READ_ROLES = [...ADMIN_ROLES, ROLES.AUDIT] as const;
 const PRODUCTION_ROLES = [...STAFF_ROLES, ROLES.AUDIT] as const;
 const DELIVERY_ROLES_WITH_AUDIT = [...DELIVERY_ROLES, ROLES.AUDIT] as const;
+const FINANCE_ROLES = [...ADMIN_ROLES, ROLES.AUDIT] as const;
 const SHELL_ROLES = [...STAFF_ROLES, ROLES.DELIVERY, ROLES.NUTRITIONIST, ROLES.AUDIT] as const;
 
 type StaffRouterProps = {
@@ -138,7 +139,7 @@ export function StaffRouter({
                 <Route
                   path="/finanzas"
                   element={
-                    <ProtectedRoute allowedRoles={[...ADMIN_ROLES]}>
+                    <ProtectedRoute allowedRoles={[...FINANCE_ROLES]}>
                       <FinancePage />
                     </ProtectedRoute>
                   }
