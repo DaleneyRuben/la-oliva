@@ -13,6 +13,7 @@ interface Props {
   onDuplicate: (movement: Movement) => void;
   onDelete: (movement: Movement) => void;
   onVoidIncome: (movement: Movement) => void;
+  readOnly?: boolean;
 }
 
 const TAG_CLS =
@@ -66,6 +67,7 @@ export function MovementRow({
   onDuplicate,
   onDelete,
   onVoidIncome,
+  readOnly = false,
 }: Props) {
   const isIncome = movement.kind === 'income';
 
@@ -112,7 +114,8 @@ export function MovementRow({
         {formatMoney(movement.amount)}
       </span>
 
-      {isIncome && movement.clientArchived && (
+      {readOnly && <span className="w-[28px] shrink-0" />}
+      {!readOnly && isIncome && movement.clientArchived && (
         <OverflowMenu
           variant="bare"
           label="Acciones del ingreso"
@@ -126,8 +129,8 @@ export function MovementRow({
           ]}
         />
       )}
-      {isIncome && !movement.clientArchived && <span className="w-[28px] shrink-0" />}
-      {!isIncome && (
+      {!readOnly && isIncome && !movement.clientArchived && <span className="w-[28px] shrink-0" />}
+      {!readOnly && !isIncome && (
         <OverflowMenu
           variant="bare"
           label="Acciones del gasto"
