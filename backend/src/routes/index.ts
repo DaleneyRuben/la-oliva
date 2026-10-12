@@ -39,7 +39,8 @@ router.use(
   evaluationRoutes,
 );
 router.use('/dashboard', requireAuth, requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN), dashboardRoutes);
-router.use('/finance', requireAuth, requireRole(ROLES.SUPER_ADMIN, ROLES.ADMIN), financeRoutes);
+// per-route role checks live in finance.routes.ts: the GETs also allow audit
+router.use('/finance', requireAuth, financeRoutes);
 router.use(
   '/delivery',
   requireAuth,
