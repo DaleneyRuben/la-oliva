@@ -310,10 +310,10 @@ The reporting layer should remain extensible — additional reports may be added
 ## Finanzas (the register)
 
 One screen (sidebar item **Finanzas**, under Administración) showing a month of money in and money
-out. Visible to `admin` and `super_admin`. The vocabulary behind it — Payment, Expense, Movement,
-and the terms deliberately rejected — is recorded in [CONTEXT.md](../CONTEXT.md); the ownership of
-the tables is [ADR-008](./adr/008-finance-owns-payments.md). What follows is what the register
-must honour.
+out. Visible to `admin` and `super_admin`, and read-only to `audit` (see User Roles). The
+vocabulary behind it — Payment, Expense, Movement, and the terms deliberately rejected — is
+recorded in [CONTEXT.md](../CONTEXT.md); the ownership of the tables is
+[ADR-008](./adr/008-finance-owns-payments.md). What follows is what the register must honour.
 
 **Cash basis.** Every record is dated by the day the money moved, never by the period it relates
 to: a renewal paid in July for a plan running in August is July income. There is no accrual, no
@@ -604,7 +604,7 @@ The system has six roles (`super_admin`, `admin`, `kitchen`, `delivery`, `nutrit
 - **kitchen** — can view the kitchen report and menu; cannot access the kitchen report download on the Reports page (that card is hidden for this role).
 - **delivery** — delivery route view only.
 - **nutritionist** — Evaluaciones only: resolves appointments (conversions for new clients, and renewals/reactivations for existing clients — see Evaluaciones (Appointments)); no access to Clientes, Planes, menus, production, deliveries, reports, dashboard, user management, or Health.
-- **audit** — read-only access to Clientes, Producción, and Entregas. It cannot create, edit, renew, pause, finalize, delete, or otherwise change client, subscription, or delivery data; it has no access to any other view.
+- **audit** — read-only access to Clientes, Producción, Entregas, and Finanzas. It cannot create, edit, renew, pause, finalize, delete, or otherwise change client, subscription, or delivery data, and on Finanzas it sees the month's tiles, breakdown and movements but cannot register, edit, duplicate or delete an expense, void a payment, or manage categories; it has no access to any other view.
 
 The dashboard's connections widget shows online/offline status for `kitchen` and `delivery` users based on last login time (online = within the last 8 hours, matching the login token's lifetime). The Usuarios table's "Estado" column (Activo/Inactivo) uses the same 8-hour rule for every role.
 
