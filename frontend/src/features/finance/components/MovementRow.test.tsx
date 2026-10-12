@@ -32,7 +32,7 @@ const expense: Movement = {
   registeredAt: '2026-08-04T18:05:00.000Z',
 };
 
-const setup = (movement: Movement) => {
+const setup = (movement: Movement, readOnly = false) => {
   const onEdit = jest.fn();
   const onDuplicate = jest.fn();
   const onDelete = jest.fn();
@@ -45,6 +45,7 @@ const setup = (movement: Movement) => {
         onDuplicate={onDuplicate}
         onDelete={onDelete}
         onVoidIncome={onVoidIncome}
+        readOnly={readOnly}
       />
     </MemoryRouter>,
   );
@@ -54,6 +55,19 @@ const setup = (movement: Movement) => {
 const openActions = () => userEvent.click(screen.getByRole('button', { name: /acciones/i }));
 
 describe('MovementRow', () => {
+  // Audit reads the register but changes nothing, so neither row offers its actions.
+  it('offers no actions on a read-only expense row', () => {
+    setup(expense, true);
+
+    expect(screen.queryByRole('button', { name: /acciones/i })).not.toBeInTheDocument();
+  });
+
+  it('offers no void on a read-only archived-client income row', () => {
+    setup({ ...income, clientArchived: true }, true);
+
+    expect(screen.queryByRole('button', { name: /acciones/i })).not.toBeInTheDocument();
+  });
+
   it('reads an income row as the client who paid', () => {
     setup(income);
 

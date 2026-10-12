@@ -6,7 +6,8 @@ interface Props {
   categories: CategoryTotal[];
   activeCategoryId: string;
   onPick: (categoryId: string) => void;
-  onManage: () => void;
+  // Absent for a read-only viewer, who cannot change the catalog.
+  onManage?: () => void;
 }
 
 // A hairline still reads as "some"; a zero-width bar reads as a rendering fault.
@@ -35,15 +36,17 @@ export function CategoryBreakdown({ categories, activeCategoryId, onPick, onMana
         </div>
         {/* The catalog changes perhaps twice a year, so managing it sits here rather than on the
             daily path — and stays reachable in a month where nothing has been spent yet. */}
-        <Button
-          variant="bare"
-          leftIcon="list-plus"
-          onClick={onManage}
-          className="border border-rule rounded-lg font-semibold text-ink-2 hover:bg-olive-50 hover:border-olive-300 cursor-pointer"
-          style={MANAGE_STYLE}
-        >
-          Administrar categorías
-        </Button>
+        {onManage && (
+          <Button
+            variant="bare"
+            leftIcon="list-plus"
+            onClick={onManage}
+            className="border border-rule rounded-lg font-semibold text-ink-2 hover:bg-olive-50 hover:border-olive-300 cursor-pointer"
+            style={MANAGE_STYLE}
+          >
+            Administrar categorías
+          </Button>
+        )}
       </div>
 
       {sorted.length === 0 ? (

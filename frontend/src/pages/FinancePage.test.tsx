@@ -7,11 +7,16 @@ import { formatDayLabel, shiftMonth } from '@/features/finance/utils/format';
 import { useFinance } from '@/features/finance/hooks/useFinance';
 import { useExpenseMutations } from '@/features/finance/hooks/useExpenses';
 import { useCategoryCatalog, useCategoryMutations } from '@/features/finance/hooks/useCategories';
+import { useAuth } from '@/features/auth/AuthContext';
 import type { FinanceOverview } from '@/features/finance/types';
 
 jest.mock('@/features/finance/hooks/useFinance');
 jest.mock('@/features/finance/hooks/useExpenses');
 jest.mock('@/features/finance/hooks/useCategories');
+jest.mock('@/features/auth/AuthContext', () => ({ useAuth: jest.fn() }));
+
+const mockUseAuth = useAuth as jest.Mock;
+const mockUserRole = (role: string) => mockUseAuth.mockReturnValue({ user: { id: 1, role } });
 
 const mockedUseFinance = useFinance as jest.MockedFunction<typeof useFinance>;
 const mockedUseMutations = useExpenseMutations as jest.MockedFunction<typeof useExpenseMutations>;
@@ -74,6 +79,7 @@ const voidIncome = jest.fn().mockResolvedValue(undefined);
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockUserRole('admin');
   mockedUseFinance.mockReturnValue({ overview, isLoading: false, error: null });
   mockedUseMutations.mockReturnValue({ create, update, remove, voidIncome, isSaving: false });
   // As the server sends it: ranked by use this month, so Transporte leads and nothing on this side
@@ -105,6 +111,41 @@ const openRowActions = () =>
   userEvent.click(screen.getByRole('button', { name: /acciones del gasto/i }));
 
 describe('FinancePage', () => {
+  describe('for the audit role', () => {
+    beforeEach(() => {
+      mockUserRole('audit');
+      mockedUseFinance.mockReturnValue({
+        overview: {
+          ...overview,
+          movements: [{ ...overview.movements[0], clientArchived: true }, overview.movements[1]],
+        },
+        isLoading: false,
+        error: null,
+      });
+    });
+
+    it('still shows the month: tiles, breakdown and movements', () => {
+      renderPage();
+
+      expect(screen.getByText('34.800')).toBeInTheDocument();
+      expect(screen.getByTestId('category-name')).toHaveTextContent('Insumos');
+      expect(screen.getByText('Reparto del día')).toBeInTheDocument();
+    });
+
+    it('offers nothing that changes the register', () => {
+      renderPage();
+
+      expect(screen.queryByRole('button', { name: /registrar gasto/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Administrar categorías' }),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /acciones del gasto/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /acciones del ingreso/i }),
+      ).not.toBeInTheDocument();
+    });
+  });
+
   it('renders the register for the current month', () => {
     renderPage();
 

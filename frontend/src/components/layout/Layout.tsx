@@ -26,6 +26,7 @@ const KITCHEN_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.KITCHEN];
 const CLIENT_READ_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.AUDIT];
 const PRODUCTION_ROLES: UserRole[] = [...KITCHEN_ROLES, ROLES.AUDIT];
 const DELIVERY_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.DELIVERY, ROLES.AUDIT];
+const FINANCE_ROLES: UserRole[] = [...ADMIN_ROLES, ROLES.AUDIT];
 
 const NAV_SECTIONS: NavSection[] = [
   {
@@ -67,7 +68,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       // The only Administración item an admin reaches: they record the expenses, so they read the
       // register. Usuarios and Health stay super_admin.
-      { to: '/finanzas', label: 'Finanzas', icon: 'wallet', allowedRoles: [...ADMIN_ROLES] },
+      { to: '/finanzas', label: 'Finanzas', icon: 'wallet', allowedRoles: FINANCE_ROLES },
       { to: '/usuarios', label: 'Usuarios', icon: 'user-plus', allowedRoles: [ROLES.SUPER_ADMIN] },
       { to: '/health', label: 'Health', icon: 'stethoscope', allowedRoles: [ROLES.SUPER_ADMIN] },
     ],

@@ -408,7 +408,7 @@ describe('Layout', () => {
     expect(screen.getByText('Entregas')).toBeInTheDocument();
   });
 
-  it('shows only Clientes, Producción and Entregas for the audit role', () => {
+  it('shows only Clientes, Producción, Entregas and Finanzas for the audit role', () => {
     mockUserRole('audit');
     render(
       <MemoryRouter>
@@ -424,7 +424,8 @@ describe('Layout', () => {
     expect(screen.queryByText('Planes')).not.toBeInTheDocument();
     expect(screen.queryByText('Menú')).not.toBeInTheDocument();
     expect(screen.queryByText('Informes')).not.toBeInTheDocument();
-    expect(screen.queryByText('Finanzas')).not.toBeInTheDocument();
+    expect(screen.getByText('Finanzas')).toBeInTheDocument();
+    expect(screen.queryByText('Usuarios')).not.toBeInTheDocument();
   });
 
   it('shows Entregas alongside everything else for the admin role', () => {

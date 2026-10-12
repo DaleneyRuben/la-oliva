@@ -19,6 +19,8 @@ import { CategoryManagerModal } from '@/features/finance/components/CategoryMana
 import { OpenMonthPill } from '@/features/finance/components/OpenMonthPill';
 import { formatMoney, formatMonthLabel } from '@/features/finance/utils/format';
 import type { ExpenseInput, Movement } from '@/features/finance/types';
+import { useAuth } from '@/features/auth/AuthContext';
+import { ROLES } from '@/constants/roles';
 
 function FinanceSkeleton() {
   return (
@@ -58,6 +60,9 @@ type FormState =
   | { mode: 'duplicate'; expense: EditableExpense };
 
 export function FinancePage() {
+  const { user } = useAuth();
+  // Audit reads the register to check it, never to change it.
+  const readOnly = user?.role === ROLES.AUDIT;
   const today = format(new Date(), 'yyyy-MM-dd');
   const currentMonth = today.slice(0, 7);
   const [month, setMonth] = useState(currentMonth);
@@ -131,9 +136,11 @@ export function FinancePage() {
         </div>
         {/* There is no "Registrar ingreso": all income is subscription revenue, written when an
             admin marks a subscription paid (ADR-008). */}
-        <Button leftIcon="plus" onClick={() => setForm({ mode: 'create' })}>
-          Registrar gasto
-        </Button>
+        {!readOnly && (
+          <Button leftIcon="plus" onClick={() => setForm({ mode: 'create' })}>
+            Registrar gasto
+          </Button>
+        )}
       </div>
 
       {isLoading || !overview ? (
@@ -155,7 +162,7 @@ export function FinancePage() {
             categories={overview.byCategory}
             activeCategoryId={filters.categoryId}
             onPick={pickCategory}
-            onManage={() => setIsManagingCategories(true)}
+            onManage={readOnly ? undefined : () => setIsManagingCategories(true)}
           />
           <MovementsList
             movements={overview.movements}
@@ -176,6 +183,7 @@ export function FinancePage() {
             onDuplicate={openFor('duplicate')}
             onDelete={setPendingDelete}
             onVoidIncome={setPendingVoid}
+            readOnly={readOnly}
           />
         </div>
       )}

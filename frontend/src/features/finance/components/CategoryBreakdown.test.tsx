@@ -26,6 +26,14 @@ const setup = (props: Partial<React.ComponentProps<typeof CategoryBreakdown>> = 
 beforeEach(() => jest.clearAllMocks());
 
 describe('CategoryBreakdown', () => {
+  it('hides the manage button when there is no way to manage', () => {
+    setup({ onManage: undefined });
+
+    expect(
+      screen.queryByRole('button', { name: 'Administrar categorías' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('lists each category with its total', () => {
     setup();
 
