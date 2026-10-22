@@ -1,5 +1,11 @@
-export const publicRegistrationFieldClass =
-  'w-full rounded-[10px] border border-rule bg-paper px-3.5 py-3 text-[13px] text-ink placeholder:text-placeholder outline-none transition focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10';
+import { inputErrorCls } from '@ui/Field';
+
+export const publicRegistrationFieldClass = (hasError = false) =>
+  `w-full rounded-[10px] border bg-paper px-3.5 py-3 text-[13px] text-ink placeholder:text-placeholder outline-none transition ${
+    hasError
+      ? inputErrorCls
+      : 'border-rule focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/10'
+  }`;
 
 export const getTomorrow = () => {
   const date = new Date();

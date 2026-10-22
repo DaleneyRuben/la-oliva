@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { format, startOfToday } from 'date-fns';
 import { Button } from '@ui/Button';
+import { FormErrorSummary } from '@ui/FormErrorSummary';
 import { StepIndicator } from '@ui/StepIndicator';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { useCreateClient } from '@/features/clients/hooks/useCreateClient';
@@ -87,6 +88,8 @@ export function NewClientPage() {
     }
     setStep((s) => s + 1);
   };
+
+  const stepErrorCount = (STEP_FIELDS[step] ?? []).filter((field) => errors[field]).length;
 
   const handleBack = () => setStep((s) => s - 1);
 
@@ -238,6 +241,7 @@ export function NewClientPage() {
             </Button>
           )}
           <div className="flex items-center gap-[14px]">
+            <FormErrorSummary count={stepErrorCount} />
             <span className="font-mono text-[11px] tracking-[.06em] text-faint uppercase">
               Paso {step} de 4
             </span>

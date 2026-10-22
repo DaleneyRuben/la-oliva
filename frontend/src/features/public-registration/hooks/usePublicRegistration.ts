@@ -70,6 +70,5 @@ export function usePublicRegistration() {
     toggleDisease,
     submit,
     clearError: () => setError(''),
-    setError,
   };
 }

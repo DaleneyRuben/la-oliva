@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { FormErrorSummary } from '@ui/FormErrorSummary';
 import { HealthDetailsStep } from '@/features/public-registration/components/HealthDetailsStep';
 import { PersonalDetailsStep } from '@/features/public-registration/components/PersonalDetailsStep';
 import { RegistrationActions } from '@/features/public-registration/components/RegistrationActions';
@@ -12,11 +13,14 @@ import { RegistrationStepHeading } from '@/features/public-registration/componen
 import { RegistrationSuccess } from '@/features/public-registration/components/RegistrationSuccess';
 import { usePublicRegistration } from '@/features/public-registration/hooks/usePublicRegistration';
 import { RegistrationStep } from '@/features/public-registration/types';
+import { validateRegistrationStep } from '@/features/public-registration/validation';
 
 const stepTitles = ['Datos personales', 'Tu salud', 'Revisa tus datos'];
 
 export function PublicRegistrationPage() {
   const [step, setStep] = useState<RegistrationStep>(1);
+  // Errors stay hidden until the first Continuar on a step, then follow the form live
+  const [showErrors, setShowErrors] = useState(false);
   const {
     form,
     error,
@@ -28,8 +32,10 @@ export function PublicRegistrationPage() {
     toggleDisease,
     submit,
     clearError,
-    setError,
   } = usePublicRegistration();
+
+  const fieldErrors = showErrors ? validateRegistrationStep(step, form) : {};
+  const fieldErrorCount = Object.keys(fieldErrors).length;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,21 +46,18 @@ export function PublicRegistrationPage() {
       return;
     }
 
-    if (!event.currentTarget.checkValidity()) {
-      event.currentTarget.reportValidity();
+    if (Object.keys(validateRegistrationStep(step, form)).length > 0) {
+      setShowErrors(true);
       return;
     }
 
-    if (step === 1 && !form.deliveryZone) {
-      setError('Selecciona una zona para continuar.');
-      return;
-    }
-
+    setShowErrors(false);
     setStep(step === 1 ? 2 : 3);
   };
 
   const previous = () => {
     clearError();
+    setShowErrors(false);
     setStep(step === 3 ? 2 : 1);
   };
 
@@ -70,10 +73,12 @@ export function PublicRegistrationPage() {
           <div className="mt-7 md:mt-0">
             <RegistrationProgress step={step} />
           </div>
-          <form onSubmit={handleSubmit} className="mt-8 flex flex-1 flex-col">
+          <form noValidate onSubmit={handleSubmit} className="mt-8 flex flex-1 flex-col">
             <div>
               <RegistrationStepHeading title={title} />
-              {step === 1 && <PersonalDetailsStep form={form} update={update} />}
+              {step === 1 && (
+                <PersonalDetailsStep form={form} update={update} errors={fieldErrors} />
+              )}
               {step === 2 && (
                 <HealthDetailsStep
                   form={form}
@@ -81,6 +86,7 @@ export function PublicRegistrationPage() {
                   addListItem={addListItem}
                   removeListItem={removeListItem}
                   toggleDisease={toggleDisease}
+                  errors={fieldErrors}
                 />
               )}
               {step === 3 && <RegistrationReviewStep form={form} />}
@@ -93,6 +99,11 @@ export function PublicRegistrationPage() {
               onChange={(event) => update('website', event.target.value)}
             />
             {error && <p className="mt-4 text-[12px] text-alert">{error}</p>}
+            {fieldErrorCount > 0 && (
+              <div className="mt-6">
+                <FormErrorSummary count={fieldErrorCount} />
+              </div>
+            )}
             <RegistrationActions step={step} onPrevious={previous} loading={submitting} />
           </form>
         </div>
