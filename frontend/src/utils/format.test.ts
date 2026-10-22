@@ -1,4 +1,5 @@
 import {
+  formatWeekdayDay,
   formatDate,
   formatDateTime,
   formatLongDate,
@@ -65,6 +66,12 @@ describe('formatShortDate', () => {
 
   it('zero-pads single-digit day and month', () => {
     expect(formatShortDate('2026-01-05')).toBe('05/01');
+  });
+});
+
+describe('formatWeekdayDay', () => {
+  it('returns the lowercase weekday and day of the month, for use mid-sentence', () => {
+    expect(formatWeekdayDay('2026-10-22')).toBe('jueves 22');
   });
 });
 

@@ -175,4 +175,72 @@ describe('update', () => {
     expect(result).toBeNull();
     expect(sequelize.transaction).not.toHaveBeenCalled();
   });
+
+  describe('delivery shift', () => {
+    it('changes the shift for every other member of the client group', async () => {
+      const instance = clientWith([], {
+        delivery: 'La Oliva',
+        deliveryShift: 'day',
+        groupToken: 'tok-1',
+      });
+      (Client.findByPk as jest.Mock).mockResolvedValue(instance);
+
+      await update(1, { deliveryShift: 'night' }, actor);
+
+      expect(instance.update).toHaveBeenCalledWith(
+        expect.objectContaining({ deliveryShift: 'night' }),
+        { transaction },
+      );
+      expect(Client.update).toHaveBeenCalledWith(
+        { deliveryShift: 'night' },
+        { where: { groupToken: 'tok-1' }, transaction },
+      );
+    });
+
+    it('does not touch the group when the shift did not change', async () => {
+      const instance = clientWith([], {
+        delivery: 'La Oliva',
+        deliveryShift: 'night',
+        groupToken: 'tok-1',
+      });
+      (Client.findByPk as jest.Mock).mockResolvedValue(instance);
+
+      await update(1, { deliveryShift: 'night', name: 'Ana' }, actor);
+
+      expect(Client.update).not.toHaveBeenCalled();
+    });
+
+    it('clears the shift when the client moves to Otro', async () => {
+      const instance = clientWith([], { delivery: 'La Oliva', deliveryShift: 'night' });
+      (Client.findByPk as jest.Mock).mockResolvedValue(instance);
+
+      await update(1, { delivery: 'Otro' }, actor);
+
+      expect(instance.update).toHaveBeenCalledWith(
+        expect.objectContaining({ delivery: 'Otro', deliveryShift: null }),
+        { transaction },
+      );
+    });
+
+    it('gives a client moving to La Oliva a day shift when none was sent', async () => {
+      const instance = clientWith([], { delivery: 'Otro', deliveryShift: null });
+      (Client.findByPk as jest.Mock).mockResolvedValue(instance);
+
+      await update(1, { delivery: 'La Oliva' }, actor);
+
+      expect(instance.update).toHaveBeenCalledWith(
+        expect.objectContaining({ delivery: 'La Oliva', deliveryShift: 'day' }),
+        { transaction },
+      );
+    });
+
+    it('leaves the shift alone when the edit does not mention delivery', async () => {
+      const instance = clientWith([], { delivery: 'La Oliva', deliveryShift: 'night' });
+      (Client.findByPk as jest.Mock).mockResolvedValue(instance);
+
+      await update(1, { name: 'Ana' }, actor);
+
+      expect(instance.update).toHaveBeenCalledWith({ name: 'Ana' }, { transaction });
+    });
+  });
 });

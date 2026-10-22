@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ZONES, DELIVERIES, SEX_OPTIONS } from '../constants/client.constants';
+import { ZONES, DELIVERIES, DELIVERY_SHIFTS, SEX_OPTIONS } from '../constants/client.constants';
 import { appToday } from '../utils/date';
 import { createSubscriptionSchema } from './subscription.schema';
 
@@ -18,6 +18,7 @@ export const createClientSchema = z.object({
   address: z.string().min(1),
   deliveryZone: z.enum(ZONES),
   delivery: z.enum(DELIVERIES),
+  deliveryShift: z.enum(DELIVERY_SHIFTS).nullable().optional(),
   nit: z.string().optional(),
   businessName: z.string().optional(),
   underlyingDiseases: z.array(z.string().max(200)).max(50).default([]),
@@ -38,6 +39,7 @@ export const updateClientSchema = z.object({
   address: z.string().min(1).optional(),
   deliveryZone: z.enum(ZONES).optional(),
   delivery: z.enum(DELIVERIES).optional(),
+  deliveryShift: z.enum(DELIVERY_SHIFTS).nullable().optional(),
   nit: z.string().nullable().optional(),
   businessName: z.string().nullable().optional(),
   underlyingDiseases: z.array(z.string().max(200)).max(50).optional(),

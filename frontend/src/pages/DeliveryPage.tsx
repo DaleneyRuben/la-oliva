@@ -5,13 +5,16 @@ import { Icon } from '@ui/Icon';
 import { Skeleton } from '@ui/Skeleton';
 import { useDeliveryRoute } from '@/features/delivery/hooks/useDeliveryRoute';
 import { formatLongDate } from '@/utils/format';
-import { DeliveryZoneSection } from '@/features/delivery/components/DeliveryZoneSection';
-import type { DeliveryDayRoute } from '@/features/delivery/types';
+import { DeliveryRunSection } from '@/features/delivery/components/DeliveryRunSection';
+import type { DeliveryDayRoute, DeliveryRun } from '@/features/delivery/types';
 
 type Day = 'today' | 'tomorrow';
 
+const runZones = (run: DeliveryRun | undefined) => run?.zones ?? [];
+
+// A tab counts every stop the driver makes that day: the morning run and the night run.
 const deliveryCountTotal = (route: DeliveryDayRoute | undefined): number =>
-  (route?.zones ?? []).reduce((sum, z) => sum + z.deliveryCount, 0);
+  [...runZones(route?.day), ...runZones(route?.night)].reduce((sum, z) => sum + z.deliveryCount, 0);
 
 const TAB_ON = 'bg-paper border border-rule text-ink shadow-[var(--shadow-tab)] font-semibold';
 const TAB_OFF = 'border border-transparent text-muted font-semibold';
@@ -26,15 +29,9 @@ export function DeliveryPage() {
 
   const selectedDate = day === 'today' ? todayDate : tomorrowDate;
   const selectedRoute = day === 'today' ? today : tomorrow;
-  const zones = selectedRoute?.zones ?? [];
   const totalLabel = deliveryCountTotal(selectedRoute);
-
-  let runningOffset = 0;
-  const zonesWithOffsets = zones.map((zone) => {
-    const colorIndexOffset = runningOffset;
-    runningOffset += zone.groups.length;
-    return { zone, colorIndexOffset };
-  });
+  const hasStops =
+    runZones(selectedRoute?.day).length > 0 || runZones(selectedRoute?.night).length > 0;
 
   return (
     <div className="px-4 py-5 lg:px-[44px] lg:py-[34px]">
@@ -75,13 +72,13 @@ export function DeliveryPage() {
       )}
 
       {!isLoading && (
-        <div className="flex flex-col gap-[22px]">
-          <div className="flex items-center justify-between gap-[18px] flex-wrap">
-            <div className="inline-flex bg-cream-2 border border-rule rounded-[11px] p-1 gap-[3px]">
+        <div className="flex flex-col gap-4 lg:gap-[22px]">
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex w-full sm:w-auto bg-cream-2 border border-rule rounded-[11px] p-1 gap-[3px]">
               <Button
                 variant="bare"
                 onClick={() => setDay('today')}
-                className={`gap-2 ${day === 'today' ? TAB_ON : TAB_OFF}`}
+                className={`flex-1 sm:flex-none gap-2 ${day === 'today' ? TAB_ON : TAB_OFF}`}
                 style={{
                   padding: '8px 18px',
                   fontSize: '13.5px',
@@ -97,7 +94,7 @@ export function DeliveryPage() {
               <Button
                 variant="bare"
                 onClick={() => setDay('tomorrow')}
-                className={`gap-2 ${day === 'tomorrow' ? TAB_ON : TAB_OFF}`}
+                className={`flex-1 sm:flex-none gap-2 ${day === 'tomorrow' ? TAB_ON : TAB_OFF}`}
                 style={{
                   padding: '8px 18px',
                   fontSize: '13.5px',
@@ -112,22 +109,25 @@ export function DeliveryPage() {
               </Button>
             </div>
 
-            <div className="flex items-center gap-4 font-mono text-[11.5px] text-muted">
-              <span className="flex items-center gap-[7px]">
-                <span className="w-[9px] h-[9px] rounded-[3px] bg-olive-700" />
-                Grupo
+            <div
+              aria-label="Leyenda de turnos"
+              className="flex items-center gap-4 sm:ml-auto text-[11.5px] text-ink-2"
+            >
+              <span className="flex items-center gap-[6px]">
+                <span className="w-[9px] h-[9px] rounded-[3px] bg-delivery-2-accent" />
+                Día
               </span>
-              <span className="flex items-center gap-[7px]">
-                <span className="w-[9px] h-[9px] rounded-full bg-rule-2" />
-                Individual
+              <span className="flex items-center gap-[6px]">
+                <span className="w-[9px] h-[9px] rounded-[3px] bg-olive-900" />
+                Noche
               </span>
-              <span className="text-ink font-semibold">
+              <span className="text-olive-900 font-semibold">
                 {totalLabel} {totalLabel === 1 ? 'entrega' : 'entregas'}
               </span>
             </div>
           </div>
 
-          {zonesWithOffsets.length === 0 && (
+          {!hasStops && (
             <div className="py-16 text-center bg-paper border border-rule rounded-lg">
               <div className="w-12 h-12 rounded-full bg-cream mx-auto mb-3 flex items-center justify-center text-olive-700">
                 <Icon name="motorcycle" size={22} />
@@ -137,9 +137,12 @@ export function DeliveryPage() {
             </div>
           )}
 
-          {zonesWithOffsets.map(({ zone, colorIndexOffset }) => (
-            <DeliveryZoneSection key={zone.zone} zone={zone} colorIndexOffset={colorIndexOffset} />
-          ))}
+          {hasStops && selectedRoute && (
+            <>
+              <DeliveryRunSection shift="day" run={selectedRoute.day} />
+              <DeliveryRunSection shift="night" run={selectedRoute.night} />
+            </>
+          )}
         </div>
       )}
     </div>

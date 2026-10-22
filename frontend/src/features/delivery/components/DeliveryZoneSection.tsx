@@ -1,59 +1,55 @@
 import { Icon } from '@ui/Icon';
 import { DeliveryGroupCard } from '@/features/delivery/components/DeliveryGroupCard';
 import { DeliveryPersonRow } from '@/features/delivery/components/DeliveryPersonRow';
-import type { DeliveryZone } from '@/features/delivery/types';
+import type { DeliveryShiftRun, DeliveryZone } from '@/features/delivery/types';
 
 interface Props {
   zone: DeliveryZone;
-  colorIndexOffset: number;
+  shift: DeliveryShiftRun;
 }
 
-export function DeliveryZoneSection({ zone, colorIndexOffset }: Props) {
+// A zone is a sub-heading inside its run's card, so it takes the run's colour rather than
+// standing out as a heading of its own.
+const TONE: Record<DeliveryShiftRun, { icon: string; label: string; rule: string }> = {
+  day: {
+    icon: 'text-delivery-2-accent',
+    label: 'text-delivery-2-chip-text',
+    rule: 'bg-delivery-2-card-border',
+  },
+  night: { icon: 'text-olive-700', label: 'text-olive-800', rule: 'bg-hairline' },
+};
+
+export function DeliveryZoneSection({ zone, shift }: Props) {
+  const tone = TONE[shift];
+
   return (
-    <section className="flex flex-col gap-[14px]">
-      <div className="flex items-center gap-[13px] pt-1">
-        <span className="w-[30px] h-[30px] rounded-[8px] bg-olive-800 text-olive-200 flex items-center justify-center shrink-0">
-          <Icon name="pin" size={16} />
+    <section className="flex flex-col">
+      <div className="flex items-center gap-2 mt-4 mb-1">
+        <Icon name="pin" size={13} stroke={2} className={`shrink-0 ${tone.icon}`} />
+        <h3 className={`text-[11px] font-bold tracking-[.14em] uppercase ${tone.label}`}>
+          Zona {zone.zone}
+        </h3>
+        <span className="text-[11px] text-muted">
+          · <span>{zone.deliveryCount === 1 ? '1 entrega' : `${zone.deliveryCount} entregas`}</span>
         </span>
-        <h2 className="font-serif font-semibold text-[25px] text-ink">Zona {zone.zone}</h2>
-        <span className="font-mono text-[11px] font-semibold tracking-[.06em] text-olive-600 bg-olive-100 border border-olive-200 rounded-full px-[11px] py-1">
-          {zone.deliveryCount} {zone.deliveryCount === 1 ? 'entrega' : 'entregas'}
-        </span>
-        <span className="h-px flex-1 bg-hairline" />
+        <span className={`h-px flex-1 ${tone.rule}`} />
       </div>
 
-      {zone.groups.length > 0 && (
-        <div className="flex flex-col gap-[14px]">
-          {zone.groups.map((g, i) => (
-            <DeliveryGroupCard key={g.groupToken} group={g} colorIndex={colorIndexOffset + i} />
-          ))}
+      {zone.groups.map((g) => (
+        <div key={g.groupToken} className="my-[6px]">
+          <DeliveryGroupCard group={g} shift={shift} />
         </div>
-      )}
+      ))}
 
-      {zone.singles.length > 0 && (
-        <div className="bg-paper border border-rule rounded-[13px] px-[18px] py-[6px]">
-          <div className="flex items-center gap-[9px] py-[11px] pb-[9px]">
-            <span className="font-mono text-[10px] font-semibold tracking-[.13em] uppercase text-faint">
-              Individuales
-            </span>
-            <span className="font-mono text-[10px] text-muted-dot">
-              {zone.singles.length === 1 ? '1 cliente' : `${zone.singles.length} clientes`}
-            </span>
-            <span className="h-px flex-1 bg-cream-2" />
-          </div>
-          <div className="flex flex-col">
-            {zone.singles.map((p) => (
-              <DeliveryPersonRow
-                key={p.id}
-                person={p}
-                avatarClass="bg-cream-2 border-hairline text-muted"
-                rowBorderClass="border-cream-2"
-                showAddress
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      {zone.singles.map((p) => (
+        <DeliveryPersonRow
+          key={p.id}
+          person={p}
+          avatarClass="bg-cream-2 border-hairline text-muted"
+          rowBorderClass="border-hairline"
+          showAddress
+        />
+      ))}
     </section>
   );
 }

@@ -1,11 +1,23 @@
-import { type UseFormRegister, type FieldErrors, type Control, Controller } from 'react-hook-form';
+import {
+  type UseFormRegister,
+  type FieldErrors,
+  type Control,
+  Controller,
+  useWatch,
+} from 'react-hook-form';
 import { parseISO, startOfToday } from 'date-fns';
 import { Field, inputCls, selectCls } from '@ui/Field';
 import { ToggleGroup } from '@ui/ToggleGroup';
 import { DatePickerInput } from '@ui/DatePickerInput';
 import { WizardSectionCard } from '@ui/WizardSectionCard';
 import type { NewClientFormValues } from '@/features/clients/types';
-import { ZONES, DELIVERIES, SEX_OPTIONS } from '@/features/clients/constants/clientOptions';
+import {
+  ZONES,
+  DELIVERIES,
+  SEX_OPTIONS,
+  SHIFT_DELIVERY,
+} from '@/features/clients/constants/clientOptions';
+import { DeliveryShiftPicker } from '@/features/clients/components/DeliveryShiftPicker';
 
 interface Props {
   register: UseFormRegister<NewClientFormValues>;
@@ -14,6 +26,8 @@ interface Props {
 }
 
 export function StepIdentity({ register, control, errors }: Props) {
+  const delivery = useWatch({ control, name: 'delivery' });
+
   return (
     <div className="flex flex-col gap-5">
       <WizardSectionCard
@@ -130,6 +144,20 @@ export function StepIdentity({ register, control, errors }: Props) {
               </Field>
             )}
           />
+
+          {delivery === SHIFT_DELIVERY && (
+            <div className="sm:col-start-2">
+              <Controller
+                name="deliveryShift"
+                control={control}
+                render={({ field }) => (
+                  <Field label="Turno de entrega" htmlFor="deliveryShift" required>
+                    <DeliveryShiftPicker value={field.value} onChange={field.onChange} />
+                  </Field>
+                )}
+              />
+            </div>
+          )}
         </div>
       </WizardSectionCard>
 

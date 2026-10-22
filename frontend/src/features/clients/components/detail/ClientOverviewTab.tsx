@@ -4,8 +4,23 @@ import { Label } from '@ui/Label';
 import { MEAL_LABELS } from '@/constants/meals';
 import type { Client, Subscription } from '@/features/clients/types';
 import { CLIENT_STATUS } from '@/features/clients/constants/clientStatus';
+import {
+  DELIVERY_SHIFT_LABELS,
+  SHIFT_DELIVERY,
+  type DeliveryShift,
+} from '@/features/clients/constants/clientOptions';
 import { EXPIRY_THRESHOLD_DAYS } from '@/features/clients/constants/subscription';
 import { formatDate } from '@/utils/format';
+
+const SHIFT_TAG_CLS: Record<DeliveryShift, string> = {
+  day: 'bg-delivery-2-chip-bg text-delivery-2-chip-text border border-delivery-2-card-border',
+  night: 'bg-olive-900 text-paper',
+};
+
+const SHIFT_DESCRIPTIONS: Record<DeliveryShift, string> = {
+  day: 'Recibe en la mañana del día de la comida.',
+  night: 'Recibe la noche anterior, de domingo a jueves.',
+};
 
 interface Props {
   client: Client;
@@ -15,6 +30,7 @@ interface Props {
 
 export function ClientOverviewTab({ client, sub, remaining }: Props) {
   const { status } = client;
+  const shift = client.delivery === SHIFT_DELIVERY ? client.deliveryShift : null;
   const delivered = sub ? Math.max(0, sub.duration - remaining) : 0;
   const progressPct = sub && sub.duration > 0 ? Math.min(100, (delivered / sub.duration) * 100) : 0;
   const hasHealthInformation =
@@ -116,9 +132,22 @@ export function ClientOverviewTab({ client, sub, remaining }: Props) {
               <Icon name="pin" size={16} className="text-muted shrink-0" />
               <span className="text-[13.5px] text-ink">{client.address}</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Icon name="truck" size={16} className="text-muted shrink-0" />
-              <span className="text-[13.5px] text-ink">Entrega: {client.delivery}</span>
+            <div className="flex flex-col gap-[6px]">
+              <div className="flex items-center gap-3 flex-wrap">
+                <Icon name="truck" size={16} className="text-muted shrink-0" />
+                <span className="text-[13.5px] text-ink">Entrega: {client.delivery}</span>
+                {shift && (
+                  <span
+                    className={`inline-flex items-center gap-[6px] text-[11.5px] font-semibold rounded-full pl-[7px] pr-[10px] py-[3px] ${SHIFT_TAG_CLS[shift]}`}
+                  >
+                    <Icon name={shift === 'night' ? 'moon' : 'sun'} size={12} stroke={2} />
+                    {DELIVERY_SHIFT_LABELS[shift]}
+                  </span>
+                )}
+              </div>
+              {shift && (
+                <p className="text-[11.5px] text-ink-2 pl-[28px]">{SHIFT_DESCRIPTIONS[shift]}</p>
+              )}
             </div>
           </div>
           {(client.nit || client.businessName) && (

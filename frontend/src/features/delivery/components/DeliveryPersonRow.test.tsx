@@ -37,15 +37,19 @@ describe('DeliveryPersonRow', () => {
     expect(nameColumn).toContainElement(link);
   });
 
-  it('positions the phone as a trailing element of the row, not under the address (single)', () => {
+  // A single stop carries a long address. On wide screens the phone trails the row; on a phone
+  // it sits under the address instead, so the address keeps the whole width.
+  it('trails the phone on wide screens and stacks it under the address on phones (single)', () => {
     const { container } = render(
       <DeliveryPersonRow person={person} avatarClass="" rowBorderClass="" showAddress />,
     );
     const row = container.firstChild as HTMLElement;
     const nameColumn = row.children[1];
-    const link = screen.getByRole('link', { name: /7259 1232/ });
-    expect(nameColumn).not.toContainElement(link);
-    expect(row).toContainElement(link);
+    const [stacked, trailing] = screen.getAllByRole('link', { name: /7259 1232/ });
+    expect(nameColumn).toContainElement(stacked);
+    expect(stacked.className).toContain('sm:hidden');
+    expect(nameColumn).not.toContainElement(trailing);
+    expect(trailing.className).toContain('hidden sm:inline-flex');
   });
 
   it('does not render the address by default', () => {

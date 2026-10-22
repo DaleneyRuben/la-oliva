@@ -279,6 +279,24 @@ describe('NewClientPage', () => {
     });
   });
 
+  it('sends the delivery shift chosen for a La Oliva client', async () => {
+    renderPage();
+    await fillStep1();
+    await userEvent.click(screen.getByRole('radio', { name: /Noche/ }));
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /completo/i }));
+    fireEvent.change(screen.getByLabelText(/fecha de inicio/i), {
+      target: { value: '2026-06-01' },
+    });
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await userEvent.click(screen.getByRole('button', { name: /crear/i }));
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(1));
+    expect(mockPost.mock.calls[0][1].client).toEqual(
+      expect.objectContaining({ delivery: 'La Oliva', deliveryShift: 'night' }),
+    );
+  });
+
   it('subscription POST defaults the price to the selected plan price', async () => {
     await navigateToStep3();
     await userEvent.click(screen.getByRole('button', { name: /completo/i }));

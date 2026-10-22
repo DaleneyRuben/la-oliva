@@ -135,4 +135,15 @@ describe('Icon', () => {
     const { container } = render(<Icon name="copy" />);
     expect(container.querySelector('svg')).toBeInTheDocument();
   });
+
+  it('renders a disc with rays for sun', () => {
+    const { container } = render(<Icon name="sun" />);
+    expect(container.querySelectorAll('circle')).toHaveLength(1);
+    expect(container.querySelectorAll('path')).toHaveLength(1);
+  });
+
+  it('renders a crescent for moon', () => {
+    const { container } = render(<Icon name="moon" />);
+    expect(container.querySelectorAll('path')).toHaveLength(1);
+  });
 });

@@ -10,8 +10,17 @@ jest.mock('@/services/api', () => ({
 const mockGet = api.get as jest.Mock;
 
 const response = {
-  '2026-06-25': { zones: [{ zone: 'Sur', deliveryCount: 1, groups: [], singles: [] }] },
-  '2026-06-26': { zones: [] },
+  '2026-06-25': {
+    day: {
+      mealDate: '2026-06-25',
+      zones: [{ zone: 'Sur', deliveryCount: 1, groups: [], singles: [] }],
+    },
+    night: { mealDate: '2026-06-26', zones: [] },
+  },
+  '2026-06-26': {
+    day: { mealDate: '2026-06-26', zones: [] },
+    night: { mealDate: '2026-06-27', zones: [] },
+  },
 };
 
 function makeWrapper() {
@@ -42,8 +51,8 @@ describe('useDeliveryRoute', () => {
 
     expect(result.current.todayDate).toBe('2026-06-25');
     expect(result.current.tomorrowDate).toBe('2026-06-26');
-    expect(result.current.today?.zones).toHaveLength(1);
-    expect(result.current.tomorrow?.zones).toEqual([]);
+    expect(result.current.today?.day.zones).toHaveLength(1);
+    expect(result.current.tomorrow?.day.zones).toEqual([]);
   });
 
   it('calls GET /delivery', async () => {

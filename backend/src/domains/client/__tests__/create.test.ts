@@ -57,7 +57,10 @@ describe('create', () => {
 
     await create(validPayload as never, transaction);
 
-    expect(Client.create).toHaveBeenCalledWith(validPayload, { transaction });
+    expect(Client.create).toHaveBeenCalledWith(
+      { ...validPayload, deliveryShift: 'day' },
+      { transaction },
+    );
   });
 
   it('allows a phone number shared by multiple clients', async () => {
@@ -66,6 +69,17 @@ describe('create', () => {
     (Client.create as jest.Mock).mockResolvedValue(mockClient);
 
     await expect(create(validPayload as never)).resolves.toEqual(mockClient);
-    expect(Client.create).toHaveBeenCalledWith(validPayload);
+    expect(Client.create).toHaveBeenCalledWith({ ...validPayload, deliveryShift: 'day' });
+  });
+
+  it('stores the shift a La Oliva client chose, and none for Otro', async () => {
+    jest.clearAllMocks();
+    (Client.create as jest.Mock).mockResolvedValue(mockClient);
+
+    await create({ ...validPayload, deliveryShift: 'night' } as never);
+    await create({ ...validPayload, delivery: 'Otro', deliveryShift: 'night' } as never);
+
+    expect((Client.create as jest.Mock).mock.calls[0][0]).toMatchObject({ deliveryShift: 'night' });
+    expect((Client.create as jest.Mock).mock.calls[1][0]).toMatchObject({ deliveryShift: null });
   });
 });

@@ -41,6 +41,8 @@ const ICON_NAMES = [
   'chevron-down',
   'dollar-sign',
   'clock',
+  'sun',
+  'moon',
   'arrow-down',
   'chevron-left',
   'chevron-right',

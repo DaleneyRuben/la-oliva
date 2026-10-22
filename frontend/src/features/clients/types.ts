@@ -1,4 +1,5 @@
 import type { HistoryEventType } from '@/features/clients/constants/historyEvents';
+import type { DeliveryShift } from '@/features/clients/constants/clientOptions';
 import type { Plan } from '@/features/plans/types';
 
 export interface Subscription {
@@ -39,6 +40,7 @@ export interface Client {
   address: string;
   deliveryZone: string;
   delivery: string | null;
+  deliveryShift: DeliveryShift | null;
   nit: string | null;
   businessName: string | null;
   underlyingDiseases: string[];
@@ -87,6 +89,7 @@ export interface NewClientFormValues {
   address: string;
   deliveryZone: string;
   delivery: string;
+  deliveryShift: DeliveryShift;
   nit: string;
   businessName: string;
   planId: string | null;

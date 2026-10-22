@@ -30,4 +30,14 @@ describe('client schema', () => {
       createClientSchema.safeParse({ ...validClient, dateOfBirth: '2999-01-01' }).success,
     ).toBe(false);
   });
+
+  it('accepts a delivery shift on creation and editing, and rejects an unknown one', () => {
+    expect(createClientSchema.safeParse({ ...validClient, deliveryShift: 'night' }).success).toBe(
+      true,
+    );
+    expect(updateClientSchema.safeParse({ deliveryShift: 'day' }).success).toBe(true);
+    expect(createClientSchema.safeParse({ ...validClient, deliveryShift: 'tarde' }).success).toBe(
+      false,
+    );
+  });
 });

@@ -116,3 +116,30 @@ it('shows health information below restrictions when health data is available', 
   const health = screen.getByText('Información de salud');
   expect(restrictions.compareDocumentPosition(health)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
 });
+
+it('shows the delivery shift beside a La Oliva delivery', () => {
+  render(
+    <ClientOverviewTab client={{ ...client, deliveryShift: 'night' }} sub={sub} remaining={15} />,
+  );
+  expect(screen.getByText('Noche')).toBeInTheDocument();
+  expect(screen.getByText('Recibe la noche anterior, de domingo a jueves.')).toBeInTheDocument();
+});
+
+it('describes the day shift as a morning delivery', () => {
+  render(
+    <ClientOverviewTab client={{ ...client, deliveryShift: 'day' }} sub={sub} remaining={15} />,
+  );
+  expect(screen.getByText('Día')).toBeInTheDocument();
+  expect(screen.getByText('Recibe en la mañana del día de la comida.')).toBeInTheDocument();
+});
+
+it('shows no shift for a client delivered by Otro', () => {
+  render(
+    <ClientOverviewTab
+      client={{ ...client, delivery: 'Otro', deliveryShift: null }}
+      sub={sub}
+      remaining={15}
+    />,
+  );
+  expect(screen.queryByText(/^Recibe/)).not.toBeInTheDocument();
+});

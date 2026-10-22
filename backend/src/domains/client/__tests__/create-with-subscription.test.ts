@@ -53,7 +53,10 @@ describe('createWithSubscription', () => {
       actor,
     );
 
-    expect(Client.create).toHaveBeenCalledWith(clientData, { transaction });
+    expect(Client.create).toHaveBeenCalledWith(
+      expect.objectContaining({ ...clientData, deliveryShift: 'day' }),
+      { transaction },
+    );
     expect(createSubscription).toHaveBeenCalledWith(
       12,
       { ...subscriptionData, paid: true },

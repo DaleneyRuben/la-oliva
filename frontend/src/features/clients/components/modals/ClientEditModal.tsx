@@ -13,7 +13,13 @@ import { ToggleGroup } from '@ui/ToggleGroup';
 import { TogglePill } from '@ui/TogglePill';
 import { usePendingAction } from '@/hooks/usePendingAction';
 import { DISEASES } from '@/features/clients/constants/diseases';
-import { ZONES, DELIVERIES, SEX_OPTIONS } from '@/features/clients/constants/clientOptions';
+import {
+  ZONES,
+  DELIVERIES,
+  SEX_OPTIONS,
+  SHIFT_DELIVERY,
+} from '@/features/clients/constants/clientOptions';
+import { DeliveryShiftField } from '@/features/clients/components/modals/DeliveryShiftField';
 import type { Client } from '@/features/clients/types';
 import { normalizeUnderlyingDiseases } from '@/features/clients/utils/underlyingDiseases';
 
@@ -25,6 +31,7 @@ export interface EditDraft {
   address: string;
   deliveryZone: string;
   delivery: string;
+  deliveryShift: NonNullable<Client['deliveryShift']>;
   nit: string;
   businessName: string;
   underlyingDiseases: string[];
@@ -45,6 +52,7 @@ export function draftFromClient(c: Client): EditDraft {
     address: c.address,
     deliveryZone: c.deliveryZone,
     delivery: c.delivery ?? '',
+    deliveryShift: c.deliveryShift ?? 'day',
     nit: c.nit ?? '',
     businessName: c.businessName ?? '',
     ...normalizeUnderlyingDiseases(c.underlyingDiseases),
@@ -271,6 +279,14 @@ export function ClientEditModal({
                   />
                 </Field>
               </div>
+              {draft.delivery === SHIFT_DELIVERY && (
+                <DeliveryShiftField
+                  shift={draft.deliveryShift}
+                  savedShift={client.deliveryShift}
+                  groupMembers={client.groupMembers}
+                  onChange={(deliveryShift) => set({ deliveryShift })}
+                />
+              )}
             </div>
           </div>
 
