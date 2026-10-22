@@ -21,13 +21,13 @@ describe('Field', () => {
     expect(screen.getByText('*')).toHaveClass('text-required');
   });
 
-  it('shows the error message', () => {
+  it('shows the error message in the alert color', () => {
     render(
       <Field label="Usuario" htmlFor="username" error="Campo requerido">
         <input id="username" />
       </Field>,
     );
-    expect(screen.getByText('Campo requerido')).toBeInTheDocument();
+    expect(screen.getByText('Campo requerido')).toHaveClass('text-alert');
   });
 
   it('defaults to the mono/uppercase label style', () => {
@@ -62,8 +62,10 @@ describe('inputCls', () => {
     expect(cls).toContain('px-[14px]');
   });
 
-  it('shows the warn border when hasError is true', () => {
-    expect(inputCls(true)).toContain('border-warn');
+  it('shows the alert border and halo when hasError is true', () => {
+    expect(inputCls(true)).toContain('border-alert');
+    expect(inputCls(true)).toContain('ring-alert/12');
+    expect(inputCls(true)).not.toContain('border-warn');
   });
 });
 
@@ -73,7 +75,8 @@ describe('selectCls', () => {
     expect(selectCls()).toContain('pr-9');
   });
 
-  it('shows the warn border when hasError is true', () => {
-    expect(selectCls(true)).toContain('border-warn');
+  it('shows the alert border when hasError is true', () => {
+    expect(selectCls(true)).toContain('border-alert');
+    expect(selectCls(true)).not.toContain('border-warn');
   });
 });
