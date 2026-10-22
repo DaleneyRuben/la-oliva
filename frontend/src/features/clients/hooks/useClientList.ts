@@ -1,5 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import api from '@/services/api';
+import type { DeliveryShift } from '@/features/clients/constants/clientOptions';
 import type { Client } from '@/features/clients/types';
 import { CLIENT_STATUS } from '@/features/clients/constants/clientStatus';
 
@@ -11,6 +12,7 @@ export interface ClientCreateDraft {
   address: string;
   deliveryZone: string;
   delivery: string;
+  deliveryShift: DeliveryShift | null;
   nit?: string;
   businessName?: string;
   underlyingDiseases: string[];
@@ -38,6 +40,7 @@ export interface ClientUpdateDraft {
   address?: string;
   deliveryZone?: string;
   delivery?: string;
+  deliveryShift?: DeliveryShift | null;
   nit?: string | null;
   businessName?: string | null;
   underlyingDiseases?: string[];
