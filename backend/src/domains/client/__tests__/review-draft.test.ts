@@ -52,7 +52,10 @@ describe('reviewDraft', () => {
 
     const result = await reviewDraft(1, clientData as never, subscriptionData as never, actor);
 
-    expect(draft.update).toHaveBeenCalledWith({ ...clientData, isDraft: false }, { transaction });
+    expect(draft.update).toHaveBeenCalledWith(
+      { ...clientData, deliveryShift: 'day', isDraft: false },
+      { transaction },
+    );
     expect(createSubscription).toHaveBeenCalledWith(
       1,
       { ...subscriptionData, paid: true },
@@ -69,5 +72,17 @@ describe('reviewDraft', () => {
       reviewDraft(1, clientData as never, subscriptionData as never, actor),
     ).resolves.toBeNull();
     expect(createSubscription).not.toHaveBeenCalled();
+  });
+
+  it('gives a reviewed La Oliva draft a day shift when none was chosen', async () => {
+    const draft = { id: 1, isDraft: true, update: jest.fn().mockResolvedValue({ id: 1 }) };
+    (Client.findByPk as jest.Mock).mockResolvedValue(draft);
+
+    await reviewDraft(1, clientData as never, subscriptionData as never, actor);
+
+    expect(draft.update).toHaveBeenCalledWith(
+      expect.objectContaining({ deliveryShift: 'day', isDraft: false }),
+      { transaction },
+    );
   });
 });
