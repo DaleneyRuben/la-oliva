@@ -177,4 +177,16 @@ describe('setDeliveryGroup', () => {
     await expect(setDeliveryGroup(999, [1])).rejects.toThrow();
     expect(sequelize.transaction).not.toHaveBeenCalled();
   });
+
+  it('gives joining members the shift of the client whose group they join', async () => {
+    const clientInstance = makeClient({ id: 1, groupToken: 'tok-1', deliveryShift: 'night' });
+    (Client.findByPk as jest.Mock).mockResolvedValue(clientInstance);
+
+    await setDeliveryGroup(1, [2, 3]);
+
+    expect(Client.update).toHaveBeenCalledWith(
+      { groupToken: 'tok-1', deliveryShift: 'night' },
+      { where: { id: [2, 3] }, transaction },
+    );
+  });
 });
