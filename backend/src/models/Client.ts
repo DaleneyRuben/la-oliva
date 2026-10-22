@@ -27,6 +27,9 @@ class Client extends Model {
   declare delivery: string | null;
 
   @Column({ type: DataType.STRING, allowNull: true })
+  declare deliveryShift: string | null;
+
+  @Column({ type: DataType.STRING, allowNull: true })
   declare nit: string | null;
 
   @Column({ type: DataType.STRING, allowNull: true })
