@@ -143,6 +143,26 @@ describe('NewClientPage', () => {
     expect(screen.getByText(/nombre es requerido/i)).toBeInTheDocument();
   });
 
+  it('summarises how many step 1 fields need fixing next to Siguiente', async () => {
+    renderPage();
+    await userEvent.type(screen.getByLabelText(/nombre/i), 'María García');
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Revisa 6 campos antes de continuar',
+    );
+  });
+
+  it('shows the missing plan as a red field error on step 3', async () => {
+    await navigateToStep3();
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    expect(await screen.findByText('Plan es requerido')).toHaveClass('text-alert');
+  });
+
+  it('shows no summary before the user tries to advance', () => {
+    renderPage();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
   it('shows a Cancelar link back to /clientes on step 1', async () => {
     renderPage();
     await userEvent.click(screen.getByRole('button', { name: /cancelar/i }));
