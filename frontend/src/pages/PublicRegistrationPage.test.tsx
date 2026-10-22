@@ -107,3 +107,78 @@ it('shows a loading state and sends one request when the submit button is clicke
   resolveRequest({ ok: true } as Response);
   await screen.findByRole('heading', { name: 'Recibimos tu solicitud' });
 });
+
+it('shows a red error under each empty field and a summary instead of advancing', async () => {
+  const user = userEvent.setup();
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  await user.type(document.getElementById('firstName') as HTMLInputElement, 'María');
+  await user.click(screen.getByRole('button', { name: 'Continuar' }));
+
+  expect(screen.getByRole('heading', { name: 'Datos personales' })).toBeInTheDocument();
+  expect(screen.getByText('Ingresa tu primer apellido')).toHaveClass('text-alert');
+  expect(screen.getByText('Selecciona una zona')).toHaveClass('text-alert');
+  expect(screen.queryByText('Ingresa tu primer nombre')).not.toBeInTheDocument();
+  expect(document.getElementById('lastName')).toHaveAttribute('aria-invalid', 'true');
+  expect(document.getElementById('lastName')).toHaveClass('border-alert');
+  expect(screen.getByRole('alert')).toHaveTextContent('Revisa 7 campos antes de continuar');
+});
+
+it('clears a field error as soon as the field is filled', async () => {
+  const user = userEvent.setup();
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  await user.click(screen.getByRole('button', { name: 'Continuar' }));
+  await user.type(document.getElementById('lastName') as HTMLInputElement, 'Pérez');
+
+  expect(screen.queryByText('Ingresa tu primer apellido')).not.toBeInTheDocument();
+  expect(screen.getByRole('alert')).toHaveTextContent('Revisa 7 campos antes de continuar');
+});
+
+it('turns off the browser validation popup so the inline errors are the only feedback', () => {
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  expect(screen.getByRole('button', { name: 'Continuar' }).closest('form')).toHaveAttribute(
+    'novalidate',
+  );
+});
+
+it('flags weight and height on the health step', async () => {
+  const user = userEvent.setup();
+  const field = (id: string) => document.getElementById(id) as HTMLInputElement;
+  render(
+    <MemoryRouter>
+      <PublicRegistrationPage />
+    </MemoryRouter>,
+  );
+
+  await user.type(field('firstName'), 'María');
+  await user.type(field('lastName'), 'Prueba');
+  await user.type(field('dateOfBirth'), '01011990');
+  await user.type(field('phoneNumber'), '70000001');
+  await user.selectOptions(field('sex'), 'female');
+  await user.type(field('address'), 'Calle de prueba 123');
+  await user.type(field('preferredStartDate'), '18092026');
+  await user.click(screen.getByRole('button', { name: 'Centro' }));
+  await user.click(screen.getByRole('button', { name: 'Continuar' }));
+  await screen.findByRole('heading', { name: 'Tu salud' });
+
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  await user.click(screen.getByRole('button', { name: 'Continuar' }));
+
+  expect(screen.getByText('Ingresa tu peso')).toHaveClass('text-alert');
+  expect(screen.getByText('Ingresa tu talla')).toHaveClass('text-alert');
+  expect(screen.getByRole('alert')).toHaveTextContent('Revisa 2 campos antes de continuar');
+});
