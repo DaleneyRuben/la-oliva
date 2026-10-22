@@ -17,6 +17,7 @@ import { StepPlan } from '@/features/clients/components/wizard/StepPlan';
 import { StepRestrictions } from '@/features/clients/components/wizard/StepRestrictions';
 import type { NewClientFormValues, RestrictionsState } from '@/features/clients/types';
 import { normalizeUnderlyingDiseases } from '@/features/clients/utils/underlyingDiseases';
+import { SHIFT_DELIVERY } from '@/features/clients/constants/clientOptions';
 
 const STEPS = ['Identidad', 'Restricciones', 'Plan', 'Confirmar'];
 
@@ -64,6 +65,7 @@ export function NewClientPage() {
       address: '',
       deliveryZone: '',
       delivery: '',
+      deliveryShift: 'day',
       nit: '',
       businessName: '',
       planId: null,
@@ -125,6 +127,7 @@ export function NewClientPage() {
       address: data.address,
       deliveryZone: data.deliveryZone,
       delivery: data.delivery,
+      deliveryShift: data.delivery === SHIFT_DELIVERY ? data.deliveryShift : null,
       ...(data.nit ? { nit: data.nit } : {}),
       ...(data.businessName ? { businessName: data.businessName } : {}),
       underlyingDiseases: restrictions.underlyingDiseases.map((disease) =>
