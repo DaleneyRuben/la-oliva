@@ -1,5 +1,6 @@
 import Client from '../../models/Client';
 import { withTransaction } from '../../database/with-transaction';
+import { resolveDeliveryShift } from './_helpers';
 import { create as createSubscription } from '../subscription';
 import type { CreateClientDto } from '../../schemas/client.schema';
 import type { CreateSubscriptionDto } from '../../schemas/subscription.schema';
@@ -15,7 +16,8 @@ export const reviewDraft = (
     const draft = await Client.findByPk(id, { transaction, lock: transaction.LOCK.UPDATE });
     if (!draft || !draft.isDraft) return null;
 
-    const reviewed = await draft.update({ ...clientData, isDraft: false } as never, {
+    const deliveryShift = resolveDeliveryShift(clientData.delivery, clientData.deliveryShift);
+    const reviewed = await draft.update({ ...clientData, deliveryShift, isDraft: false } as never, {
       transaction,
     });
     await createSubscription(id, { ...subscriptionData, paid: true }, actor, transaction);
