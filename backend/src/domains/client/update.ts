@@ -5,7 +5,12 @@ import { UpdateClientDto } from '../../schemas/client.schema';
 import type { Actor } from '../../types/actor';
 import { appToday } from '../../utils/date';
 import { pause, resume } from '../subscription';
-import { withStatus, getCurrentSubscription, INCLUDE_SUBSCRIPTION_ORDERED } from './_helpers';
+import {
+  withStatus,
+  getCurrentSubscription,
+  INCLUDE_SUBSCRIPTION_ORDERED,
+  resolveDeliveryShift,
+} from './_helpers';
 
 type SubLike = {
   id: number;
@@ -14,6 +19,17 @@ type SubLike = {
   contractEndDate?: string | null;
   finalizedAt?: string | null;
   pausedSince?: Date | null;
+};
+
+type ClientFields = Omit<UpdateClientDto, 'pausedSince'>;
+
+// The shift is only re-resolved when the edit touches delivery, so an unrelated edit never
+// rewrites it.
+const withResolvedShift = (client: Client, fields: ClientFields): ClientFields => {
+  if (fields.delivery === undefined && fields.deliveryShift === undefined) return fields;
+  const delivery = fields.delivery ?? client.delivery;
+  const shift = fields.deliveryShift !== undefined ? fields.deliveryShift : client.deliveryShift;
+  return { ...fields, deliveryShift: resolveDeliveryShift(delivery, shift) };
 };
 
 export const update = async (
@@ -28,6 +44,7 @@ export const update = async (
   // The API still speaks of pausing "the client", but a pause belongs to a plan. This domain
   // resolves which plan the request means; the subscription domain owns the pause itself.
   const { pausedSince, ...clientFields } = data;
+  const previousShift = client.deliveryShift;
 
   const updated = await withTransaction(transaction, async (t) => {
     let pauseChanged = false;
@@ -48,7 +65,16 @@ export const update = async (
       }
     }
 
-    const saved = await client.update(clientFields, { transaction: t });
+    const fields = withResolvedShift(client, clientFields);
+    const saved = await client.update(fields, { transaction: t });
+
+    // Everyone in a group shares one shift, since a group is one stop.
+    if (client.groupToken && 'deliveryShift' in fields && fields.deliveryShift !== previousShift) {
+      await Client.update(
+        { deliveryShift: fields.deliveryShift },
+        { where: { groupToken: client.groupToken }, transaction: t },
+      );
+    }
 
     // The pause was written to a different row than the one held in memory here, so the
     // subscriptions loaded above are stale and would report the status from before the change.
