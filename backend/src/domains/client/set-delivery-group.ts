@@ -59,6 +59,11 @@ export const setDeliveryGroup = async (
       );
     }
 
-    await Client.update({ groupToken: token }, { where: { id: memberIds }, transaction: t });
+    // A group is one stop, so it is delivered in one shift: joiners take the shift of the client
+    // whose group they are joining.
+    await Client.update(
+      { groupToken: token, deliveryShift: client.deliveryShift },
+      { where: { id: memberIds }, transaction: t },
+    );
   });
 };
