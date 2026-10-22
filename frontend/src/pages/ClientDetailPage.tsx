@@ -22,6 +22,7 @@ import { ConfirmDeleteRenewalModal } from '@/features/clients/components/modals/
 import { ClientDetailSkeleton } from '@/features/clients/components/detail/ClientDetailSkeleton';
 import { useAuth } from '@/features/auth/AuthContext';
 import { ROLES } from '@/constants/roles';
+import { SHIFT_DELIVERY } from '@/features/clients/constants/clientOptions';
 
 type TabId = 'overview' | 'plan' | 'entregas' | 'history';
 
@@ -76,6 +77,7 @@ export function ClientDetailPage() {
       address: draft.address,
       deliveryZone: draft.deliveryZone,
       delivery: draft.delivery,
+      deliveryShift: draft.delivery === SHIFT_DELIVERY ? draft.deliveryShift : null,
       nit: draft.nit || null,
       businessName: draft.businessName || null,
       underlyingDiseases: draft.underlyingDiseases.map((disease) =>
