@@ -1,5 +1,10 @@
 import Plan from '../../../models/Plan';
-import { getPrimarySubscription, INCLUDE_SUBSCRIPTION_ORDERED, withStatus } from '../_helpers';
+import {
+  getPrimarySubscription,
+  INCLUDE_SUBSCRIPTION_ORDERED,
+  resolveDeliveryShift,
+  withStatus,
+} from '../_helpers';
 
 jest.mock('../../../models/Subscription');
 jest.mock('../../../models/Plan');
@@ -223,5 +228,21 @@ describe('withStatus', () => {
     expect(
       withStatus({ ...baseClient, subscriptions: [sinFecha, running] }).pausedSince,
     ).toBeNull();
+  });
+});
+
+describe('resolveDeliveryShift', () => {
+  it('keeps the chosen shift for a La Oliva client', () => {
+    expect(resolveDeliveryShift('La Oliva', 'night')).toBe('night');
+  });
+
+  it('defaults a La Oliva client with no shift to day', () => {
+    expect(resolveDeliveryShift('La Oliva', undefined)).toBe('day');
+    expect(resolveDeliveryShift('La Oliva', null)).toBe('day');
+  });
+
+  it('clears the shift for a client not delivered by La Oliva', () => {
+    expect(resolveDeliveryShift('Otro', 'night')).toBeNull();
+    expect(resolveDeliveryShift(null, 'day')).toBeNull();
   });
 });
