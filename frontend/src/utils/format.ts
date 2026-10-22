@@ -30,6 +30,10 @@ export function formatShortDate(iso: string) {
   return format(parseISO(iso), 'dd/MM');
 }
 
+export function formatWeekdayDay(iso: string) {
+  return format(parseISO(iso), 'EEEE d', { locale: es });
+}
+
 export function formatWeekdayDate(iso: string) {
   const label = format(parseISO(iso), 'EEEE dd/MM', { locale: es });
   return label.charAt(0).toUpperCase() + label.slice(1);
