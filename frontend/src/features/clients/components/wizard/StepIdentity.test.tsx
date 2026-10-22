@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { useForm } from 'react-hook-form';
 import type { NewClientFormValues } from '@/features/clients/types';
 import { StepIdentity } from './StepIdentity';
@@ -17,6 +18,7 @@ function Wrapper() {
       address: '',
       deliveryZone: '',
       delivery: '',
+      deliveryShift: 'day',
       nit: '',
       businessName: '',
     },
@@ -47,4 +49,17 @@ it('renders the address field', () => {
 it('renders the NIT field', () => {
   render(<Wrapper />);
   expect(screen.getByLabelText(/nit/i)).toBeInTheDocument();
+});
+
+it('asks for the delivery shift only once La Oliva is chosen', async () => {
+  render(<Wrapper />);
+  expect(screen.queryByRole('radiogroup', { name: 'Turno de entrega' })).not.toBeInTheDocument();
+
+  await userEvent.click(screen.getByRole('button', { name: 'La Oliva' }));
+
+  expect(screen.getByRole('radio', { name: /Día/ })).toHaveAttribute('aria-checked', 'true');
+
+  await userEvent.click(screen.getByRole('button', { name: 'Otro' }));
+
+  expect(screen.queryByRole('radiogroup', { name: 'Turno de entrega' })).not.toBeInTheDocument();
 });
