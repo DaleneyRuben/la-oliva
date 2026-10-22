@@ -12,6 +12,7 @@ const client: Client = {
   address: 'Calle Falsa 123',
   deliveryZone: 'Centro',
   delivery: 'La Oliva',
+  deliveryShift: 'night',
   nit: null,
   businessName: null,
   underlyingDiseases: [],
@@ -130,4 +131,41 @@ it('stays open while saving', async () => {
   expect(onClose).not.toHaveBeenCalled();
   expect(screen.getByRole('button', { name: /cancelar/i })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Cerrar' })).toBeDisabled();
+});
+
+it('shows the saved delivery shift and saves a changed one', async () => {
+  const onSave = jest.fn().mockResolvedValue(undefined);
+  render(<ClientEditModal client={client} onSave={onSave} onClose={jest.fn()} isSaving={false} />);
+
+  expect(screen.getByRole('radio', { name: /Noche/ })).toHaveAttribute('aria-checked', 'true');
+  await userEvent.click(screen.getByRole('radio', { name: /Día/ }));
+  await userEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+
+  expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ deliveryShift: 'day' }));
+});
+
+it('hides the delivery shift for a client delivered by Otro', async () => {
+  render(
+    <ClientEditModal client={client} onSave={jest.fn()} onClose={jest.fn()} isSaving={false} />,
+  );
+
+  // Delivery's Otro comes before the diseases' Otro pill.
+  await userEvent.click(screen.getAllByRole('button', { name: 'Otro' })[0]);
+
+  expect(screen.queryByRole('radiogroup', { name: 'Turno de entrega' })).not.toBeInTheDocument();
+});
+
+it('starts a client moving to La Oliva on the day shift', async () => {
+  render(
+    <ClientEditModal
+      client={{ ...client, delivery: 'Otro', deliveryShift: null }}
+      onSave={jest.fn()}
+      onClose={jest.fn()}
+      isSaving={false}
+    />,
+  );
+
+  await userEvent.click(screen.getByRole('button', { name: 'La Oliva' }));
+
+  expect(screen.getByRole('radio', { name: /Día/ })).toHaveAttribute('aria-checked', 'true');
 });
