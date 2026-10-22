@@ -1,3 +1,4 @@
+import type { DeliveryShift } from '../../constants/client.constants';
 import Subscription from '../../models/Subscription';
 import { INCLUDE_HISTORICAL_PLAN } from '../../models/plan-includes';
 import { appToday } from '../../utils/date';
@@ -97,4 +98,14 @@ export function withStatus(client: any): Record<string, unknown> {
   // Derived, never stored: the detail view needs to know whether the plan on screen is the paused
   // one to choose between Pausar and Reanudar, and that is a fact about the current subscription.
   return { ...plain, status, pausedSince: sub?.pausedSince ?? null };
+}
+
+// Only La Oliva delivers in shifts. A La Oliva client with no shift chosen is delivered by day,
+// as La Oliva always has; anyone else has no shift at all.
+export function resolveDeliveryShift(
+  delivery: string | null | undefined,
+  shift: DeliveryShift | string | null | undefined,
+): DeliveryShift | null {
+  if (delivery !== 'La Oliva') return null;
+  return shift === 'night' ? 'night' : 'day';
 }
