@@ -1,8 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import {
-  DeliveryGroupCard,
-  GROUP_PALETTE_SIZE,
-} from '@/features/delivery/components/DeliveryGroupCard';
+import { DeliveryGroupCard } from '@/features/delivery/components/DeliveryGroupCard';
 import type { DeliveryGroup } from '@/features/delivery/types';
 
 const group: DeliveryGroup = {
@@ -29,23 +26,23 @@ const group: DeliveryGroup = {
 
 describe('DeliveryGroupCard', () => {
   it('shows the "Entrega conjunta" label', () => {
-    render(<DeliveryGroupCard group={group} colorIndex={0} />);
+    render(<DeliveryGroupCard group={group} shift="day" />);
     expect(screen.getByText('Entrega conjunta')).toBeInTheDocument();
   });
 
   it('shows the member count chip', () => {
-    render(<DeliveryGroupCard group={group} colorIndex={0} />);
+    render(<DeliveryGroupCard group={group} shift="day" />);
     expect(screen.getByText('2 clientes')).toBeInTheDocument();
   });
 
   it('renders every member', () => {
-    render(<DeliveryGroupCard group={group} colorIndex={0} />);
+    render(<DeliveryGroupCard group={group} shift="day" />);
     expect(screen.getByText('Carmen Tapia')).toBeInTheDocument();
     expect(screen.getByText('Jorge Rengel')).toBeInTheDocument();
   });
 
   it('shows the shared address once, taken from the first member', () => {
-    render(<DeliveryGroupCard group={group} colorIndex={0} />);
+    render(<DeliveryGroupCard group={group} shift="day" />);
     expect(screen.getAllByText('C. Sucre #88, Centro')).toHaveLength(1);
   });
 
@@ -56,24 +53,20 @@ describe('DeliveryGroupCard', () => {
           ...group,
           members: group.members.map((member) => ({ ...member, delivery: 'Otro' as const })),
         }}
-        colorIndex={0}
+        shift="day"
       />,
     );
 
     expect(screen.getAllByText('Entrega fuera de La Oliva')).toHaveLength(1);
   });
 
-  it('wraps the colorIndex around the palette size', () => {
-    const { container: c1 } = render(<DeliveryGroupCard group={group} colorIndex={0} />);
-    const { container: c2 } = render(
-      <DeliveryGroupCard group={group} colorIndex={GROUP_PALETTE_SIZE} />,
-    );
-    expect(c1.firstChild?.className).toBe(c2.firstChild?.className);
+  it('takes the warm palette inside the day run', () => {
+    const { container } = render(<DeliveryGroupCard group={group} shift="day" />);
+    expect((container.firstChild as HTMLElement).className).toContain('bg-delivery-2-card-bg');
   });
 
-  it('uses a different palette color for a different colorIndex', () => {
-    const { container: c1 } = render(<DeliveryGroupCard group={group} colorIndex={0} />);
-    const { container: c2 } = render(<DeliveryGroupCard group={group} colorIndex={1} />);
-    expect(c1.firstChild?.className).not.toBe(c2.firstChild?.className);
+  it('takes the olive palette inside the night run', () => {
+    const { container } = render(<DeliveryGroupCard group={group} shift="night" />);
+    expect((container.firstChild as HTMLElement).className).toContain('bg-delivery-1-card-bg');
   });
 });
