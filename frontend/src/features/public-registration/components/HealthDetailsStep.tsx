@@ -1,3 +1,4 @@
+import { FieldError } from '@ui/FieldError';
 import { DISEASES } from '@/features/clients/constants/diseases';
 import { ListEditor } from '@/features/public-registration/components/ListEditor';
 import {
@@ -6,6 +7,7 @@ import {
   UpdateRegistrationForm,
 } from '@/features/public-registration/types';
 import { publicRegistrationFieldClass } from '@/features/public-registration/utils';
+import { RegistrationErrors } from '@/features/public-registration/validation';
 
 interface HealthDetailsStepProps {
   form: RegistrationForm;
@@ -13,6 +15,7 @@ interface HealthDetailsStepProps {
   addListItem: (key: ListField, value: string) => void;
   removeListItem: (key: ListField, item: string) => void;
   toggleDisease: (disease: string) => void;
+  errors?: RegistrationErrors;
 }
 
 export function HealthDetailsStep({
@@ -21,6 +24,7 @@ export function HealthDetailsStep({
   addListItem,
   removeListItem,
   toggleDisease,
+  errors = {},
 }: HealthDetailsStepProps) {
   return (
     <div className="mt-7 space-y-5">
@@ -38,9 +42,11 @@ export function HealthDetailsStep({
             required
             value={form.weight}
             onChange={(event) => update('weight', event.target.value)}
+            aria-invalid={!!errors.weight || undefined}
             placeholder="Ej. 65,5"
-            className={`${publicRegistrationFieldClass} mt-2`}
+            className={`${publicRegistrationFieldClass(!!errors.weight)} mt-2`}
           />
+          {errors.weight && <FieldError>{errors.weight}</FieldError>}
         </label>
         <label htmlFor="height" className="text-[11px] font-semibold text-ink-2">
           Talla (cm) <span className="text-required">*</span>
@@ -51,9 +57,11 @@ export function HealthDetailsStep({
             required
             value={form.height}
             onChange={(event) => update('height', event.target.value)}
+            aria-invalid={!!errors.height || undefined}
             placeholder="Ej. 165"
-            className={`${publicRegistrationFieldClass} mt-2`}
+            className={`${publicRegistrationFieldClass(!!errors.height)} mt-2`}
           />
+          {errors.height && <FieldError>{errors.height}</FieldError>}
         </label>
       </div>
       <ListEditor
@@ -92,8 +100,12 @@ export function HealthDetailsStep({
               required
               value={form.otherUnderlyingDisease}
               onChange={(event) => update('otherUnderlyingDisease', event.target.value)}
-              className={`${publicRegistrationFieldClass} mt-2`}
+              aria-invalid={!!errors.otherUnderlyingDisease || undefined}
+              className={`${publicRegistrationFieldClass(!!errors.otherUnderlyingDisease)} mt-2`}
             />
+            {errors.otherUnderlyingDisease && (
+              <FieldError>{errors.otherUnderlyingDisease}</FieldError>
+            )}
           </label>
         )}
       </div>

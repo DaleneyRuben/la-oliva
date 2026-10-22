@@ -1,14 +1,17 @@
 import { addDays, parseISO, startOfToday } from 'date-fns';
+import { FieldError } from '@ui/FieldError';
 import { DatePickerInput } from '@/components/ui/DatePickerInput';
 import { RegistrationForm, UpdateRegistrationForm } from '@/features/public-registration/types';
 import { publicRegistrationFieldClass } from '@/features/public-registration/utils';
+import { RegistrationErrors } from '@/features/public-registration/validation';
 
 interface PersonalDetailsStepProps {
   form: RegistrationForm;
   update: UpdateRegistrationForm;
+  errors?: RegistrationErrors;
 }
 
-export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) {
+export function PersonalDetailsStep({ form, update, errors = {} }: PersonalDetailsStepProps) {
   return (
     <>
       <p className="mt-3 text-[13px] text-muted">
@@ -20,36 +23,42 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
           <input
             id="firstName"
             required
+            aria-invalid={!!errors.firstName || undefined}
             value={form.firstName}
             onChange={(event) => update('firstName', event.target.value)}
             placeholder="Ej. María"
-            className={`${publicRegistrationFieldClass} mt-2`}
+            className={`${publicRegistrationFieldClass(!!errors.firstName)} mt-2`}
           />
+          {errors.firstName && <FieldError>{errors.firstName}</FieldError>}
         </label>
         <label htmlFor="lastName" className="text-[11px] font-semibold text-ink-2">
           Primer apellido <span className="text-required">*</span>
           <input
             id="lastName"
             required
+            aria-invalid={!!errors.lastName || undefined}
             value={form.lastName}
             onChange={(event) => update('lastName', event.target.value)}
             placeholder="Ej. Pérez"
-            className={`${publicRegistrationFieldClass} mt-2`}
+            className={`${publicRegistrationFieldClass(!!errors.lastName)} mt-2`}
           />
+          {errors.lastName && <FieldError>{errors.lastName}</FieldError>}
         </label>
         <label htmlFor="sex" className="text-[11px] font-semibold text-ink-2">
           Sexo <span className="text-required">*</span>
           <select
             id="sex"
             required
+            aria-invalid={!!errors.sex || undefined}
             value={form.sex}
             onChange={(event) => update('sex', event.target.value)}
-            className={`${publicRegistrationFieldClass} mt-2 pr-9`}
+            className={`${publicRegistrationFieldClass(!!errors.sex)} mt-2 pr-9`}
           >
             <option value="">Seleccionar...</option>
             <option value="female">Femenino</option>
             <option value="male">Masculino</option>
           </select>
+          {errors.sex && <FieldError>{errors.sex}</FieldError>}
         </label>
         <div>
           <p className="text-[11px] font-semibold text-ink-2">
@@ -61,12 +70,13 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
             required
             value={form.dateOfBirth}
             onChange={(value) => update('dateOfBirth', value)}
-            inputClassName={`${publicRegistrationFieldClass} mt-2`}
+            inputClassName={`${publicRegistrationFieldClass(!!errors.dateOfBirth)} mt-2`}
             captionLayout="dropdown"
             startMonth={parseISO('1940-01-01')}
             endMonth={startOfToday()}
             disabled={{ after: startOfToday() }}
           />
+          {errors.dateOfBirth && <FieldError>{errors.dateOfBirth}</FieldError>}
         </div>
         <label htmlFor="phoneNumber" className="flex flex-col text-[11px] font-semibold text-ink-2">
           <span className="min-h-[30px] md:min-h-0">
@@ -75,11 +85,13 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
           <input
             id="phoneNumber"
             required
+            aria-invalid={!!errors.phoneNumber || undefined}
             value={form.phoneNumber}
             onChange={(event) => update('phoneNumber', event.target.value)}
             placeholder="7XX XXX XX"
-            className={`${publicRegistrationFieldClass} mt-2`}
+            className={`${publicRegistrationFieldClass(!!errors.phoneNumber)} mt-2`}
           />
+          {errors.phoneNumber && <FieldError>{errors.phoneNumber}</FieldError>}
         </label>
         <div className="flex flex-col">
           <p className="min-h-[30px] text-[11px] font-semibold text-ink-2 md:min-h-0">
@@ -91,10 +103,11 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
             required
             value={form.preferredStartDate}
             onChange={(value) => update('preferredStartDate', value)}
-            inputClassName={`${publicRegistrationFieldClass} mt-2`}
+            inputClassName={`${publicRegistrationFieldClass(!!errors.preferredStartDate)} mt-2`}
             startMonth={addDays(startOfToday(), 1)}
             disabled={[{ before: addDays(startOfToday(), 1) }, { dayOfWeek: [0, 6] }]}
           />
+          {errors.preferredStartDate && <FieldError>{errors.preferredStartDate}</FieldError>}
         </div>
       </div>
       <label htmlFor="address" className="mt-4 block text-[11px] font-semibold text-ink-2">
@@ -103,11 +116,13 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
           id="address"
           rows={2}
           required
+          aria-invalid={!!errors.address || undefined}
           value={form.address}
           onChange={(event) => update('address', event.target.value)}
           placeholder="Calle, número, edificio y referencia"
-          className={`${publicRegistrationFieldClass} mt-2 resize-none`}
+          className={`${publicRegistrationFieldClass(!!errors.address)} mt-2 resize-none`}
         />
+        {errors.address && <FieldError>{errors.address}</FieldError>}
       </label>
       <fieldset className="mt-4">
         <legend className="text-[11px] font-semibold text-ink-2">
@@ -130,6 +145,7 @@ export function PersonalDetailsStep({ form, update }: PersonalDetailsStepProps) 
             </button>
           ))}
         </div>
+        {errors.deliveryZone && <FieldError>{errors.deliveryZone}</FieldError>}
       </fieldset>
     </>
   );
