@@ -46,7 +46,7 @@ describe('findRoute', () => {
 
     const result = await findRoute();
 
-    expect(result['2026-06-27'].zones).toEqual([]);
+    expect(result['2026-06-27'].day.zones).toEqual([]);
     expect(findActiveSubscriptionsForDate).not.toHaveBeenCalledWith('2026-06-27');
   });
 
@@ -56,7 +56,7 @@ describe('findRoute', () => {
 
     const result = await findRoute();
 
-    expect(result['2026-06-28'].zones).toEqual([]);
+    expect(result['2026-06-28'].day.zones).toEqual([]);
   });
 
   it('returns no zones for tomorrow when tomorrow is a Saturday, while today still has data', async () => {
@@ -65,8 +65,8 @@ describe('findRoute', () => {
 
     const result = await findRoute();
 
-    expect(result['2026-06-26'].zones).toHaveLength(1);
-    expect(result['2026-06-27'].zones).toEqual([]);
+    expect(result['2026-06-26'].day.zones).toHaveLength(1);
+    expect(result['2026-06-27'].day.zones).toEqual([]);
   });
 
   it('returns an empty zones array when nothing matches on a weekday', async () => {
@@ -75,8 +75,8 @@ describe('findRoute', () => {
 
     const result = await findRoute();
 
-    expect(result['2026-06-23'].zones).toEqual([]);
-    expect(result['2026-06-24'].zones).toEqual([]);
+    expect(result['2026-06-23'].day.zones).toEqual([]);
+    expect(result['2026-06-24'].day.zones).toEqual([]);
   });
 
   describe('zone/group clustering', () => {
@@ -89,7 +89,7 @@ describe('findRoute', () => {
 
       const result = await findRoute('delivery');
 
-      expect(result['2026-06-23'].zones[0]?.singles.map((client) => client.name)).toEqual([
+      expect(result['2026-06-23'].day.zones[0]?.singles.map((client) => client.name)).toEqual([
         'La Oliva',
       ]);
     });
@@ -102,7 +102,7 @@ describe('findRoute', () => {
 
       const result = await findRoute('admin');
 
-      expect(result['2026-06-23'].zones[0]?.singles[0]).toMatchObject({
+      expect(result['2026-06-23'].day.zones[0]?.singles[0]).toMatchObject({
         name: 'Otro repartidor',
         delivery: 'Otro',
       });
@@ -121,7 +121,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.groups).toEqual([
         {
           groupToken: 'tok-1',
@@ -161,7 +161,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.groups).toEqual([]);
       expect(centro?.singles.map((s) => s.name)).toEqual(['Carmen Tapia']);
       expect(centro?.deliveryCount).toBe(1);
@@ -175,7 +175,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.groups).toEqual([]);
       expect(centro?.singles).toEqual([
         {
@@ -197,7 +197,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      expect(result['2026-06-23'].zones.map((z) => z.zone)).toEqual(['Centro']);
+      expect(result['2026-06-23'].day.zones.map((z) => z.zone)).toEqual(['Centro']);
     });
 
     it('orders zones as Sur then Centro', async () => {
@@ -209,7 +209,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      expect(result['2026-06-23'].zones.map((z) => z.zone)).toEqual(['Sur', 'Centro']);
+      expect(result['2026-06-23'].day.zones.map((z) => z.zone)).toEqual(['Sur', 'Centro']);
     });
 
     it('sorts singles alphabetically by name', async () => {
@@ -221,7 +221,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.singles.map((s) => s.name)).toEqual(['Ana López', 'Zara Gomez']);
     });
 
@@ -236,7 +236,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.deliveryCount).toBe(3);
     });
   });
@@ -250,7 +250,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.singles[0].isNew).toBe(true);
     });
 
@@ -262,7 +262,7 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.singles[0].isNew).toBe(false);
     });
 
@@ -274,8 +274,8 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centroToday = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
-      const centroTomorrow = result['2026-06-24'].zones.find((z) => z.zone === 'Centro');
+      const centroToday = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
+      const centroTomorrow = result['2026-06-24'].day.zones.find((z) => z.zone === 'Centro');
       expect(centroToday?.singles[0].isNew).toBe(false);
       expect(centroTomorrow?.singles[0].isNew).toBe(true);
     });
@@ -290,8 +290,104 @@ describe('findRoute', () => {
 
       const result = await findRoute();
 
-      const centro = result['2026-06-23'].zones.find((z) => z.zone === 'Centro');
+      const centro = result['2026-06-23'].day.zones.find((z) => z.zone === 'Centro');
       expect(centro?.singles[0].address).toBe('C. Los Cusis #18');
+    });
+  });
+
+  describe('delivery shifts', () => {
+    const night = (overrides: Partial<Record<string, unknown>> = {}) =>
+      makeClient({ deliveryShift: 'night', ...overrides });
+
+    const mockByDate = (byDate: Record<string, unknown[]>) =>
+      (findActiveSubscriptionsForDate as jest.Mock).mockImplementation(
+        async (date: string) => byDate[date] ?? [],
+      );
+
+    it('puts day clients in the day run for their own meal day', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-22');
+      mockByDate({ '2026-10-22': [makeSubscription(makeClient({ deliveryShift: 'day' }))] });
+
+      const result = await findRoute();
+
+      expect(result['2026-10-22'].day.mealDate).toBe('2026-10-22');
+      expect(result['2026-10-22'].day.zones[0].singles).toHaveLength(1);
+      expect(result['2026-10-22'].night.zones).toEqual([]);
+    });
+
+    it('puts night clients in the night run of the evening before their meal day', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-22');
+      mockByDate({
+        '2026-10-22': [makeSubscription(night({ name: 'Hoy noche no' }))],
+        '2026-10-23': [makeSubscription(night({ name: 'Julia Cuentas' }))],
+      });
+
+      const result = await findRoute();
+
+      expect(result['2026-10-22'].night.mealDate).toBe('2026-10-23');
+      expect(result['2026-10-22'].night.zones[0].singles.map((p) => p.name)).toEqual([
+        'Julia Cuentas',
+      ]);
+      expect(result['2026-10-22'].day.zones).toEqual([]);
+    });
+
+    it('treats clients delivered by Otro as day clients', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-22');
+      mockByDate({
+        '2026-10-22': [makeSubscription(makeClient({ delivery: 'Otro', deliveryShift: null }))],
+      });
+
+      const result = await findRoute('admin');
+
+      expect(result['2026-10-22'].day.zones[0].singles).toHaveLength(1);
+      expect(result['2026-10-22'].night.zones).toEqual([]);
+    });
+
+    it('runs a Sunday night route for Monday meals while the Sunday day run stays empty', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-25');
+      mockByDate({
+        '2026-10-26': [makeSubscription(night()), makeSubscription(makeClient({ id: 2 }))],
+      });
+
+      const result = await findRoute();
+
+      expect(result['2026-10-25'].day.zones).toEqual([]);
+      expect(result['2026-10-25'].night.mealDate).toBe('2026-10-26');
+      expect(result['2026-10-25'].night.zones[0].singles).toHaveLength(1);
+      expect(findActiveSubscriptionsForDate).not.toHaveBeenCalledWith('2026-10-25');
+    });
+
+    it('has no night run on Friday, since Saturday has no meals', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-23');
+      mockByDate({ '2026-10-23': [makeSubscription(makeClient())] });
+
+      const result = await findRoute();
+
+      expect(result['2026-10-23'].day.zones).toHaveLength(1);
+      expect(result['2026-10-23'].night.zones).toEqual([]);
+      expect(findActiveSubscriptionsForDate).not.toHaveBeenCalledWith('2026-10-24');
+    });
+
+    it('flags a night client as new on the evening before their start date', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-22');
+      mockByDate({ '2026-10-23': [makeSubscription(night(), '2026-10-23')] });
+
+      const result = await findRoute();
+
+      expect(result['2026-10-22'].night.zones[0].singles[0].isNew).toBe(true);
+    });
+
+    it('builds tomorrow from its own meal days', async () => {
+      (appToday as jest.Mock).mockReturnValue('2026-10-21');
+      mockByDate({
+        '2026-10-22': [makeSubscription(makeClient({ name: 'Día jueves' }))],
+        '2026-10-23': [makeSubscription(night({ name: 'Noche viernes' }))],
+      });
+
+      const result = await findRoute();
+
+      expect(result['2026-10-22'].day.zones[0].singles[0].name).toBe('Día jueves');
+      expect(result['2026-10-22'].night.zones[0].singles[0].name).toBe('Noche viernes');
     });
   });
 });
