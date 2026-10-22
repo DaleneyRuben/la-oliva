@@ -6,4 +6,5 @@ export type {
   DeliveryGroup,
   DeliveryZoneRoute,
   DeliveryDayRoute,
+  DeliveryRun,
 } from './find-route';

@@ -1,5 +1,6 @@
 import { parseISO } from 'date-fns';
 import Client from '../../models/Client';
+import type Subscription from '../../models/Subscription';
 import { ROLES } from '../../constants/roles.constants';
 import type { UserRole } from '../../models/User';
 import { appToday, addCalendarDays } from '../../utils/date';
@@ -33,8 +34,16 @@ export type DeliveryZoneRoute = {
   singles: DeliveryPerson[];
 };
 
-export type DeliveryDayRoute = {
+// One driver run: the stops for the meals of `mealDate`. A night run is driven the evening
+// before its meal day, so its mealDate is the day after the route day it belongs to.
+export type DeliveryRun = {
+  mealDate: string;
   zones: DeliveryZoneRoute[];
+};
+
+export type DeliveryDayRoute = {
+  day: DeliveryRun;
+  night: DeliveryRun;
 };
 
 type DeliveryClientRow = {
@@ -50,8 +59,8 @@ type DeliveryClientRow = {
 
 const byName = (a: DeliveryPerson, b: DeliveryPerson) => a.name.localeCompare(b.name, 'es');
 
-// A client is "new" on the day their subscription's start date matches the route
-// day being rendered — i.e. this is their first delivery.
+// A client is "new" in the run whose meal day matches their subscription's start date — i.e.
+// this is their first delivery, the evening before for a night client.
 const toPerson = (c: DeliveryClientRow, date: string): DeliveryPerson => ({
   id: c.id,
   name: c.name,
@@ -100,28 +109,39 @@ const buildZones = (clients: DeliveryClientRow[], date: string): DeliveryZoneRou
     };
   }).filter((z) => z.deliveryCount > 0);
 
-// Weekends are never delivery days — return an empty route without hitting the DB.
-const buildDayRoute = async (date: string, role: UserRole): Promise<DeliveryDayRoute> => {
-  if (checkIsWeekend(parseISO(date))) return { zones: [] };
+const isNightClient = (c: Client) => c.delivery === 'La Oliva' && c.deliveryShift === 'night';
 
-  const subscriptions = await findActiveSubscriptionsForDate(date);
+const toRow = (s: Subscription): DeliveryClientRow => {
+  const c = s.client as Client;
+  return {
+    id: c.id,
+    name: c.name,
+    phoneNumber: c.phoneNumber,
+    deliveryZone: c.deliveryZone,
+    groupToken: c.groupToken,
+    address: c.address,
+    startDate: s.startDate,
+    delivery: c.delivery,
+  };
+};
+
+// Meals exist only Mon–Fri, so a run whose meal day is a weekend is empty and never queried.
+const findMealDaySubscriptions = async (mealDate: string): Promise<Subscription[]> =>
+  checkIsWeekend(parseISO(mealDate)) ? [] : findActiveSubscriptionsForDate(mealDate);
+
+const buildRun = (
+  mealDate: string,
+  subscriptions: Subscription[],
+  role: UserRole,
+  shift: 'day' | 'night',
+): DeliveryRun => {
   const clients = subscriptions
     .filter((s) => role !== ROLES.DELIVERY || (s.client as Client).delivery !== 'Otro')
-    .map((s) => {
-      const c = s.client as Client;
-      return {
-        id: c.id,
-        name: c.name,
-        phoneNumber: c.phoneNumber,
-        deliveryZone: c.deliveryZone,
-        groupToken: c.groupToken,
-        address: c.address,
-        startDate: s.startDate,
-        delivery: c.delivery,
-      };
-    });
+    // Otro clients and clients with no shift recorded are delivered as La Oliva always has: by day.
+    .filter((s) => isNightClient(s.client as Client) === (shift === 'night'))
+    .map(toRow);
 
-  return { zones: buildZones(clients, date) };
+  return { mealDate, zones: buildZones(clients, mealDate) };
 };
 
 export const findRoute = async (
@@ -129,11 +149,21 @@ export const findRoute = async (
 ): Promise<Record<string, DeliveryDayRoute>> => {
   const today = appToday();
   const tomorrow = addCalendarDays(today, 1);
+  const afterTomorrow = addCalendarDays(today, 2);
 
-  const [todayRoute, tomorrowRoute] = await Promise.all([
-    buildDayRoute(today, role),
-    buildDayRoute(tomorrow, role),
-  ]);
+  // Tomorrow's day run and today's night run feed the same meals, so they share one query.
+  const [todaySubs, tomorrowSubs, afterTomorrowSubs] = await Promise.all(
+    [today, tomorrow, afterTomorrow].map(findMealDaySubscriptions),
+  );
 
-  return { [today]: todayRoute, [tomorrow]: tomorrowRoute };
+  return {
+    [today]: {
+      day: buildRun(today, todaySubs, role, 'day'),
+      night: buildRun(tomorrow, tomorrowSubs, role, 'night'),
+    },
+    [tomorrow]: {
+      day: buildRun(tomorrow, tomorrowSubs, role, 'day'),
+      night: buildRun(afterTomorrow, afterTomorrowSubs, role, 'night'),
+    },
+  };
 };
