@@ -22,6 +22,7 @@ Each client has:
 - Address
 - Delivery zone (`deliveryZone` — `Centro` | `Sur`)
 - Delivery (`La Oliva` | `Otro`)
+- Delivery shift (`deliveryShift` — `day` | `night`, only when Delivery is `La Oliva` — see Delivery shift)
 - NIT (optional — tax ID for billing)
 - Razón Social (optional — business name for billing)
 - Underlying diseases (list)
@@ -40,6 +41,30 @@ Each client has:
 ### Delivery groups
 
 Clients at the same address can be linked into a delivery group via a shared `groupToken` (UUID). A group counts as **one delivery stop** regardless of how many members it has — this is reflected in the dashboard's delivery count. Managing groups (adding/removing members) is done through the client detail view. If a group is reduced to one member, the token is cleared automatically.
+
+### Delivery shift
+
+A client delivered by La Oliva has a **delivery shift** (`deliveryShift`), displayed as **Día** or
+**Noche**. A client with Delivery `Otro` has no shift (`null`).
+
+- **Día** (`day`) — the meals are delivered in the morning of the day they are for, as La Oliva has
+  always delivered.
+- **Noche** (`night`) — the meals are delivered the evening before: Monday's meals on Sunday night,
+  and so on through Friday's meals on Thursday night. There is no delivery on Friday or Saturday
+  night.
+
+The shift changes only _when_ meals are delivered, never _which_ meals or days a client receives:
+the client view (Mon–Fri), contract dates, suspensions, and kitchen reports are unchanged.
+
+- It is chosen in the new-client wizard (including Review of a Draft client) and the edit client
+  form, where Día is preselected. Public client intake does not collect it, since it does not
+  collect Delivery.
+- Clients that existed before the shift was introduced are migrated to **Día** when their Delivery
+  is `La Oliva`.
+- **Everyone in a delivery group shares one shift**, since a group is one stop. Changing one
+  member's shift changes it for every La Oliva member of the group, and the edit form says so
+  before saving. A client who joins a group takes the group's shift.
+- The client profile shows the shift beside Delivery. It appears nowhere else outside Entregas.
 
 ### Underlying diseases field
 
@@ -286,10 +311,13 @@ Two features on this card are visible to `admin`, `super_admin`, and `audit`. Th
 
 A screen (sidebar item **Entregas**) that shows staff the day's delivery route: active clients grouped by delivery zone, then by delivery group (same-address stops, see Delivery groups) vs. individual stops. Visible to `delivery`, `admin`, and `super_admin` roles.
 
-- **Hoy / Mañana tabs** show the active-client route for today and for the literal next calendar day, computed server-side (`GET /api/delivery`, no date parameter, keyed by both dates). Same active-subscription rule as chef reports and Producción (within contract dates, not finalized, not paused, not suspended on that day). Weekends return an empty route without querying.
-- **Zone grouping**: clients are split by `deliveryZone` (Sur, then Centro), then within each zone by `groupToken` — members sharing a token render as one group card (one delivery stop), everyone else renders as an individual row under "Individuales".
+- **Hoy / Mañana tabs** show the route the driver runs on today and on the literal next calendar day, computed server-side (`GET /api/delivery`, no date parameter, keyed by both dates). Each day's route has two runs (see Delivery shift):
+  - **Turno día** — clients with shift `day`, plus every Delivery `Otro` client, whose meals are for that same day.
+  - **Turno noche** — clients with shift `night` whose meals are for the **next** calendar day.
+  Each run applies the same active-subscription rule as chef reports and Producción (within contract dates, not finalized, not paused, not suspended) to the day its meals are for. A run whose meal day is a weekend is empty, so Friday and Saturday have no night run and Saturday and Sunday have no day run. A tab's count is both runs' stops together.
+- **Zone grouping**: within each run, clients are split by `deliveryZone` (Sur, then Centro), then within each zone by `groupToken` — members sharing a token render as one group card (one delivery stop), everyone else renders as an individual row under "Individuales".
 - **Address**: each delivery stop shows the client's address. For a group, the address is shown once at the group-card level (all members of a group share one address); for an individual stop, the address is shown on that client's own row.
-- **"Nuevo" badge**: a client's name is flagged **Nuevo** on the specific day (Hoy or Mañana) that equals their subscription's `startDate` — i.e. the day of their very first delivery. This is a display-only flag recomputed per rendered day; it is not stored.
+- **"Nuevo" badge**: a client's name is flagged **Nuevo** in the run whose meal day equals their subscription's `startDate` — i.e. their very first delivery. For a night client that is the evening before the start date. This is a display-only flag recomputed per rendered run; it is not stored.
 
 ---
 
