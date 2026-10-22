@@ -7,6 +7,7 @@ import {
   useWatch,
 } from 'react-hook-form';
 import { CheckboxRow } from '@ui/CheckboxRow';
+import { FieldError } from '@ui/FieldError';
 import { WizardSectionCard } from '@ui/WizardSectionCard';
 import type { NewClientFormValues } from '@/features/clients/types';
 import type { Plan } from '@/features/plans/types';
@@ -51,9 +52,7 @@ export function StepPlan({ register, control, errors, plans, setValue, isLoading
             render={({ field }) => (
               <>
                 <PlanRadioList plans={plans} selectedId={field.value} onSelect={field.onChange} />
-                {errors.planId && (
-                  <p className="text-[12px] text-warn mt-2">{errors.planId.message}</p>
-                )}
+                {errors.planId && <FieldError>{errors.planId.message}</FieldError>}
               </>
             )}
           />
