@@ -1,4 +1,5 @@
 import { Icon } from '@ui/Icon';
+import { WHATSAPP_LINKS } from '@/constants/contact.constants';
 import { useReveal } from '@/features/public-info/hooks/useReveal';
 
 import { PRICES, PRICE_NOTES } from '@/features/public-info/content';
@@ -43,7 +44,7 @@ export function PricingSection() {
           ))}
         </ul>
         <div className="self-start">
-          <WhatsAppLink>Quiero contratar mi plan</WhatsAppLink>
+          <WhatsAppLink href={WHATSAPP_LINKS.hire}>Quiero contratar mi plan</WhatsAppLink>
         </div>
       </div>
 
@@ -65,7 +66,9 @@ export function PricingSection() {
           extra. La hora de entrega depende de la zona de tu domicilio.
         </p>
         <div className="self-start">
-          <WhatsAppLink icon="pin">Consultar mi zona</WhatsAppLink>
+          <WhatsAppLink href={WHATSAPP_LINKS.deliveryZone} icon="pin">
+            Consultar mi zona
+          </WhatsAppLink>
         </div>
       </div>
     </section>

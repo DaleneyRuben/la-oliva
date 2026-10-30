@@ -1,4 +1,5 @@
 import { useReveal } from '@/features/public-info/hooks/useReveal';
+import { WHATSAPP_LINKS } from '@/constants/contact.constants';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 import { WhatsAppLink } from './WhatsAppLink';
@@ -18,7 +19,7 @@ export function ContactSection() {
           Cualquier duda estamos para ayudarte con gusto.
         </p>
         <div className="mt-2 self-start">
-          <WhatsAppLink>Tengo una consulta</WhatsAppLink>
+          <WhatsAppLink href={WHATSAPP_LINKS.question}>Tengo una consulta</WhatsAppLink>
         </div>
       </div>
       <div className="flex min-w-0 flex-[1_1_360px] flex-col items-center gap-2.5 text-center text-public-terracotta">

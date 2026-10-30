@@ -3,6 +3,8 @@ import cena from '@/assets/public-info/cena.jpg';
 import desayuno from '@/assets/public-info/desayuno.jpg';
 import ensalada from '@/assets/public-info/ensalada.jpg';
 import jugo from '@/assets/public-info/jugo.jpg';
+import lunchDinnerPlan from '@/assets/public-info/lunch-dinner-plan.webp';
+import lunchOnlyPlan from '@/assets/public-info/lunch-only-plan.webp';
 import meriendaAm from '@/assets/public-info/merienda-am.jpg';
 import meriendaPm from '@/assets/public-info/merienda-pm.jpg';
 
@@ -92,6 +94,17 @@ export const PLAN_TYPES: PlanType[] = [
   { name: 'Incremento de masa', meals: '6 comidas', icon: 'dumbbell', tone: 'orange' },
   { name: 'Tratamiento médico', meals: '5 comidas', icon: 'heartbeat', tone: 'terracotta' },
   { name: 'Futura mamá o lactante', meals: '6 comidas', icon: 'mother', tone: 'terracotta' },
+];
+
+export interface PlanImage {
+  src: string;
+  alt: string;
+}
+
+// The manager's flyers behind "Además contamos con plan de Almuerzos y/o Cena", in that order.
+export const LUNCH_DINNER_PLAN_IMAGES: PlanImage[] = [
+  { src: lunchOnlyPlan, alt: 'Plan Solo Almuerzo' },
+  { src: lunchDinnerPlan, alt: 'Plan Almuerzo + Cena' },
 ];
 
 export interface PriceCard {

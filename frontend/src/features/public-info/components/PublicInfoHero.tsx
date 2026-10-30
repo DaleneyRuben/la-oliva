@@ -1,5 +1,6 @@
 import heroPhoto from '@/assets/public-info/hero.jpg';
 import officialLogo from '@/assets/public-info/logo-official.png';
+import { WHATSAPP_LINKS } from '@/constants/contact.constants';
 import { Botanical } from './Botanical';
 import { WhatsAppLink } from './WhatsAppLink';
 
@@ -38,7 +39,7 @@ export function PublicInfoHero() {
             sin que tengas que preocuparte por cocinar o planificar cada comida.
           </p>
           <div className="enter-up-4 mt-1.5">
-            <WhatsAppLink>Quiero contratar</WhatsAppLink>
+            <WhatsAppLink href={WHATSAPP_LINKS.hire}>Quiero contratar</WhatsAppLink>
           </div>
         </div>
 

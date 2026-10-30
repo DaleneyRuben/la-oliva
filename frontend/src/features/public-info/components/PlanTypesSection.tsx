@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { Button } from '@ui/Button';
-import { PLAN_TYPES, TONE_TEXT } from '@/features/public-info/content';
+import { LUNCH_DINNER_PLAN_IMAGES, PLAN_TYPES, TONE_TEXT } from '@/features/public-info/content';
 import { useReveal } from '@/features/public-info/hooks/useReveal';
 import { Botanical } from './Botanical';
+import { LunchDinnerPlanModal } from './LunchDinnerPlanModal';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 
 export function PlanTypesSection() {
   const plans = useReveal<HTMLUListElement>({ stagger: true });
+  const [planModalOpen, setPlanModalOpen] = useState(false);
 
   return (
     <section
@@ -44,9 +47,9 @@ export function PlanTypesSection() {
             </li>
           ))}
         </ul>
-        {/* TODO: the action behind this button is not defined yet. */}
         <Button
           variant="bare"
+          onClick={() => setPlanModalOpen(true)}
           className="attention-pulse mt-2 w-full gap-3.5 rounded-[22px] bg-public-olive py-2.5 pl-2.5 pr-3 text-left text-[15px] font-semibold leading-snug text-public-cream hover:bg-public-ink md:w-auto md:gap-4 md:rounded-full md:text-[17px]"
         >
           <span className="inline-flex h-11 w-11 flex-none items-center justify-center rounded-full bg-public-cream text-public-olive">
@@ -58,6 +61,12 @@ export function PlanTypesSection() {
           </span>
         </Button>
       </div>
+      {planModalOpen && (
+        <LunchDinnerPlanModal
+          images={LUNCH_DINNER_PLAN_IMAGES}
+          onClose={() => setPlanModalOpen(false)}
+        />
+      )}
     </section>
   );
 }

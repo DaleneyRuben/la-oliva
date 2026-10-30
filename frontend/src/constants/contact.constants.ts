@@ -1,7 +1,8 @@
 /**
- * Business WhatsApp number in international format without the leading "+", as wa.me expects it.
- * Empty until the manager provides it: wa.me then opens WhatsApp without a preselected chat.
+ * The business WhatsApp chat, one wa.link per call to action, as the manager provided them.
  */
-export const WHATSAPP_PHONE = '';
-
-export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_PHONE}`;
+export const WHATSAPP_LINKS = {
+  hire: 'https://wa.link/mrujyv',
+  deliveryZone: 'https://wa.link/0jp5dy',
+  question: 'https://wa.link/y0xmrv',
+} as const;
