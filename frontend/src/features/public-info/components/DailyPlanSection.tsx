@@ -1,5 +1,6 @@
 import { MEALS } from '@/features/public-info/content';
 import { useReveal } from '@/features/public-info/hooks/useReveal';
+import { Botanical } from './Botanical';
 import { SectionHeading } from './SectionHeading';
 
 export function DailyPlanSection() {
@@ -7,8 +8,16 @@ export function DailyPlanSection() {
   const meals = useReveal<HTMLDivElement>({ stagger: true });
 
   return (
-    <section id="plan-completo" className="border-y border-public-rule bg-public-paper">
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-12 px-6 py-[72px]">
+    <section
+      id="plan-completo"
+      className="relative overflow-hidden border-y border-public-rule bg-public-paper"
+    >
+      <Botanical name="leaves" className="left-0 top-1/4 hidden w-[56px] opacity-80 xl:block" />
+      <Botanical
+        name="leaves"
+        className="bottom-12 right-0 hidden w-[56px] -scale-x-100 opacity-80 xl:block"
+      />
+      <div className="relative mx-auto flex max-w-[1200px] flex-wrap items-center gap-12 px-6 py-[72px]">
         <div
           ref={intro.ref}
           className={`flex min-w-0 flex-[1_1_360px] flex-col gap-5 ${intro.className}`}
@@ -45,12 +54,10 @@ export function DailyPlanSection() {
               key={meal.label}
               className="m-0 overflow-hidden rounded-2xl border border-public-rule bg-public-cream"
             >
-              {/* The photos are low-resolution crops from the slides, so they are shown whole on a
-                  cream letterbox rather than cropped to fill the card. */}
               <img
                 src={meal.image}
                 alt={meal.alt}
-                className="block aspect-[3/2] h-auto w-full bg-public-cream-2 object-contain"
+                className="block aspect-[3/2] h-auto w-full object-cover"
               />
               <figcaption className="px-3.5 py-3 text-center font-public-display text-[18px] text-public-ink">
                 {meal.label}

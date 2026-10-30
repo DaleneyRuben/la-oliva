@@ -241,6 +241,16 @@ select {
   border-radius: 0 2px 2px 0;
 }
 
+@keyframes attention-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(79 91 48 / 45%);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 16px rgb(79 91 48 / 0%);
+  }
+}
+
 /* Public information page. The document is what scrolls, so smooth anchor scrolling has to be
    declared on <html>, scoped to the time the page is mounted. */
 html:has(.public-info-page) {
@@ -271,6 +281,11 @@ html:has(.public-info-page) {
   }
   .enter-from-right {
     animation: slide-from-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+  }
+
+  /* A slow ring that keeps drawing the eye to the lunch-and-dinner plan button. */
+  .attention-pulse {
+    animation: attention-pulse 2.4s ease-out infinite;
   }
 
   .reveal {

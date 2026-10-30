@@ -1,28 +1,25 @@
-const VALUES = ['Sabor', 'Calidad', 'Experiencia'];
+import ftLogo from '@/assets/public-info/logo-ft.png';
+import { Botanical } from './Botanical';
 
 export function PublicInfoFooter() {
   return (
-    <footer className="border-t border-public-rule">
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-[18px] px-6 pb-[72px] pt-8">
-        <p className="m-0 flex flex-wrap items-center gap-3.5 font-public-display text-[22px] text-public-ink">
-          <span>La Oliva Catering</span>
-          <span aria-hidden="true" className="inline-block h-5 w-px bg-public-terracotta" />
-          <span>Catering con altura</span>
-        </p>
-        <ul className="m-0 flex list-none items-center gap-3.5 p-0 text-[11px] font-semibold uppercase tracking-[0.22em] text-public-muted">
-          {VALUES.map((value, index) => (
-            <li key={value} className="flex items-center gap-3.5">
-              {index > 0 && (
-                <span
-                  aria-hidden="true"
-                  className="inline-block h-1 w-1 rounded-full bg-public-terracotta"
-                />
-              )}
-              {value}
-            </li>
-          ))}
-        </ul>
+    <footer className="relative overflow-hidden border-t border-public-rule">
+      <Botanical name="branch" className="bottom-11 left-0 hidden w-[210px] md:block" />
+      <Botanical
+        name="leaves"
+        className="-right-2.5 -top-5 hidden w-[96px] -scale-x-100 opacity-85 md:block"
+      />
+      <div className="relative flex justify-center px-6 pb-[84px] pt-12">
+        <img
+          src={ftLogo}
+          alt="La Oliva, catering con altura. Sabor, calidad, experiencia"
+          className="block h-auto w-[220px] md:w-[280px]"
+        />
       </div>
+      <div
+        aria-hidden="true"
+        className="absolute inset-x-0 bottom-0 h-11 rounded-t-[60%_34px] bg-public-olive"
+      />
     </footer>
   );
 }

@@ -28,6 +28,7 @@ it('covers the glyphs the slides use that the shared icon set lacks', () => {
       'credit-card',
       'user',
       'chat',
+      'cutlery',
     ]),
   );
 });

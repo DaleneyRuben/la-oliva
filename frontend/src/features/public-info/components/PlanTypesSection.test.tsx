@@ -13,7 +13,9 @@ it('renders the five plan types with their meal counts', () => {
     'Tratamiento médico5 comidas',
     'Futura mamá o lactante6 comidas',
   ]);
-  expect(screen.getByText('Además contamos con plan de Almuerzos y/o Cena')).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: 'Además contamos con plan de Almuerzos y/o Cena' }),
+  ).toHaveClass('bg-public-olive');
   expect(document.getElementById('tipos-de-plan')).not.toBeNull();
   expect(screen.getByRole('list')).toHaveClass('reveal-stagger');
   expect(screen.getAllByRole('listitem')[0]).toHaveClass('hover:-translate-y-0.5');
