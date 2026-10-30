@@ -1,15 +1,20 @@
 import { useState } from 'react';
 import { Button } from '@ui/Button';
 import { LUNCH_DINNER_PLAN_IMAGES, PLAN_TYPES, TONE_TEXT } from '@/features/public-info/content';
+import { usePreloadImages } from '@/features/public-info/hooks/usePreloadImages';
 import { useReveal } from '@/features/public-info/hooks/useReveal';
 import { Botanical } from './Botanical';
 import { LunchDinnerPlanModal } from './LunchDinnerPlanModal';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 
+const PLAN_IMAGE_SOURCES = LUNCH_DINNER_PLAN_IMAGES.map((image) => image.src);
+
 export function PlanTypesSection() {
   const plans = useReveal<HTMLUListElement>({ stagger: true });
   const [planModalOpen, setPlanModalOpen] = useState(false);
+  // The flyers are heavy: fetch them as soon as the plan cards are on screen, not on click.
+  usePreloadImages(PLAN_IMAGE_SOURCES, plans.visible);
 
   return (
     <section
