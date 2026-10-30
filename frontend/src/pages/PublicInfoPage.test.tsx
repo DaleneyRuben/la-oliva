@@ -81,7 +81,9 @@ it('shows only copy that exists on the slides', () => {
   expect(screen.queryByText(/registrarme/i)).not.toBeInTheDocument();
   expect(screen.queryByText(/ver planes/i)).not.toBeInTheDocument();
   expect(screen.queryByRole('banner')).not.toBeInTheDocument();
-  expect(screen.getByText('La Oliva Catering')).toBeInTheDocument();
+  expect(
+    screen.getByRole('img', { name: 'La Oliva, catering con altura. Sabor, calidad, experiencia' }),
+  ).toBeInTheDocument();
   expect(screen.getByText('Comer bien también es cuidarte')).toBeInTheDocument();
 });
 

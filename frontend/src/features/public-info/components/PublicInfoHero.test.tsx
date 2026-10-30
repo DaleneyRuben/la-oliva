@@ -19,7 +19,11 @@ it('renders the hero slide copy, photo and WhatsApp button', () => {
     'href',
     WHATSAPP_URL,
   );
-  expect(screen.getByRole('img')).toHaveAttribute('src', 'hero.jpg');
+  expect(screen.getByRole('img', { name: /Porciones de comida/ })).toHaveAttribute(
+    'src',
+    'hero.jpg',
+  );
+  expect(screen.getByRole('img', { name: 'La Oliva, catering con altura' })).toBeInTheDocument();
   expect(screen.getByText('Bs. 1.450')).toBeInTheDocument();
   expect(screen.getByText('por 20 días')).toBeInTheDocument();
 });
@@ -35,6 +39,8 @@ it('staggers the hero entrance and slides the photo in from the right', () => {
   expect(screen.getByRole('link', { name: 'Quiero contratar' }).parentElement).toHaveClass(
     'enter-up-4',
   );
-  expect(screen.getByRole('img').parentElement).toHaveClass('enter-from-right');
+  expect(screen.getByRole('img', { name: /Porciones de comida/ }).parentElement).toHaveClass(
+    'enter-from-right',
+  );
   expect(screen.getByText('Planes desde').parentElement).toHaveClass('enter-up-5');
 });
