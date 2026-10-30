@@ -80,3 +80,19 @@ it('hides the thumbnails when there is a single image', () => {
 
   expect(screen.queryByRole('button', { name: 'Ver Plan uno' })).not.toBeInTheDocument();
 });
+
+it('shows a pulsing placeholder until the image arrives, then fades it in', () => {
+  render(<LunchDinnerPlanModal images={IMAGES} onClose={jest.fn()} />);
+
+  const image = screen.getByRole('img', { name: 'Plan uno' });
+  const stage = image.closest('[aria-busy]');
+  expect(stage).toHaveAttribute('aria-busy', 'true');
+  expect(image).toHaveClass('opacity-0');
+  expect(screen.getAllByTestId('plan-image-placeholder')[0]).toHaveClass('animate-pulse');
+
+  fireEvent.load(image);
+
+  expect(stage).toHaveAttribute('aria-busy', 'false');
+  expect(image).toHaveClass('opacity-100');
+  expect(screen.getAllByTestId('plan-image-placeholder')).toHaveLength(1);
+});
