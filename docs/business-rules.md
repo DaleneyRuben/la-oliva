@@ -143,8 +143,11 @@ The public form lives at `/registro`, outside the staff layout, and is designed 
 The public host also serves an unauthenticated **information page** at `/` (reachable as
 `/informacion` in the combined local build). It is the manager's four information slides rebuilt
 as one scrolling, mobile-first page: every visible string is copied from the slides verbatim, with
-no header, navigation bar or sign-up control added. Its four call-to-action buttons open the
-business WhatsApp chat; nothing on it links to `/registro` unless the manager asks for it. The
+no header, navigation bar or sign-up control added. The logos, olive branches and meal photos are
+cut from the slides and the manager's logo files. Its four call-to-action buttons open the
+business WhatsApp chat; nothing on it links to `/registro` unless the manager asks for it. The one
+addition the manager asked for is a highlighted **Además contamos con plan de Almuerzos y/o Cena**
+button under the plan types, whose action is not defined yet. The
 plan names and prices on it are marketing copy kept in frontend constants, not the Plans catalog,
 so a price change on the page is a copy edit and never follows an admin's plan edit. Unknown paths
 on the public host redirect to this page.
@@ -314,7 +317,7 @@ A screen (sidebar item **Entregas**) that shows staff the day's delivery route: 
 - **Hoy / Mañana tabs** show the route the driver runs on today and on the literal next calendar day, computed server-side (`GET /api/delivery`, no date parameter, keyed by both dates). Each day's route has two runs (see Delivery shift):
   - **Turno día** — clients with shift `day`, plus every Delivery `Otro` client, whose meals are for that same day.
   - **Turno noche** — clients with shift `night` whose meals are for the **next** calendar day.
-  Each run applies the same active-subscription rule as chef reports and Producción (within contract dates, not finalized, not paused, not suspended) to the day its meals are for. A run whose meal day is a weekend is empty, so Friday and Saturday have no night run and Saturday and Sunday have no day run. A tab's count is both runs' stops together.
+    Each run applies the same active-subscription rule as chef reports and Producción (within contract dates, not finalized, not paused, not suspended) to the day its meals are for. A run whose meal day is a weekend is empty, so Friday and Saturday have no night run and Saturday and Sunday have no day run. A tab's count is both runs' stops together.
 - **Zone grouping**: within each run, clients are split by `deliveryZone` (Sur, then Centro), then within each zone by `groupToken` — members sharing a token render as one group card (one delivery stop), everyone else renders as an individual row under "Individuales".
 - **Address**: each delivery stop shows the client's address. For a group, the address is shown once at the group-card level (all members of a group share one address); for an individual stop, the address is shown on that client's own row.
 - **"Nuevo" badge**: a client's name is flagged **Nuevo** in the run whose meal day equals their subscription's `startDate` — i.e. their very first delivery. For a night client that is the evening before the start date. This is a display-only flag recomputed per rendered run; it is not stored.
