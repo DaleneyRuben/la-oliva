@@ -12,6 +12,7 @@ export const PUBLIC_INFO_ICON_NAMES = [
   'credit-card',
   'user',
   'chat',
+  'cutlery',
 ] as const;
 
 type PublicInfoIconName = (typeof PUBLIC_INFO_ICON_NAMES)[number];
@@ -50,6 +51,14 @@ export function PublicInfoIcon({ name, size = 24, stroke = 1.6, className }: Pro
   };
 
   switch (name) {
+    case 'cutlery':
+      return (
+        <svg {...props}>
+          <path d="M7 2v20" />
+          <path d="M4 2v6a3 3 0 0 0 6 0V2" />
+          <path d="M17 22V2c-2.2 1.2-3.5 3.6-3.5 7v4H17" />
+        </svg>
+      );
     case 'whatsapp':
       return (
         <svg {...props}>
