@@ -15,6 +15,7 @@ const ROUND_BUTTON =
 
 export function LunchDinnerPlanModal({ images, onClose }: Props) {
   const [index, setIndex] = useState(0);
+  const [loaded, setLoaded] = useState<Record<string, boolean>>({});
   const count = images.length;
   // Adding `count` before the modulo keeps "previous" from the first image positive.
   const goTo = (target: number) => setIndex((target + count) % count);
@@ -25,19 +26,31 @@ export function LunchDinnerPlanModal({ images, onClose }: Props) {
       className="flex max-h-[calc(100dvh-2rem)] w-full max-w-[1000px] flex-col overflow-y-auto rounded-[28px]! bg-public-paper! font-public-body text-public-ink md:flex-row md:overflow-hidden"
     >
       <div className="order-2 flex flex-none items-center justify-center px-5 md:order-1 md:w-[52%] md:bg-public-cream-2 md:p-5">
-        <div className="relative w-full overflow-hidden rounded-[18px] border border-public-rule bg-public-cream shadow-public-badge">
+        <div
+          aria-busy={!loaded[images[index].alt]}
+          className="relative w-full overflow-hidden rounded-[18px] border border-public-rule bg-public-cream shadow-public-badge"
+        >
           <div
             className="flex transition-transform duration-[400ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none"
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
             {images.map((image, i) => (
-              <img
-                key={image.alt}
-                src={image.src}
-                alt={image.alt}
-                aria-hidden={i !== index}
-                className="block aspect-[1024/1400] w-full flex-none object-cover object-top"
-              />
+              <div key={image.alt} className="relative w-full flex-none">
+                {!loaded[image.alt] && (
+                  <div
+                    data-testid="plan-image-placeholder"
+                    aria-hidden="true"
+                    className="absolute inset-0 animate-pulse bg-public-cream-2 motion-reduce:animate-none"
+                  />
+                )}
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  aria-hidden={i !== index}
+                  onLoad={() => setLoaded((current) => ({ ...current, [image.alt]: true }))}
+                  className={`relative block aspect-[1024/1400] w-full object-cover object-top transition-opacity duration-500 ${loaded[image.alt] ? 'opacity-100' : 'opacity-0'}`}
+                />
+              </div>
             ))}
           </div>
           {count > 1 && (

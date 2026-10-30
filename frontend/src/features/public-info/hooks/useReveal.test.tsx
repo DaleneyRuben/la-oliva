@@ -7,7 +7,12 @@ function Probe({ stagger = false }: { stagger?: boolean }) {
   const reveal = useReveal<HTMLDivElement>({ stagger });
 
   return (
-    <div ref={reveal.ref} className={`card ${reveal.className}`} data-testid="probe">
+    <div
+      ref={reveal.ref}
+      className={`card ${reveal.className}`}
+      data-testid="probe"
+      data-visible={reveal.visible}
+    >
       hola
     </div>
   );
@@ -41,6 +46,7 @@ describe('useReveal', () => {
     const probe = screen.getByTestId('probe');
     expect(probe).toHaveClass('card', 'reveal');
     expect(probe).not.toHaveClass('is-visible');
+    expect(probe).toHaveAttribute('data-visible', 'false');
     expect(observe).toHaveBeenCalledWith(probe);
     expect(window.IntersectionObserver).toHaveBeenCalledWith(expect.any(Function), {
       threshold: 0.15,
@@ -59,6 +65,7 @@ describe('useReveal', () => {
       ]);
     });
     expect(probe).toHaveClass('reveal', 'is-visible');
+    expect(probe).toHaveAttribute('data-visible', 'true');
     expect(disconnect).toHaveBeenCalledTimes(1);
   });
 

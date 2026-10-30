@@ -36,3 +36,18 @@ it('opens the lunch and dinner plan modal from the highlighted button and closes
   fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 });
+
+it('starts downloading the plan flyers before the modal is opened', () => {
+  const OriginalImage = window.Image;
+  const requested: string[] = [];
+  window.Image = jest.fn(() => ({
+    set src(value: string) {
+      requested.push(value);
+    },
+  })) as unknown as typeof Image;
+
+  render(<PlanTypesSection />);
+
+  expect(requested).toHaveLength(2);
+  window.Image = OriginalImage;
+});

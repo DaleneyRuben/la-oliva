@@ -8,6 +8,7 @@ interface Options {
 interface Reveal<T extends HTMLElement> {
   ref: RefObject<T>;
   className: string;
+  visible: boolean;
 }
 
 // The share of the element that must be on screen before it reveals. Low enough that tall
@@ -53,5 +54,5 @@ export function useReveal<T extends HTMLElement>({ stagger = false }: Options = 
 
   const base = stagger ? 'reveal-stagger' : 'reveal';
 
-  return { ref, className: visible ? `${base} is-visible` : base };
+  return { ref, className: visible ? `${base} is-visible` : base, visible };
 }
