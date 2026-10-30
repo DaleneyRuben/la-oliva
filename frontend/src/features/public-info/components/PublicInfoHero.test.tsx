@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { WHATSAPP_URL } from '@/constants/contact.constants';
 import { PublicInfoHero } from './PublicInfoHero';
 
 jest.mock('@/assets/public-info/hero.jpg', () => ({ __esModule: true, default: 'hero.jpg' }));
@@ -17,7 +16,7 @@ it('renders the hero slide copy, photo and WhatsApp button', () => {
   ).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Quiero contratar' })).toHaveAttribute(
     'href',
-    WHATSAPP_URL,
+    'https://wa.link/mrujyv',
   );
   expect(screen.getByRole('img', { name: /Porciones de comida/ })).toHaveAttribute(
     'src',

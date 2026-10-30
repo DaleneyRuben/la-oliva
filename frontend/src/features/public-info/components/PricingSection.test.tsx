@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { WHATSAPP_URL } from '@/constants/contact.constants';
 import { PricingSection } from './PricingSection';
 
 it('renders both complete-plan prices and the delivery card', () => {
@@ -15,7 +14,7 @@ it('renders both complete-plan prices and the delivery card', () => {
   expect(screen.getByText('La fecha de inicio la decides tú.')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Quiero contratar mi plan' })).toHaveAttribute(
     'href',
-    WHATSAPP_URL,
+    'https://wa.link/mrujyv',
   );
 
   expect(screen.getByRole('heading', { name: 'Entregamos en La Paz' })).toBeInTheDocument();
@@ -26,7 +25,7 @@ it('renders both complete-plan prices and the delivery card', () => {
   ).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Consultar mi zona' })).toHaveAttribute(
     'href',
-    WHATSAPP_URL,
+    'https://wa.link/0jp5dy',
   );
   expect(document.getElementById('precios')).not.toBeNull();
   expect(document.getElementById('entregas')).toHaveClass('reveal');

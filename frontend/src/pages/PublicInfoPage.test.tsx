@@ -1,5 +1,4 @@
 import { render, screen, within } from '@testing-library/react';
-import { WHATSAPP_URL } from '@/constants/contact.constants';
 import { PublicInfoPage } from './PublicInfoPage';
 
 function renderPage() {
@@ -57,19 +56,19 @@ it('links the five summary cards to sections that exist on the page', () => {
   });
 });
 
-it('sends all four call-to-action buttons to WhatsApp', () => {
+it('sends each call-to-action button to its own WhatsApp link', () => {
   renderPage();
 
-  const names = [
-    'Quiero contratar',
-    'Quiero contratar mi plan',
-    'Consultar mi zona',
-    'Tengo una consulta',
-  ];
+  const links = {
+    'Quiero contratar': 'https://wa.link/mrujyv',
+    'Quiero contratar mi plan': 'https://wa.link/mrujyv',
+    'Consultar mi zona': 'https://wa.link/0jp5dy',
+    'Tengo una consulta': 'https://wa.link/y0xmrv',
+  };
 
-  names.forEach((name) => {
+  Object.entries(links).forEach(([name, href]) => {
     const link = screen.getByRole('link', { name });
-    expect(link).toHaveAttribute('href', WHATSAPP_URL);
+    expect(link).toHaveAttribute('href', href);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
   });
