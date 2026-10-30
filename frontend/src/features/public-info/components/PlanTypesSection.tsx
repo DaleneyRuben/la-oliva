@@ -1,6 +1,7 @@
-import { Icon } from '@ui/Icon';
+import { Button } from '@ui/Button';
 import { PLAN_TYPES, TONE_TEXT } from '@/features/public-info/content';
 import { useReveal } from '@/features/public-info/hooks/useReveal';
+import { Botanical } from './Botanical';
 import { PublicInfoIcon } from './PublicInfoIcon';
 import { SectionHeading } from './SectionHeading';
 
@@ -8,8 +9,14 @@ export function PlanTypesSection() {
   const plans = useReveal<HTMLUListElement>({ stagger: true });
 
   return (
-    <section id="tipos-de-plan" className="border-y border-public-rule bg-public-paper">
-      <div className="mx-auto flex max-w-[1200px] flex-col items-center gap-7 px-6 py-[72px]">
+    <section
+      id="tipos-de-plan"
+      className="relative overflow-hidden border-y border-public-rule bg-public-paper"
+    >
+      <Botanical name="branch" className="bottom-0 left-0 w-[120px] md:w-[200px]" />
+      <Botanical name="branch" className="bottom-0 right-0 w-[120px] -scale-x-100 md:hidden" />
+      <Botanical name="corner" className="right-0 top-[90px] hidden w-[120px] md:block" />
+      <div className="relative mx-auto flex max-w-[1200px] flex-col items-center gap-7 px-6 pb-[132px] pt-[72px] md:pb-[72px]">
         <div className="flex flex-col gap-2.5 text-center">
           <SectionHeading size="lg" align="center">
             Nuestros planes
@@ -37,12 +44,19 @@ export function PlanTypesSection() {
             </li>
           ))}
         </ul>
-        <p className="m-0 inline-flex items-center gap-3 rounded-full border border-public-orange bg-public-paper px-[22px] py-3 text-[14px] text-public-ink">
-          <span className="text-public-orange">
-            <Icon name="utensils" size={18} stroke={1.8} />
+        {/* TODO: the action behind this button is not defined yet. */}
+        <Button
+          variant="bare"
+          className="attention-pulse mt-2 w-full gap-3.5 rounded-[22px] bg-public-olive py-2.5 pl-2.5 pr-3 text-left text-[15px] font-semibold leading-snug text-public-cream hover:bg-public-ink md:w-auto md:gap-4 md:rounded-full md:text-[17px]"
+        >
+          <span className="inline-flex h-11 w-11 flex-none items-center justify-center rounded-full bg-public-cream text-public-olive">
+            <PublicInfoIcon name="cutlery" size={22} stroke={1.8} />
           </span>
-          Además contamos con plan de Almuerzos y/o Cena
-        </p>
+          <span className="flex-1">Además contamos con plan de Almuerzos y/o Cena</span>
+          <span className="inline-flex h-10 w-10 flex-none items-center justify-center rounded-full bg-public-cream/20">
+            <PublicInfoIcon name="chevron-right" size={18} stroke={2.2} />
+          </span>
+        </Button>
       </div>
     </section>
   );
