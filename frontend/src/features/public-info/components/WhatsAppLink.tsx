@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
-import { WHATSAPP_URL } from '@/constants/contact.constants';
 import { PublicInfoIcon } from './PublicInfoIcon';
 
 interface Props {
+  href: string;
   children: ReactNode;
   icon?: string;
   className?: string;
@@ -12,10 +12,10 @@ interface Props {
  * The slides' call-to-action pill. It is a link, not a button: every one of them opens the
  * business WhatsApp chat in a new tab.
  */
-export function WhatsAppLink({ children, icon = 'whatsapp', className = '' }: Props) {
+export function WhatsAppLink({ href, children, icon = 'whatsapp', className = '' }: Props) {
   return (
     <a
-      href={WHATSAPP_URL}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className={`inline-flex items-center gap-3 rounded-full bg-public-olive px-[26px] py-4 text-[13px] font-semibold uppercase tracking-[0.14em] text-public-cream no-underline transition hover:bg-public-ink active:scale-[0.98] ${className}`}
