@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { DailyPlanSection } from './DailyPlanSection';
 
-it('renders the seven meals with their photos shown whole', () => {
+it('renders the seven meals with their photos filling each card', () => {
   render(<DailyPlanSection />);
 
   expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
@@ -17,7 +17,7 @@ it('renders the seven meals with their photos shown whole', () => {
     'Jugo vitamínico',
   ]);
   screen.getAllByRole('img').forEach((img) => {
-    expect(img).toHaveClass('object-contain');
+    expect(img).toHaveClass('object-cover');
   });
   expect(screen.getByText('5 o 6 comidas diarias')).toBeInTheDocument();
   expect(screen.getByText('+ jugo vitamínico')).toBeInTheDocument();
