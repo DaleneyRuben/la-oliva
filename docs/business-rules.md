@@ -145,12 +145,16 @@ The public host also serves an unauthenticated **information page** at `/` (reac
 as one scrolling, mobile-first page: every visible string is copied from the slides verbatim, with
 no header, navigation bar or sign-up control added. The logos, olive branches and meal photos are
 cut from the slides and the manager's logo files. Its four call-to-action buttons open the
-business WhatsApp chat; nothing on it links to `/registro` unless the manager asks for it. The one
-addition the manager asked for is a highlighted **Además contamos con plan de Almuerzos y/o Cena**
-button under the plan types, whose action is not defined yet. The
-plan names and prices on it are marketing copy kept in frontend constants, not the Plans catalog,
-so a price change on the page is a copy edit and never follows an admin's plan edit. Unknown paths
-on the public host redirect to this page.
+business WhatsApp chat through the manager's wa.link short links, one per purpose: both contract
+buttons (**Quiero contratar** and **Quiero contratar mi plan**) share one, while **Consultar mi
+zona** and **Tengo una consulta** each have their own. Nothing on it links to `/registro` unless
+the manager asks for it. The one addition the manager asked for is a highlighted **Además contamos
+con plan de Almuerzos y/o Cena** button under the plan types. It opens a modal showing the
+manager's flyers for that plan — a carousel once there is more than one — with a **Quiero
+contratar un plan** button that uses the contract link. The plan names and prices on it are
+marketing copy kept in frontend constants, not the Plans catalog, so a price change on the page is
+a copy edit and never follows an admin's plan edit. Unknown paths on the public host redirect to
+this page.
 
 ### Restrictions field
 
